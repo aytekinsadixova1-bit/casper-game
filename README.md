@@ -1,2 +1,5 @@
 # casper-game
-My Telegram Game 
+
+My Telegram Game
+
+![Casper Oyun Şəkli](caspergame.png)
