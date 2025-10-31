@@ -29,7 +29,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Arial', sans-serif;
         }
 
         body {
@@ -44,15 +44,14 @@
         .container {
             width: 100%;
             max-width: 400px;
-            background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: white;
+            border-radius: 0;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
             margin: 0;
             position: relative;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
         .splash-screen {
@@ -70,13 +69,12 @@
             width: 200px; 
             height: 200px; 
             margin-bottom: 20px; 
-            border-radius: 50%;
+            border-radius: 0;
             overflow: visible;
             background: transparent;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
         }
         .splash-image img { 
             width: 100%; 
@@ -87,16 +85,15 @@
         }
         .splash-text { 
             color: white; 
-            font-size: 32px; 
-            font-weight: 900; 
+            font-size: 24px; 
+            font-weight: bold; 
             text-align: center; 
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5); 
             margin-bottom: 10px;
-            letter-spacing: 2px;
         }
         .splash-subtext {
             color: rgba(255,255,255,0.8);
-            font-size: 16px;
+            font-size: 14px;
             text-align: center;
             margin-bottom: 20px;
             max-width: 300px;
@@ -104,17 +101,17 @@
         }
         .loading-bar { 
             width: 200px; 
-            height: 6px; 
+            height: 4px; 
             background: rgba(255,255,255,0.3); 
-            border-radius: 3px; 
+            border-radius: 2px; 
             margin-top: 20px; 
             overflow: hidden; 
         }
         .loading-progress { 
             width: 0%; 
             height: 100%; 
-            background: linear-gradient(90deg, #00b894, #55efc4); 
-            border-radius: 3px; 
+            background: white; 
+            border-radius: 2px; 
             animation: loading 5s linear forwards; 
         }
         @keyframes loading { 
@@ -129,13 +126,11 @@
         }
 
         .header {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
             color: white; text-align: center; padding: 20px; flex-shrink: 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .header h1 { font-size: 32px; margin-bottom: 5px; font-weight: 900; letter-spacing: 2px; text-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .header h1 { font-size: 32px; margin-bottom: 0px; font-weight: 900; letter-spacing: 2px; }
         .header p { font-size: 16px; opacity: 0.9; margin-top: 5px; }
         
         .content {
@@ -145,15 +140,14 @@
         }
         
         .banner-area {
-            width: 100%; height: 50px; background-color: rgba(0, 0, 0, 0.3); color: white;
+            width: 100%; height: 50px; background-color: #333; color: white;
             display: flex; justify-content: center; align-items: center;
             font-size: 12px; font-weight: bold; text-transform: uppercase;
             letter-spacing: 1px; flex-shrink: 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .top-banner { border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        .bottom-banner { border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .top-banner { border-bottom: 2px solid #0f3460; background: #252525; }
+        .bottom-banner { border-top: 2px solid #0f3460; background: #252525; }
 
         .game-screen { 
             display: none; 
@@ -170,78 +164,29 @@
             flex-grow: 1;
         }
         
-        .energy-container { 
-            margin-bottom: 15px; 
-            padding: 10px 0; 
-        }
-        
-        .energy-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.8);
-        }
-        
-        .energy-bar { 
-            width: 100%; 
-            height: 20px; 
-            background: rgba(255, 255, 255, 0.1); 
-            border-radius: 10px; 
-            overflow: hidden; 
-            position: relative; 
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .energy-fill { 
-            height: 100%; 
-            border-radius: 10px; 
-            transition: width 0.3s ease, background 0.5s ease; 
-            position: relative; 
-            background: linear-gradient(90deg, #00b894, #55efc4);
-            box-shadow: 0 0 10px rgba(0, 184, 148, 0.5);
-        }
-        .energy-text { 
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            font-size: 12px; 
-            font-weight: bold; 
-            color: white; 
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5); 
-        }
-        .ad-counter-container { 
-            text-align: center; 
-            margin-top: 10px; 
-            font-size: 12px; 
-            color: rgba(255, 255, 255, 0.7); 
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px;
-            border-radius: 8px;
-        }
-        .click-area { 
-            text-align: center; 
-            margin: 30px 0 20px 0; 
-            position: relative; 
-        } 
+        .energy-container { margin-bottom: 5px; padding: 10px 0; border-bottom: 1px solid #e9ecef; border-top: 1px solid #e9ecef; }
+        .energy-bar { width: 100%; height: 20px; background: #e9ecef; border-radius: 10px; overflow: hidden; position: relative; }
+        .energy-fill { height: 100%; border-radius: 10px; transition: width 0.3s ease, background 0.5s ease; position: relative; }
+        .energy-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; font-weight: bold; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .ad-counter-container { text-align: center; margin-top: 5px; font-size: 12px; color: #6c757d; }
+        .click-area { text-align: center; margin: 30px 0 5px 0; position: relative; } 
         
         .main-icon { 
-            width: 180px; 
-            height: 180px; 
+            width: 150px; 
+            height: 150px; 
             background: transparent !important;
-            border-radius: 50%;
+            border-radius: 0;
             margin: 0 auto; 
             cursor: pointer; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+            box-shadow: none !important;
             transition: all 0.3s ease; 
             user-select: none; 
             border: none !important;
             overflow: visible !important;
             position: relative;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
         }
 
         .main-icon img { 
@@ -392,312 +337,59 @@
             }
         }
 
-        .stats-block { 
-            margin: 25px 0 20px 0; 
-            padding: 15px; 
-            border-radius: 15px; 
-            background: rgba(255, 255, 255, 0.1); 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .money-stat-small { 
-            background: linear-gradient(135deg, #00b894, #55efc4); 
-            color: white; 
-            padding: 15px; 
-            border-radius: 12px; 
-            text-align: center; 
-            margin-bottom: 0; 
-            box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3);
-        }
-        .money-stat-small .stat-value { 
-            font-size: 24px; 
-            font-weight: bold; 
-        }
-        .money-stat-small .stat-label { 
-            font-size: 14px; 
-            text-transform: uppercase; 
-            margin-top: 5px; 
-            opacity: 0.9;
-        }
-        .score-popup, .money-popup { 
-            position: absolute; 
-            font-weight: bold; 
-            pointer-events: none; 
-            animation: floatUp 1.2s ease-out forwards; 
-            z-index: 50; 
-        }
-        .money-popup { 
-            color: #00b894; 
-            font-size: 16px; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-        @keyframes floatUp { 
-            0% { 
-                opacity: 1; 
-                transform: translate(-50%, 0) scale(1); 
-            } 
-            100% { 
-                opacity: 0; 
-                transform: translate(-50%, -50px) scale(1.2); 
-            } 
-        }
+        .stats-block { margin: 25px 0 20px 0; padding: 10px; border-radius: 12px; background: #f8f9fa; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .money-stat-small { background: #d4edda; color: #155724; padding: 10px 15px; border-radius: 8px; text-align: center; margin-bottom: 0; }
+        .money-stat-small .stat-value { font-size: 18px; font-weight: bold; }
+        .money-stat-small .stat-label { font-size: 12px; text-transform: uppercase; margin-top: 2px; }
+        .score-popup, .money-popup { position: absolute; font-weight: bold; pointer-events: none; animation: floatUp 1.2s ease-out forwards; z-index: 50; }
+        .money-popup { color: #155724; font-size: 16px; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translate(-50%, 0) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50px) scale(1.2); } }
         
-        .navbar { 
-            display: flex; 
-            justify-content: space-around; 
-            background: rgba(255, 255, 255, 0.1); 
-            padding: 15px 0; 
-            border-top: 1px solid rgba(255, 255, 255, 0.1); 
-            flex-shrink: 0; 
-            backdrop-filter: blur(10px);
-        }
-        .nav-item { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            color: rgba(255, 255, 255, 0.7); 
-            font-size: 12px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: all 0.3s ease; 
-            text-align: center; 
-            width: 70px; 
-        }
-        .nav-icon-wrapper { 
-            width: 50px; 
-            height: 50px; 
-            background: rgba(255, 255, 255, 0.1); 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            margin-bottom: 5px; 
-            transition: all 0.3s ease; 
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .nav-item i { 
-            font-size: 22px; 
-            color: rgba(255, 255, 255, 0.7); 
-            transition: color 0.3s ease; 
-        }
-        .nav-item.active { 
-            color: white; 
-        }
-        .nav-item.active .nav-icon-wrapper { 
-            background: linear-gradient(135deg, #00b894, #55efc4); 
-            box-shadow: 0 0 15px rgba(0, 184, 148, 0.5); 
-        }
-        .nav-item.active i { 
-            color: white; 
-        }
+        .navbar { display: flex; justify-content: space-around; background: #1a1a2e; padding: 10px 0; border-top: 5px solid #0f3460; flex-shrink: 0; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #6c757d; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 70px; }
+        .nav-icon-wrapper { width: 50px; height: 50px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; transition: all 0.3s ease; }
+        .nav-item i { font-size: 22px; color: #6c757d; transition: color 0.3s ease; }
+        .nav-item.active { color: white; }
+        .nav-item.active .nav-icon-wrapper { background: #0f3460; box-shadow: 0 0 10px #0f3460; }
+        .nav-item.active i { color: white; }
 
-        .tabs { 
-            display: flex; 
-            margin-bottom: 20px; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            background: rgba(255, 255, 255, 0.1); 
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            backdrop-filter: blur(10px);
-        }
-        .tab { 
-            flex: 1; 
-            padding: 12px; 
-            text-align: center; 
-            cursor: pointer; 
-            transition: all 0.3s ease; 
-            font-weight: 600; 
-            color: rgba(255, 255, 255, 0.7); 
-            font-size: 14px; 
-        }
-        .tab.active { 
-            background: linear-gradient(135deg, #00b894, #55efc4); 
-            color: white; 
-            box-shadow: 0 2px 10px rgba(0, 184, 148, 0.3);
-        }
-        .form { 
-            display: none; 
-        }
-        .form.active { 
-            display: block; 
-            animation: fadeIn 0.5s ease; 
-        }
-        .input-group { 
-            margin-bottom: 15px; 
-        }
-        .input-group label { 
-            display: block; 
-            margin-bottom: 6px; 
-            font-weight: 600; 
-            color: rgba(255, 255, 255, 0.9); 
-            font-size: 14px; 
-        }
-        .input-group input, .input-group select { 
-            width: 100%; 
-            padding: 12px; 
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            border-radius: 8px; 
-            font-size: 14px; 
-            transition: border-color 0.3s; 
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-        .input-group input:focus, .input-group select:focus { 
-            border-color: #00b894; 
-            outline: none; 
-            box-shadow: 0 0 0 3px rgba(0, 184, 148, 0.1); 
-        }
-        .input-group input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
+        .tabs { display: flex; margin-bottom: 20px; border-radius: 12px; overflow: hidden; background: #f8f9fa; border: 2px solid #e9ecef; }
+        .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; transition: all 0.3s ease; font-weight: 600; color: #6c757d; font-size: 14px; }
+        .tab.active { background: #0f3460; color: white; }
+        .form { display: none; }
+        .form.active { display: block; animation: fadeIn 0.5s ease; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 6px; font-weight: 600; color: #495057; font-size: 14px; }
+        .input-group input, .input-group select { width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 14px; transition: border-color 0.3s; }
+        .input-group input:focus, .input-group select:focus { border-color: #0f3460; outline: none; box-shadow: 0 0 0 3px rgba(15, 52, 96, 0.1); }
         .btn {
-            width: 100%; 
-            padding: 14px; 
-            background: linear-gradient(135deg, #00b894, #55efc4);
-            color: white; 
-            border: none; 
-            border-radius: 10px; 
-            font-size: 16px; 
-            font-weight: 600;
-            cursor: pointer; 
-            transition: all 0.3s ease; 
-            margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3);
+            width: 100%; padding: 14px; background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
+            color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease; margin-top: 10px;
         }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 184, 148, 0.4);
-        }
-        .message { 
-            padding: 10px; 
-            border-radius: 6px; 
-            margin-bottom: 15px; 
-            text-align: center; 
-            display: none; 
-            font-weight: 600; 
-            font-size: 14px; 
-        }
-        .error { 
-            background: rgba(255, 107, 107, 0.2); 
-            color: #ff6b6b; 
-            border: 1px solid rgba(255, 107, 107, 0.3); 
-        }
-        .success { 
-            background: rgba(0, 184, 148, 0.2); 
-            color: #00b894; 
-            border: 1px solid rgba(0, 184, 148, 0.3); 
-        }
+        .message { padding: 10px; border-radius: 6px; margin-bottom: 15px; text-align: center; display: none; font-weight: 600; font-size: 14px; }
+        .error { background: #ffe6e6; color: #d63031; border: 2px solid #ff7675; }
+        .success { background: #e6f7e6; color: #00b894; border: 2px solid #55efc4; }
 
-        .sub-header { 
-            font-size: 20px; 
-            color: white; 
-            margin-bottom: 15px; 
-            padding-bottom: 5px; 
-            border-bottom: 2px solid #00b894; 
-        }
-        .profile-item { 
-            background: rgba(255, 255, 255, 0.1); 
-            padding: 15px; 
-            border-radius: 10px; 
-            margin-bottom: 10px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .profile-info h4 { 
-            font-size: 14px; 
-            color: white; 
-            margin-bottom: 4px; 
-            font-weight: 700; 
-        }
-        .profile-info p { 
-            font-size: 14px; 
-            color: rgba(255, 255, 255, 0.8); 
-            font-weight: 500; 
-        }
-        .referral-container { 
-            background: rgba(0, 184, 148, 0.2); 
-            padding: 15px; 
-            border-radius: 10px; 
-            margin-top: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            text-align: center; 
-            border: 1px solid rgba(0, 184, 148, 0.3);
-        }
-        .referral-code { 
-            font-size: 18px; 
-            font-weight: bold; 
-            color: #00b894; 
-            margin: 10px 0; 
-            padding: 5px 10px; 
-            background: rgba(255, 255, 255, 0.1); 
-            border-radius: 5px; 
-            border: 1px dashed #00b894; 
-        }
-        .copy-btn { 
-            background: linear-gradient(135deg, #00b894, #00cec9); 
-            color: white; 
-            padding: 8px 15px; 
-            border-radius: 8px; 
-            font-size: 12px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            border: none; 
-            transition: opacity 0.3s; 
-            margin-top: 10px; 
-            box-shadow: 0 2px 10px rgba(0, 184, 148, 0.3);
-        }
-        .friend-item { 
-            background: rgba(255, 255, 255, 0.1); 
-            padding: 15px; 
-            border-radius: 10px; 
-            margin-bottom: 10px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
-        }
-        .settings-btn-group { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-            margin-top: 15px; 
-        }
-        .settings-btn { 
-            padding: 12px; 
-            border-radius: 8px; 
-            font-size: 14px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            text-align: left; 
-            transition: background 0.3s; 
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-        .settings-btn i { 
-            margin-right: 10px; 
-            color: #00b894; 
-        }
-        .delete-btn { 
-            background: rgba(255, 107, 107, 0.2); 
-            color: #ff6b6b; 
-            border: 1px solid rgba(255, 107, 107, 0.3); 
-            margin-top: 15px; 
-        }
+        .sub-header { font-size: 20px; color: #0f3460; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 2px solid #0f3460; }
+        .profile-item { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .profile-info h4 { font-size: 14px; color: #1a1a2e; margin-bottom: 4px; font-weight: 700; }
+        .profile-info p { font-size: 14px; color: #6c757d; font-weight: 500; }
+        .referral-container { background: #d4edda; padding: 15px; border-radius: 10px; margin-top: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .referral-code { font-size: 18px; font-weight: bold; color: #155724; margin: 10px 0; padding: 5px 10px; background: white; border-radius: 5px; border: 1px dashed #00b894; }
+        .copy-btn { background: linear-gradient(135deg, #00b894, #00cec9); color: white; padding: 8px 15px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: opacity 0.3s; margin-top: 10px; }
+        .friend-item { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .settings-btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .settings-btn { padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; text-align: left; transition: background 0.3s; border: 1px solid #e9ecef; }
+        .settings-btn i { margin-right: 10px; color: #0f3460; }
+        .delete-btn { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; margin-top: 15px; }
 
         .social-share-container { 
             display: flex; 
             justify-content: space-around; 
             margin: 20px 0; 
             padding: 10px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid #e9ecef;
         }
         .social-icon-btn {
             width: 60px; height: 60px;
@@ -721,76 +413,44 @@
             overflow: auto; background-color: rgba(0,0,0,0.4); justify-content: center; align-items: center;
         }
         .modal-content {
-            background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%); 
-            margin: auto; 
-            padding: 20px; 
-            border-radius: 15px;
-            width: 90%; 
-            max-width: 350px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            background-color: #fff; margin: auto; padding: 20px; border-radius: 15px;
+            width: 90%; max-width: 350px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             animation: slideUp 0.3s;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
         }
-        .close-btn { 
-            color: rgba(255, 255, 255, 0.7); 
-            float: right; 
-            font-size: 28px; 
-            font-weight: bold; 
-        }
-        .close-btn:hover, .close-btn:focus { 
-            color: white; 
-            text-decoration: none; 
-            cursor: pointer; 
-        }
-        .modal h2 { 
-            margin-top: 0; 
-            color: white; 
-            border-bottom: 2px solid #00b894; 
-            padding-bottom: 10px; 
-            margin-bottom: 15px; 
-        }
-        @keyframes slideUp { 
-            from { 
-                transform: translateY(100px); 
-                opacity: 0; 
-            } 
-            to { 
-                transform: translateY(0); 
-                opacity: 1; 
-            } 
-        }
+        .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+        .close-btn:hover, .close-btn:focus { color: #000; text-decoration: none; cursor: pointer; }
+        .modal h2 { margin-top: 0; color: #0f3460; border-bottom: 2px solid #0f3460; padding-bottom: 10px; margin-bottom: 15px; }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         .withdrawal-info {
-            background: rgba(33, 150, 243, 0.2);
+            background: #e3f2fd;
             padding: 15px;
             border-radius: 10px;
             margin: 15px 0;
             text-align: center;
             border-left: 4px solid #2196f3;
-            border: 1px solid rgba(33, 150, 243, 0.3);
         }
 
         .withdrawal-warning {
-            background: rgba(255, 193, 7, 0.2);
-            color: #ffc107;
+            background: #fff3cd;
+            color: #856404;
             padding: 12px;
             border-radius: 8px;
             margin-bottom: 15px;
             font-size: 14px;
             text-align: center;
-            border: 1px solid rgba(255, 193, 7, 0.3);
+            border: 1px solid #ffeeba;
         }
 
         .user-id-container {
-            background: linear-gradient(135deg, #00b894, #55efc4);
+            background: linear-gradient(135deg, #0f3460, #1a1a2e);
             color: white;
             padding: 15px;
             border-radius: 10px;
             margin: 15px 0;
             text-align: center;
             border: 2px solid #00b894;
-            box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3);
+            box-shadow: 0 4px 15px rgba(15, 52, 96, 0.3);
         }
 
         .user-id-badge {
@@ -925,13 +585,12 @@
         }
 
         .bonus-info {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 12px;
-            margin: 15px 0;
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
             text-align: center;
-            border-left: 4px solid #00b894;
-            backdrop-filter: blur(10px);
+            border-left: 4px solid #2196f3;
         }
 
         .welcome-message {
@@ -957,29 +616,28 @@
         }
 
         .invite-link-container {
-            background: rgba(255, 255, 255, 0.1);
+            background: #f8f9fa;
             padding: 15px;
             border-radius: 10px;
             margin: 15px 0;
-            border: 2px dashed #00b894;
-            backdrop-filter: blur(10px);
+            border: 2px dashed #0f3460;
         }
 
         .invite-link {
-            background: rgba(255, 255, 255, 0.1);
+            background: white;
             padding: 10px;
             border-radius: 8px;
             margin: 10px 0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid #e9ecef;
             word-break: break-all;
             font-size: 14px;
-            color: white;
+            color: #0f3460;
             font-weight: 600;
         }
 
         .amount-input-hint {
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.7);
+            color: #6c757d;
             margin-top: 5px;
             text-align: center;
         }
@@ -1009,7 +667,7 @@
         }
 
         .cg-id-badge {
-            background: linear-gradient(135deg, #00b894, #55efc4);
+            background: linear-gradient(135deg, #0f3460, #1a1a2e);
             color: white;
             padding: 8px 15px;
             border-radius: 20px;
@@ -1017,7 +675,7 @@
             font-size: 14px;
             display: inline-block;
             margin: 5px 0;
-            box-shadow: 0 2px 8px rgba(0, 184, 148, 0.3);
+            box-shadow: 0 2px 8px rgba(15, 52, 96, 0.3);
             border: 2px solid #00b894;
         }
         
@@ -1031,11 +689,10 @@
             display: flex;
             justify-content: space-between;
             margin: 15px 0;
-            background: rgba(255, 255, 255, 0.1);
+            background: #f8f9fa;
             padding: 15px;
             border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
+            border: 1px solid #e9ecef;
         }
         
         .stat-item {
@@ -1046,33 +703,32 @@
         .stat-value {
             font-size: 18px;
             font-weight: bold;
-            color: #00b894;
+            color: #0f3460;
         }
         
         .stat-label {
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.7);
+            color: #6c757d;
             margin-top: 5px;
         }
 
         .adsgram-video-btn {
             background: linear-gradient(45deg, #FF6B6B, #FF8E53);
             color: white;
-            padding: 15px 20px;
+            padding: 12px 20px;
             border: none;
-            border-radius: 25px;
-            font-size: 16px;
+            border-radius: 20px;
+            font-size: 14px;
             cursor: pointer;
             font-weight: bold;
-            margin: 10px 0;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            margin: 5px;
+            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
             transition: all 0.3s ease;
-            width: 100%;
         }
 
         .adsgram-video-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
         }
 
         .adsgram-video-btn:active {
@@ -1089,14 +745,6 @@
         .main-icon::before,
         .main-icon::after {
             display: none !important;
-        }
-        
-        .energy-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.8);
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -1206,7 +854,7 @@
                         <div class="input-group">
                             <label for="registerReferralCode">Dəvət Kodu</label>
                             <input type="text" id="registerReferralCode" placeholder="Dəvət kodunuzu daxil edin">
-                            <small style="color: rgba(255, 255, 255, 0.7); font-size: 12px;">İstəyə bağlı - dostunuzun dəvət kodunu daxil edin</small>
+                            <small style="color: #6c757d; font-size: 12px;">İstəyə bağlı - dostunuzun dəvət kodunu daxil edin</small>
                         </div>
                         
                         <button type="submit" class="btn">QEYDİYYATDAN KEÇ</button>
@@ -1221,7 +869,7 @@
 
                 <div class="header">
                     <h1>CASPER GAME</h1>
-                    <p id="welcomeText">Xoş gəldiniz, aytekin! 👋</p>
+                    <p id="welcomeText">Xoş gəldiniz, İstifadəçi! 👋</p>
                 </div>
                 
                 <div class="content">
@@ -1234,17 +882,13 @@
                         
                         <!-- REKLAM VƏ BONUS MƏLUMAT HİSSƏSİ -->
                         <div class="energy-container">
-                            <div class="energy-info">
-                                <span>Enerji:</span>
-                                <span id="energyText">100.000</span>
-                            </div>
                             <div class="energy-bar">
                                 <div class="energy-fill" id="energyFill" style="width: 100%">
-                                    <div class="energy-text" id="energyTextInner">100.000</div>
+                                    <div class="energy-text" id="energyText">100.000</div>
                                 </div>
                             </div>
                             <div class="ad-counter-container">
-                                <span>Növbəti reklam:</span> <span id="clicksUntilAdDisplay">14</span> klik
+                                <span>Növbəti reklam:</span> <span id="clicksUntilAdDisplay">30</span> klik
                             </div>
                         </div>
 
@@ -1253,7 +897,7 @@
                             <button onclick="showAdsGramRewardVideo()" class="adsgram-video-btn">
                                 🎬 Video İzlə & 0.001 AZN Qazan!
                             </button>
-                            <p style="font-size: 12px; color: rgba(255, 255, 255, 0.8); margin-top: 10px;">
+                            <p style="font-size: 12px; color: #6c757d; margin-top: 5px;">
                                 Hər video üçün 0.001 AZN bonus! Gündəlik limit yoxdur!
                             </p>
                         </div>
@@ -1266,21 +910,197 @@
                             <div class="main-icon" id="mainIcon">
                                 <img id="clickImage" src="https://i.ibb.co/hp0mdt1/2025-10-31-T103543-300-removebg-preview.png" alt="Casper" 
                                     onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22150%22 viewBox=%220 0 150 150%22><rect width=%22150%22 height=%22150%22 fill=%23ff7e5f/><text x=%2275%22 y=%2275%22 font-family=%22Arial%22 font-size=%2260%22 fill=%22white%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>👻</text></svg>'"
-                                    style="width: 100% !important; height: 100% !important; object-fit: contain !important; display: block !important; background: transparent !important;"
-                                    class="floating-ghost">
+                                    style="width: 100% !important; height: 100% !important; object-fit: contain !important; display: block !important; background: transparent !important;">
                             </div>
                         </div>
                         
                         <div class="stats-block">
                             <div class="money-stat-small">
-                                <div class="stat-value" id="totalMoney">0.007354 AZN</div> 
+                                <div class="stat-value" id="totalMoney">0.000000 AZN</div> 
                                 <div class="stat-label">CƏMİ QAZANC</div>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Diğer ekranlar aynı şekilde güncellenebilir -->
-                    
+                    <div class="game-sub-screen" id="profileScreen" style="display: none;">
+                        <h3 class="sub-header">👤 Profil Məlumatları</h3>
+                        
+                        <div class="profile-item">
+                            <div class="profile-info">
+                                <h4>CG ID:</h4>
+                                <div class="cg-id-badge" id="profileCGID">CG1</div>
+                            </div>
+                        </div>
+
+                        <div class="profile-item">
+                            <div class="profile-info">
+                                <h4>İstifadəçi Adı (Login):</h4>
+                                <p id="profileUsername">N/A</p>
+                            </div>
+                        </div>
+
+                        <div class="profile-item">
+                            <div class="profile-info">
+                                <h4>Ad Soyad:</h4>
+                                <p id="profileFullName">N/A</p>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-item">
+                            <div class="profile-info">
+                                <h4>Telefon Nömrəsi:</h4>
+                                <p id="profilePhone">N/A</p>
+                            </div>
+                        </div>
+
+                        <div class="profile-item">
+                            <div class="profile-info">
+                                <h4>E-poçt (Mail):</h4>
+                                <p id="profileEmail">N/A</p>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-item">
+                            <div class="profile-info">
+                                <h4>Qazanılmış Cəmi AZN:</h4> <p id="profileMoney">0.000000 AZN</p> </div>
+                        </div>
+
+                        <div class="referral-container">
+                            <h4>Dəvət Kodu (Dostlarınızla Paylaşın)</h4>
+                            <div class="referral-code" id="profileReferralCode">LOADING...</div>
+                            <button class="copy-btn" onclick="copyReferralCode()">Kodu Kopyala</button>
+                        </div>
+
+                        <h3 class="sub-header" style="margin-top: 20px;">⚙️ Tənzimləmələr</h3>
+                        
+                        <div class="settings-btn-group">
+                            <button class="settings-btn" onclick="openModal('editProfileModal')">
+                                <i class="fa-solid fa-pen-to-square"></i> <span>Adı / Məlumatları Dəyişdir</span>
+                            </button>
+                            <button class="settings-btn delete-btn" onclick="openModal('deleteProfileModal')">
+                                <i class="fa-solid fa-trash-can"></i> <span>Hesabı Sil</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="game-sub-screen" id="friendsScreen" style="display: none;">
+                        <h3 class="sub-header">🤝 Dostlarınızı Dəvət Edin</h3>
+                        
+                        <div class="bonus-info">
+                            <strong>Hər dəvət üçün 0.10 AZN bonus qazanın!</strong>
+                        </div>
+
+                        <div class="invite-link-container">
+                            <h4 style="text-align: center; margin-bottom: 15px;">🎁 Dəvət Məlumatlarınız</h4>
+                            <div class="invite-link" id="inviteLinkDisplay">
+                                Məlumatlar yüklənir...
+                            </div>
+                            <button class="copy-btn" onclick="copyInviteLink()" style="width: 100%;">
+                                <i class="fa-solid fa-copy"></i> Məlumatları Kopyala
+                            </button>
+                            <p style="text-align: center; margin-top: 10px; font-size: 12px; color: #6c757d;">
+                                Dostunuz qeydiyyat zamanı sizin dəvət kodunuzu daxil etməlidir!
+                            </p>
+                        </div>
+                        
+                        <div class="social-share-container">
+                            <div class="social-icon-btn whatsapp" onclick="shareOnWhatsApp()">
+                                <i class="fa-brands fa-whatsapp"></i>
+                            </div>
+                            <div class="social-icon-btn telegram" onclick="shareOnTelegram()">
+                                <i class="fa-brands fa-telegram"></i>
+                            </div>
+                            <div class="social-icon-btn" style="background: #1877F2;" onclick="shareOnFacebook()">
+                                <i class="fa-brands fa-facebook"></i>
+                            </div>
+                            <div class="social-icon-btn" style="background: #252525;" onclick="copyInviteLink()">
+                                <i class="fa-solid fa-link"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="referral-stats">
+                            <div class="stat-item">
+                                <div class="stat-value" id="successfulReferrals">0</div>
+                                <div class="stat-label">Uğurlu Dəvət</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="referralBonusTotal">0.00 AZN</div>
+                                <div class="stat-label">Cəmi Bonus</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="referralLimit">10</div>
+                                <div class="stat-label">Maksimum Limit</div>
+                            </div>
+                        </div>
+                        
+                        <div class="referral-container" style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba;">
+                            <h4 style="color: #856404;">Dəvət Bonus Qaydası</h4>
+                            <p style="font-size: 14px; margin-top: 5px;">
+                                Hər qeydiyyatdan keçən dostunuz üçün sizə **0.10 AZN** bonus verilir. Bonus yalnız ilk **10 uğurlu dəvət** üçün nəzərdə tutulub. </p>
+                        </div>
+                    </div>
+
+                    <div class="game-sub-screen" id="withdrawalScreen" style="display: none;">
+                        <h3 class="sub-header">💸 AZN Çıxarışı</h3> 
+                        
+                        <div class="user-id-container">
+                            <h4 style="margin-bottom: 10px; color: white;">🆔 Sizin User ID</h4>
+                            <div class="user-id-badge" id="withdrawalUserIdDisplay">Yüklənir...</div>
+                            <p style="color: #e0e0e0; font-size: 12px; margin-top: 8px;">
+                                Bu ID çıxarış sorğunuzda avtomatik olaraq adminə göndəriləcək
+                            </p>
+                        </div>
+
+                        <div class="withdrawal-info">
+                            <p><strong>Minimum çıxarış məbləği: 5.00 AZN</strong></p>
+                            <p><strong>Çıxarış limiti: 10 gündə 1 dəfə</strong></p>
+                            <p><strong>Maksimum çıxarış: 1000.00 AZN</strong></p>
+                            <p><strong>Çıxarış məlumatları avtomatik olaraq adminə göndəriləcək</strong></p>
+                        </div>
+
+                        <div class="withdrawal-warning">
+                            <p id="withdrawalTimerInfo">Növbəti çıxarış üçün: <strong id="nextWithdrawalTime">Hazır</strong></p>
+                        </div>
+                        
+                        <div class="friend-item">
+                            <div class="boost-info">
+                                <h4>Mövcud Balans:</h4>
+                                <p id="availableMoney">0.000000 AZN</p> 
+                            </div>
+                        </div>
+
+                        <form id="withdrawalForm">
+                            <div class="input-group">
+                                <label for="withdrawAmount">Çıxarmaq İstədiyiniz Məbləğ (AZN)</label> 
+                                <input type="number" step="0.01" id="withdrawAmount" placeholder="Məbləği daxil edin (Məs: 5.00)" required> 
+                                <div class="amount-input-hint" id="amountHint"></div>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="withdrawName">Ad</label>
+                                <input type="text" id="withdrawName" placeholder="Adınızı daxil edin" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="withdrawSurname">Soyad</label>
+                                <input type="text" id="withdrawSurname" placeholder="Soyadınızı daxil edin" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="withdrawPhone">Telefon Nömrəsi</label>
+                                <input type="tel" id="withdrawPhone" value="+994" placeholder="xx xxx xx xx" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="withdrawCardNumber">Kart Nömrəsi (16 Rəqəm)</label>
+                                <input type="text" id="withdrawCardNumber" placeholder="Kart Nömrəsini daxil edin" required pattern="\d{16}" maxlength="16">
+                            </div>
+                            <div class="input-group">
+                                <label for="withdrawCardHolder">Kart Sahibinin Adı Soyadı</label>
+                                <input type="text" id="withdrawCardHolder" placeholder="Kartın sahibinin ad/soyadı" required>
+                            </div>
+
+                            <button type="submit" class="btn" id="withdrawSubmitBtn">ÇIXARIŞ ET</button>
+                        </form>
+                    </div>
+
                 </div>
                 
                 <div class="navbar">
@@ -1314,8 +1134,42 @@
             </div>
         </div>
         
-        <!-- Modal pencereler aynı şekilde güncellenebilir -->
-        
+        <div id="editProfileModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal('editProfileModal')">&times;</span>
+                <h2>Məlumatları Dəyişdir</h2>
+                <form id="editProfileForm">
+                    <div class="input-group">
+                        <label for="editName">Ad</label>
+                        <input type="text" id="editName" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="editSurname">Soyad</label>
+                        <input type="text" id="editSurname" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="editEmail">E-poçt (Mail)</label>
+                        <input type="email" id="editEmail" required>
+                    </div>
+                    <button type="submit" class="btn" style="margin-top: 15px;">Yadda Saxla</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="deleteProfileModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal('deleteProfileModal')">&times;</span>
+                <h2>Hesabı Silmə</h2>
+                <div class="message error" style="display: block;">
+                    Hesabınızı silməkdə əminsiniz? Bu əməliyyat geri qaytarılmayacaq!
+                </div>
+                <div class="input-group">
+                    <label for="deleteConfirm">Təsdiq üçün "SİL" yazın</label>
+                    <input type="text" id="deleteConfirm" placeholder="SİL" required>
+                </div>
+                <button class="btn delete-btn" onclick="deleteProfile()">Hesabımı Sil</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1502,18 +1356,18 @@ function updateInviteLinkDisplay() {
         // Link və referral kodu ayrı-ayrı göstər
         inviteLinkDisplay.innerHTML = `
             <div style="margin-bottom: 15px; text-align: center;">
-                <strong style="color: white;">📱 Telegram Bot Linki:</strong><br>
-                <div style="background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 8px; margin: 8px 0; border: 1px solid rgba(255, 255, 255, 0.2); word-break: break-all;">
+                <strong style="color: #0f3460;">📱 Telegram Bot Linki:</strong><br>
+                <div style="background: white; padding: 10px; border-radius: 8px; margin: 8px 0; border: 1px solid #e9ecef; word-break: break-all;">
                     ${inviteLink}
                 </div>
             </div>
             <div style="margin-bottom: 15px; text-align: center;">
-                <strong style="color: white;">🎯 Dəvət Kodunuz:</strong><br>
-                <div style="background: rgba(0, 184, 148, 0.2); color: #00b894; padding: 12px; border-radius: 8px; margin: 8px 0; font-weight: bold; font-size: 18px; border: 1px dashed #00b894;">
+                <strong style="color: #0f3460;">🎯 Dəvət Kodunuz:</strong><br>
+                <div style="background: #d4edda; color: #155724; padding: 12px; border-radius: 8px; margin: 8px 0; font-weight: bold; font-size: 18px; border: 1px dashed #00b894;">
                     ${currentUserState.referralCode}
                 </div>
             </div>
-            <div style="margin-top: 10px; padding: 12px; background: rgba(255, 193, 7, 0.2); border-radius: 8px; font-size: 12px; color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.3);">
+            <div style="margin-top: 10px; padding: 12px; background: #fff3cd; border-radius: 8px; font-size: 12px; color: #856404; border: 1px solid #ffeeba;">
                 ⚠️ <strong>Diqqət:</strong> Dostunuz qeydiyyatdan keçərkən yuxarıdakı dəvət kodunuzu daxil etməlidir!
             </div>
         `;
@@ -2604,13 +2458,13 @@ document.getElementById('withdrawAmount').addEventListener('input', function(e) 
     const hint = document.getElementById('amountHint');
     
     if (amount < MIN_WITHDRAWAL_AMOUNT) {
-        hint.innerHTML = `<span style="color: #ff6b6b;">⚠️ Minimum ${MIN_WITHDRAWAL_AMOUNT.toFixed(2)} AZN</span>`;
+        hint.innerHTML = `<span style="color: #dc3545;">⚠️ Minimum ${MIN_WITHDRAWAL_AMOUNT.toFixed(2)} AZN</span>`;
     } else if (amount > currentUserState.totalMoney) {
-        hint.innerHTML = `<span style="color: #ff6b6b;">⚠️ Balansınız kifayət deyil</span>`;
+        hint.innerHTML = `<span style="color: #dc3545;">⚠️ Balansınız kifayət deyil</span>`;
     } else if (amount > MAX_WITHDRAWAL_AMOUNT) {
-        hint.innerHTML = `<span style="color: #ff6b6b;">⚠️ Maksimum ${MAX_WITHDRAWAL_AMOUNT.toFixed(2)} AZN</span>`;
+        hint.innerHTML = `<span style="color: #dc3545;">⚠️ Maksimum ${MAX_WITHDRAWAL_AMOUNT.toFixed(2)} AZN</span>`;
     } else {
-        hint.innerHTML = `<span style="color: #00b894;">✓ Məbləğ uyğundur</span>`;
+        hint.innerHTML = `<span style="color: #28a745;">✓ Məbləğ uyğundur</span>`;
     }
 });
 
