@@ -1000,15 +1000,15 @@
                         </div>
 
                         <div class="invite-link-container">
-                            <h4 style="text-align: center; margin-bottom: 15px;">🎁 Dəvət Linkiniz</h4>
+                            <h4 style="text-align: center; margin-bottom: 15px;">🎁 Dəvət Məlumatlarınız</h4>
                             <div class="invite-link" id="inviteLinkDisplay">
-                                Link yüklənir...
+                                Məlumatlar yüklənir...
                             </div>
                             <button class="copy-btn" onclick="copyInviteLink()" style="width: 100%;">
-                                <i class="fa-solid fa-copy"></i> Linki Kopyala
+                                <i class="fa-solid fa-copy"></i> Məlumatları Kopyala
                             </button>
                             <p style="text-align: center; margin-top: 10px; font-size: 12px; color: #6c757d;">
-                                Bu linki dostlarınızla paylaşın. Linkə klikləyəndə avtomatik olaraq sizin referans kodunuz əlavə olunacaq.
+                                Dostunuz qeydiyyat zamanı sizin dəvət kodunuzu daxil etməlidir!
                             </p>
                         </div>
                         
@@ -1364,47 +1364,79 @@ async function initializeCounter() {
 // =================================================================
 
 function generateInviteLink() {
-    if (!currentUserState.referralCode) return '';
-    
-    // Yeni format: https://t.me/Casper_Game_bot/directlink?start=REFERRAL_CODE
-    const inviteLink = `${TELEGRAM_BOT_URL}?start=${currentUserState.referralCode}`;
-    return inviteLink;
+    // Yalnız əsas linki qaytar
+    return TELEGRAM_BOT_URL;
 }
 
 function updateInviteLinkDisplay() {
     const inviteLink = generateInviteLink();
-    if (inviteLink) {
-        inviteLinkDisplay.textContent = inviteLink;
+    if (inviteLink && currentUserState.referralCode) {
+        // Link və referral kodu ayrı-ayrı göstər
+        inviteLinkDisplay.innerHTML = `
+            <div style="margin-bottom: 15px; text-align: center;">
+                <strong style="color: #0f3460;">📱 Telegram Bot Linki:</strong><br>
+                <div style="background: white; padding: 10px; border-radius: 8px; margin: 8px 0; border: 1px solid #e9ecef; word-break: break-all;">
+                    ${inviteLink}
+                </div>
+            </div>
+            <div style="margin-bottom: 15px; text-align: center;">
+                <strong style="color: #0f3460;">🎯 Dəvət Kodunuz:</strong><br>
+                <div style="background: #d4edda; color: #155724; padding: 12px; border-radius: 8px; margin: 8px 0; font-weight: bold; font-size: 18px; border: 1px dashed #00b894;">
+                    ${currentUserState.referralCode}
+                </div>
+            </div>
+            <div style="margin-top: 10px; padding: 12px; background: #fff3cd; border-radius: 8px; font-size: 12px; color: #856404; border: 1px solid #ffeeba;">
+                ⚠️ <strong>Diqqət:</strong> Dostunuz qeydiyyatdan keçərkən yuxarıdakı dəvət kodunuzu daxil etməlidir!
+            </div>
+        `;
     } else {
-        inviteLinkDisplay.textContent = "Dəvət kodu yoxdur";
+        inviteLinkDisplay.textContent = "Məlumatlar yüklənir...";
     }
 }
 
 function copyInviteLink() {
     const inviteLink = generateInviteLink();
-    if (!inviteLink) {
-        alert("Dəvət linki hazır deyil.");
+    const referralCode = currentUserState.referralCode;
+    
+    if (!inviteLink || !referralCode) {
+        alert("Dəvət məlumatları hazır deyil.");
         return;
     }
 
-    navigator.clipboard.writeText(inviteLink).then(() => {
-        alert("✅ Dəvət linki uğurla kopyalandı!\n\nLink: " + inviteLink);
+    const fullInfo = `🎮 Casper Game - Dost Dəvət Məlumatları:
+
+📱 Telegram Bot: ${inviteLink}
+🎯 Dəvət Kodum: ${referralCode}
+
+💡 Qeydiyyat zamanı dəvət kodumu daxil et!`;
+    
+    navigator.clipboard.writeText(fullInfo).then(() => {
+        alert("✅ Dəvət məlumatları uğurla kopyalandı!\n\nTelegram Bot Linki və Dəvət Kodunuz kopyalandı.");
     }).catch(() => {
-        const tempInput = document.createElement('input');
-        tempInput.value = inviteLink;
+        const tempInput = document.createElement('textarea');
+        tempInput.value = fullInfo;
         document.body.appendChild(tempInput);
         tempInput.select();
         document.execCommand('copy');
         document.body.removeChild(tempInput);
-        alert("✅ Dəvət linki uğurla kopyalandı!");
+        alert("✅ Dəvət məlumatları uğurla kopyalandı!");
     });
 }
 
 function shareOnWhatsApp() {
     const inviteLink = generateInviteLink();
-    if (!inviteLink) return;
+    const referralCode = currentUserState.referralCode;
+    if (!inviteLink || !referralCode) return;
     
-    const message = `Salam! Casper Game-də mənə qoşul və pul qazan! 🎮💰\n\nDəvət linkim: ${inviteLink}`;
+    const message = `🎮 Casper Game - Dost Dəvəti
+
+Salam! Casper Game-də mənə qoşul və pul qazan! 
+
+📱 Telegram Bot: ${inviteLink}
+🎯 Dəvət Kodum: ${referralCode}
+
+💡 Qeydiyyat zamanı yuxarıdakı dəvət kodumu daxil et! 🚀`;
+    
     const encodedMessage = encodeURIComponent(message);
     const url = `https://wa.me/?text=${encodedMessage}`;
     window.open(url, '_blank');
@@ -1412,10 +1444,18 @@ function shareOnWhatsApp() {
 
 function shareOnTelegram() {
     const inviteLink = generateInviteLink();
-    if (!inviteLink) return;
+    const referralCode = currentUserState.referralCode;
+    if (!inviteLink || !referralCode) return;
     
-    // Telegram paylaşım linki
-    const message = `Salam! Casper Game-də mənə qoşul və pul qazan! 🎮💰\n\nDəvət linkim: ${inviteLink}`;
+    const message = `🎮 Casper Game - Dost Dəvəti
+
+Salam! Casper Game-də mənə qoşul və pul qazan! 
+
+📱 Telegram Bot: ${inviteLink}
+🎯 Dəvət Kodum: ${referralCode}
+
+💡 Qeydiyyat zamanı yuxarıdakı dəvət kodumu daxil et! 🚀`;
+    
     const encodedMessage = encodeURIComponent(message);
     const url = `https://t.me/share/url?url=${encodeURIComponent(inviteLink)}&text=${encodedMessage}`;
     window.open(url, '_blank');
@@ -1423,9 +1463,17 @@ function shareOnTelegram() {
 
 function shareOnFacebook() {
     const inviteLink = generateInviteLink();
-    if (!inviteLink) return;
+    const referralCode = currentUserState.referralCode;
+    if (!inviteLink || !referralCode) return;
     
-    const message = `Salam! Casper Game-də mənə qoşul və pul qazan! 🎮💰`;
+    const message = `🎮 Casper Game - Dost Dəvəti
+
+Salam! Casper Game-də mənə qoşul və pul qazan! 
+
+Dəvət Kodum: ${referralCode}
+
+Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
+    
     const encodedMessage = encodeURIComponent(message);
     const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(inviteLink)}&quote=${encodedMessage}`;
     window.open(url, '_blank');
@@ -1433,7 +1481,7 @@ function shareOnFacebook() {
 
 function checkUrlForReferralCode() {
     const urlParams = new URLSearchParams(window.location.search);
-    const refCode = urlParams.get('ref') || urlParams.get('start');
+    const refCode = urlParams.get('ref');
     
     if (refCode) {
         document.getElementById('registerReferralCode').value = refCode;
