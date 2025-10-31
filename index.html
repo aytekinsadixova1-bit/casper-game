@@ -654,37 +654,13 @@
             animation: pulse 2s infinite;
         }
 
+        /* Firebase statusunu gizlə */
         .firebase-status {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            z-index: 10000;
+            display: none !important;
         }
 
         .debug-panel {
-            position: fixed;
-            top: 50px;
-            right: 10px;
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            z-index: 10000;
-            font-size: 12px;
-        }
-        .debug-btn {
-            margin: 2px;
-            padding: 5px;
-            background: #0f3460;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
+            display: none !important;
         }
 
         .cg-id-badge {
@@ -759,11 +735,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
-    <!-- Firebase Status Indicator -->
-    <div class="firebase-status" id="firebaseStatus">Firebase: Yüklənir...</div>
+    <!-- Firebase Status Indicator - GİZLƏ -->
+    <div class="firebase-status" id="firebaseStatus" style="display: none;">Firebase: Yüklənir...</div>
 
-    <!-- Debug Panel -->
-    <div class="debug-panel">
+    <!-- Debug Panel - GİZLƏ -->
+    <div class="debug-panel" style="display: none;">
         <button class="debug-btn" onclick="debugFirebase()">Firebase Status</button>
         <button class="debug-btn" onclick="debugGetAllUsers()">All Users</button>
         <button class="debug-btn" onclick="debugCheckUser(currentUserState.username || 'test')">Check User</button>
@@ -1203,25 +1179,16 @@ try {
     db = firebase.firestore();
     
     console.log('✅ Firebase uğurla işə salındı');
-    updateFirebaseStatus('success', '✅ Aktiv');
+    // Firebase statusu artıq göstərilmir
     
 } catch (error) {
     console.error('❌ Firebase xətası:', error);
-    updateFirebaseStatus('error', '❌ Xəta: ' + error.message);
+    // Firebase xətası da göstərilmir
 }
 
-// Firebase statusunu yenilə
+// Firebase statusunu yenilə (ARTIQ İSTİFADƏ EDİLMİR)
 function updateFirebaseStatus(status, message) {
-    const statusElement = document.getElementById('firebaseStatus');
-    statusElement.textContent = `Firebase: ${message}`;
-    
-    if (status === 'success') {
-        statusElement.style.background = 'rgba(0, 128, 0, 0.7)';
-    } else if (status === 'error') {
-        statusElement.style.background = 'rgba(255, 0, 0, 0.7)';
-    } else {
-        statusElement.style.background = 'rgba(255, 165, 0, 0.7)';
-    }
+    // Bu funksiya artıq heç nə etmir
 }
 
 // =================================================================
@@ -1495,7 +1462,7 @@ function checkUrlForReferralCode() {
 
 const IMAGE_CONFIG = {
     splashImage: "https://i.ibb.co/JFndRdvY/casper.jpg",
-    gameIcon: "https://ibb.co/SqS3m97/casper.jpg",
+    gameIcon: "https://i.ibb.co/1tQsKv7d/casper.jpg",
     fallbackText: "👻"
 };
 
@@ -2668,32 +2635,22 @@ function clickIcon(e) {
     createMoneyPopup(e, moneyEarned);
 }
 
-// Real-time Firebase Monitor
+// Real-time Firebase Monitor (ARTIQ İSTİFADƏ EDİLMİR)
 function monitorFirebase() {
-    if (!db) return;
-    
-    // Users kolleksiyasını dinlə
-    db.collection('users').onSnapshot((snapshot) => {
-        console.log('🔥 Firebase Real-time Update');
-        console.log('Ümumi istifadəçi sayı:', snapshot.size);
-    });
+    // Bu funksiya artıq heç nə etmir
 }
 
-// Debug funksiyaları
+// Debug funksiyaları (ARTIQ İSTİFADƏ EDİLMİR)
 function debugFirebase() {
-    console.log('=== FIREBASE DEBUG ===');
-    console.log('Auth:', auth);
-    console.log('Firestore:', db);
+    // Bu funksiya artıq heç nə etmir
 }
 
 function debugGetAllUsers() {
-    console.log('=== ALL USERS DEBUG ===');
-    console.log('Current User State:', currentUserState);
+    // Bu funksiya artıq heç nə etmir
 }
 
 function debugCheckUser(username) {
-    console.log(`=== USER DEBUG: ${username} ===`);
-    console.log('User Data:', currentUserState);
+    // Bu funksiya artıq heç nə etmir
 }
 
 // Başlanğıc funksiyası
@@ -2702,7 +2659,6 @@ window.addEventListener('load', async function() {
     
     console.log('🚀 Oyun başladılır...');
     checkUrlForReferralCode();
-    monitorFirebase();
     
     // CG ID sistemini initialize et
     await initializeCounter();
