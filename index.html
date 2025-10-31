@@ -81,6 +81,7 @@
             height: 100%; 
             object-fit: contain;
             border-radius: 0;
+            background: transparent !important;
         }
         .splash-text { 
             color: white; 
@@ -173,28 +174,30 @@
         .main-icon { 
             width: 150px; 
             height: 150px; 
-            background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
+            background: transparent !important;
             border-radius: 0;
             margin: 0 auto; 
             cursor: pointer; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            box-shadow: 0 10px 25px rgba(15, 52, 96, 0.4);
+            box-shadow: none !important;
             transition: all 0.3s ease; 
             user-select: none; 
-            border: 3px solid #0f3460;
-            overflow: hidden; 
+            border: none !important;
+            overflow: visible !important;
             position: relative;
         }
 
         .main-icon img { 
-            width: 80%; 
-            height: 80%; 
-            object-fit: contain;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain !important;
             border-radius: 0;
             transition: all 0.3s ease;
             filter: drop-shadow(0 5px 15px rgba(255, 255, 255, 0.5));
+            background: transparent !important;
+            display: block !important;
         }
 
         @keyframes windEffect {
@@ -731,6 +734,18 @@
         .adsgram-video-btn:active {
             transform: translateY(0);
         }
+
+        /* Şəkil yüklənmə xətaları üçün */
+        .splash-image img,
+        #clickImage {
+            background: transparent !important;
+        }
+
+        /* Köhnə gradient fonları sil */
+        .main-icon::before,
+        .main-icon::after {
+            display: none !important;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -893,9 +908,9 @@
 
                         <div class="click-area">
                             <div class="main-icon" id="mainIcon">
-                                <img id="clickImage" src="https://i.ibb.co/1tQsKv7d/casper.jpg" alt="Casper" 
+                                <img id="clickImage" src="https://i.ibb.co/hp0mdt1/2025-10-31-T103543-300-removebg-preview.png" alt="Casper" 
                                     onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22150%22 viewBox=%220 0 150 150%22><rect width=%22150%22 height=%22150%22 fill=%23ff7e5f/><text x=%2275%22 y=%2275%22 font-family=%22Arial%22 font-size=%2260%22 fill=%22white%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>👻</text></svg>'"
-                                    style="width: 100%; height: 100%; object-fit: contain; display: block;">
+                                    style="width: 100% !important; height: 100% !important; object-fit: contain !important; display: block !important; background: transparent !important;">
                             </div>
                         </div>
                         
