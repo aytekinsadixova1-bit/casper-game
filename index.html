@@ -14,35 +14,52 @@
 <!-- ✅ YENİ ADSGRAM REKLAM SDK -->
 <script async src="https://adsgram.ai/js/sdk.min.js"></script>
 <script>
-  window.addEventListener("load", () => {
-    if (window.Adsgram) {
-      console.log("✅ AdsGram SDK yükləndi!");
-      Adsgram.init();
+  (function loadAdsgramSDK() {
+    const s = document.createElement("script");
+    s.src = "https://adsgram.ai/js/sdk.min.js";
+    s.async = true;
+    s.onload = function() {
+      console.log("✅ AdsGram SDK faylı yükləndi, başlatmaq üçün gözləyirəm...");
+      initAdsgram();
+    };
+    s.onerror = function() {
+      console.error("❌ AdsGram SDK faylı yüklənmədi (şəbəkə və ya CORS problemi)");
+    };
+    document.head.appendChild(s);
+  })();
 
-      // Banner reklam (yuxarı hissədə)
-      Adsgram.display("banner", {
-        publisher: "15398",   // sənin platformId
-        adslot: "16650",      // sənin unitId
-        container: "adsgram-banner-1",
-        onDisplay: () => console.log("✅ Banner göstərildi!"),
-        onError: (err) => console.error("❌ Banner xətası:", err),
-      });
-
-      // Reward video (video izləyərək bonus qazan)
-      window.showAdsGramRewardVideo = function() {
-        Adsgram.display("rewarded", {
-          publisher: "15398",
-          adslot: "16650",
-          onDisplay: () => console.log("📺 Reward video başladı"),
-          onReward: () => alert("🎉 Video tamamlandı! Bonus qazandınız!"),
-          onError: (err) => console.error("❌ Reward xətası:", err),
-        });
-      };
-    } else {
-      console.error("❌ AdsGram SDK tapılmadı.");
+  function initAdsgram() {
+    if (!window.Adsgram) {
+      console.error("❌ AdsGram hələ də tapılmadı — 0.5 saniyəyə yenidən yoxlayıram...");
+      setTimeout(initAdsgram, 500);
+      return;
     }
-  });
+
+    console.log("✅ AdsGram SDK yükləndi və işləkdir!");
+    Adsgram.init();
+
+    // Banner reklam
+    Adsgram.display("banner", {
+      publisher: "15398",
+      adslot: "16650",
+      container: "adsgram-banner-1",
+      onDisplay: () => console.log("✅ Banner göstərildi!"),
+      onError: (err) => console.error("❌ Banner xətası:", err),
+    });
+
+    // Reward video
+    window.showAdsGramRewardVideo = function() {
+      Adsgram.display("rewarded", {
+        publisher: "15398",
+        adslot: "16650",
+        onDisplay: () => console.log("📺 Reward video başladı"),
+        onReward: () => alert("🎉 Video tamamlandı! Bonus qazandınız!"),
+        onError: (err) => console.error("❌ Reward xətası:", err),
+      });
+    };
+  }
 </script>
+
     
     <style>
         * {
