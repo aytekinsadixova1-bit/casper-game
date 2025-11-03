@@ -12,31 +12,7 @@
     
     <!-- ADSGRAM AI REKLAM SİSTEMİ -->
     <script async src="https://adsgram.ai/js/sdk.min.js"></script>
-    <script>
-      (function loadAdsgramSDK() {
-        const s = document.createElement("script");
-        s.src = "https://adsgram.ai/js/sdk.min.js";
-        s.async = true;
-        s.onload = function() {
-          console.log("✅ AdsGram SDK faylı yükləndi, başlatmaq üçün gözləyirəm...");
-          initAdsgram();
-        };
-        s.onerror = function() {
-          console.error("❌ AdsGram SDK faylı yüklənmədi (şəbəkə və ya CORS problemi)");
-        };
-        document.head.appendChild(s);
-      })();
-
-      function initAdsgram() {
-        if (!window.Adsgram) {
-          console.error("❌ AdsGram hələ də tapılmadı — 0.5 saniyəyə yenidən yoxlayıram...");
-          setTimeout(initAdsgram, 500);
-          return;
-        }
-
-        console.log("✅ AdsGram SDK yükləndi və işləkdir!");
-        Adsgram.init();
-
+ 
         // Banner reklam
         Adsgram.display("banner", {
           publisher: "15398",
