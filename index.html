@@ -10,55 +10,14 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     
-    <!-- ADSGRAM AI REKLAM SİSTEMİ -->
-    <script async src="https://adsgram.ai/js/sdk.min.js"></script>
-    <script>
-      (function loadAdsgramSDK() {
-        const s = document.createElement("script");
-        s.src = "https://adsgram.ai/js/sdk.min.js";
-        s.async = true;
-        s.onload = function() {
-          console.log("✅ AdsGram SDK faylı yükləndi, başlatmaq üçün gözləyirəm...");
-          initAdsgram();
-        };
-        s.onerror = function() {
-          console.error("❌ AdsGram SDK faylı yüklənmədi (şəbəkə və ya CORS problemi)");
-        };
-        document.head.appendChild(s);
-      })();
-
-      function initAdsgram() {
-        if (!window.Adsgram) {
-          console.error("❌ AdsGram hələ də tapılmadı — 0.5 saniyəyə yenidən yoxlayıram...");
-          setTimeout(initAdsgram, 500);
-          return;
-        }
-
-        console.log("✅ AdsGram SDK yükləndi və işləkdir!");
-        Adsgram.init();
-
-        // Banner reklam
-        Adsgram.display("banner", {
-          publisher: "15398",
-          adslot: "16650",
-          container: "adsgram-banner-1",
-          onDisplay: () => console.log("✅ Banner göstərildi!"),
-          onError: (err) => console.error("❌ Banner xətası:", err),
-        });
-
-        // Reward video
-        window.showAdsGramRewardVideo = function() {
-          Adsgram.display("rewarded", {
-            publisher: "15398",
-            adslot: "16650",
-            onDisplay: () => console.log("📺 Reward video başladı"),
-            onReward: () => alert("🎉 Video tamamlandı! Bonus qazandınız!"),
-            onError: (err) => console.error("❌ Reward xətası:", err),
-          });
-        };
-      }
+    <!-- MONETAG/PROPELLERADS SDK -->
+    <script type="text/javascript">
+        var _paq = _paq || [];
+        _paq.push(['setPublisherId', '3097775']); // SİZİN PUBLISHER ID
+        _paq.push(['setAdType', 'rewarded']);
     </script>
-    
+    <script type="text/javascript" src="https://cdn.propellerads.com/static/loader.min.js" async></script>
+
     <style>
         * {
             margin: 0;
@@ -881,123 +840,29 @@
             border: 2px solid #00b894;
         }
 
-        .ad-screen {
-            display: none; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); 
-            z-index: 2000; 
-            align-items: center; 
-            justify-content: center; 
-            flex-direction: column; 
-            color: white; 
-            text-align: center;
-            padding: 20px;
-        }
-
-        .ad-content {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 40px 30px;
-            border-radius: 20px;
-            max-width: 320px;
-            width: 90%;
-            border: 3px solid;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            margin-bottom: 20px;
-        }
-
-        .ad-timer {
-            font-size: 48px;
-            font-weight: bold;
-            margin: 20px 0;
-            color: #00b894;
-            text-shadow: 0 0 10px rgba(0, 184, 148, 0.5);
-        }
-
-        .ad-message {
-            font-size: 14px;
-            color: #ccc;
-            margin-top: 10px;
-        }
-
-        .ad-counter {
-            font-size: 16px;
-            color: #ffd700;
-            margin: 10px 0;
-            font-weight: bold;
-        }
-
-        .ad-reward {
-            font-size: 18px;
-            color: #00b894;
-            font-weight: bold;
-            margin: 15px 0;
-            background: rgba(0, 184, 148, 0.2);
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid #00b894;
-        }
-
-        .ad-progress-container {
-            width: 90%;
-            max-width: 320px;
-            margin-top: 20px;
-        }
-
-        .ad-progress-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 3px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .ad-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00b894, #55efc4);
-            border-radius: 3px;
-            width: 100%;
-            transition: width 1s linear;
-        }
-
-        .ad-progress-text {
-            font-size: 12px;
-            color: #ccc;
-            text-align: center;
-        }
-
-        .ad-premium { border-color: #ff6b6b; }
-        .ad-special { border-color: #4ecdc4; }
-        .ad-bonus { border-color: #45b7d1; }
-
-        .ad-skip-btn {
-            background: rgba(255, 255, 255, 0.2);
+        .monetag-video-btn {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
             color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 8px 16px;
+            padding: 12px 20px;
+            border: none;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 4vw;
+            max-font-size: 14px;
             cursor: pointer;
-            margin-top: 15px;
+            font-weight: bold;
+            margin: 5px;
+            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
             transition: all 0.3s ease;
+            width: 100%;
         }
 
-        .ad-skip-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
+        .monetag-video-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
         }
 
-        @keyframes adPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .ad-pulse {
-            animation: adPulse 2s ease-in-out infinite;
+        .monetag-video-btn:active {
+            transform: translateY(0);
         }
 
         .bonus-info {
@@ -1079,7 +944,6 @@
             animation: pulse 2s infinite;
         }
 
-        /* Firebase statusunu gizlə */
         .firebase-status {
             display: none !important;
         }
@@ -1135,31 +999,6 @@
             max-font-size: 12px;
             color: #6c757d;
             margin-top: 5px;
-        }
-
-        .adsgram-video-btn {
-            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 20px;
-            font-size: 4vw;
-            max-font-size: 14px;
-            cursor: pointer;
-            font-weight: bold;
-            margin: 5px;
-            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-
-        .adsgram-video-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
-        }
-
-        .adsgram-video-btn:active {
-            transform: translateY(0);
         }
 
         /* Şəkil yüklənmə xətaları üçün */
@@ -1279,10 +1118,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
-    <!-- Firebase Status Indicator - GİZLƏ -->
     <div class="firebase-status" id="firebaseStatus" style="display: none;">Firebase: Yüklənir...</div>
 
-    <!-- Debug Panel - GİZLƏ -->
     <div class="debug-panel" style="display: none;">
         <button class="debug-btn" onclick="debugFirebase()">Firebase Status</button>
         <button class="debug-btn" onclick="debugGetAllUsers()">All Users</button>
@@ -1299,17 +1136,6 @@
             <div class="splash-subtext">Pul qazanmaq üçün kliklə və qazan! 🚀</div>
             <div class="loading-bar">
                 <div class="loading-progress"></div>
-            </div>
-        </div>
-        
-        <div class="ad-screen" id="adScreen">
-            <div class="ad-content" id="adContent">
-                </div>
-            <div class="ad-progress-container">
-                <div class="ad-progress-bar">
-                    <div class="ad-progress-fill" id="adProgressFill"></div>
-                </div>
-                <div class="ad-progress-text" id="adProgressText">Reklam bitir: 10s</div>
             </div>
         </div>
         
@@ -1393,8 +1219,8 @@
             
             <div class="game-screen" id="gameScreen" style="display: none;">
                 
-                <!-- ADSGRAM BANNER REKLAM -->
-                <div id="adsgram-banner-1" style="width: 100%; height: 50px; background: transparent;"></div>
+                <!-- MONETAG BANNER REKLAM -->
+                <div id="monetag-banner-1" style="width: 100%; height: 50px; background: transparent;"></div>
 
                 <div class="header">
                     <h1>CASPER GAME</h1>
@@ -1421,18 +1247,18 @@
                             </div>
                         </div>
 
-                        <!-- YENİ ADSGRAM REWARD VIDEO DÜYMƏSİ -->
+                        <!-- YENİ MONETAG REWARD VIDEO DÜYMƏSİ -->
                         <div class="bonus-info" style="margin: 15px 0; text-align: center;">
-                            <button onclick="showAdsGramRewardVideo()" class="adsgram-video-btn">
-                                🎬 Video İzlə & 0.001 AZN Qazan!
+                            <button onclick="showMonetagRewardVideo()" class="monetag-video-btn">
+                                🎬 Video İzlə & 0.004 AZN Qazan! (Monetag)
                             </button>
                             <p style="font-size: 12px; color: #6c757d; margin-top: 5px;">
-                                Hər video üçün 0.001 AZN bonus! Gündəlik limit yoxdur!
+                                Hər video üçün 0.004 AZN bonus! Gündəlik limit yoxdur!
                             </p>
                         </div>
 
                         <div class="bonus-info">
-                            <strong>Reklam Bonusu:</strong> Hər reklam üçün <strong>0.0001 AZN</strong> (hər biri 10 saniyə)
+                            <strong>Reklam Bonusu:</strong> Hər reklam üçün <strong>0.004 AZN</strong> (Monetag Telegram)
                         </div>
 
                         <div class="click-area">
@@ -1656,8 +1482,8 @@
                 </div>
 
                 <div class="banner-area bottom-banner">
-                    <!-- ADSGRAM BANNER -->
-                    <div id="adsgram-banner-2" style="width: 100%; height: 50px; background: transparent;"></div>
+                    <!-- MONETAG BANNER -->
+                    <div id="monetag-banner-2" style="width: 100%; height: 50px; background: transparent;"></div>
                 </div>
 
             </div>
@@ -1723,109 +1549,88 @@ try {
     db = firebase.firestore();
     
     console.log('✅ Firebase uğurla işə salındı');
-    // Firebase statusu artıq göstərilmir
-    
 } catch (error) {
     console.error('❌ Firebase xətası:', error);
-    // Firebase xətası da göstərilmir
 }
 
-// Firebase statusunu yenilə (ARTIQ İSTİFADƏ EDİLMİR)
-function updateFirebaseStatus(status, message) {
-    // Bu funksiya artıq heç nə etmir
+// =================================================================
+// MONETAG/PROPELLERADS KONFİQURASİYASI
+// =================================================================
+const MONETAG_CONFIG = {
+    publisherId: "3097775", // SİZİN PUBLISHER ID
+    rewardAmount: 0.004, // AZN - Telegram üçün daha yüksək!
+    adFormats: ["rewarded", "banner"]
+};
+
+// MONETAG REWARD VIDEO FUNKSİYASI
+function showMonetagRewardVideo() {
+    if (typeof _paq === 'undefined') {
+        console.error('❌ Monetag SDK yüklənməyib');
+        alert('🎬 Reklam sistemi hazır deyil. Bir neçə saniyə gözləyin.');
+        return false;
+    }
+    
+    try {
+        _paq.push(['showRewarded', {
+            onReward: function() {
+                console.log('🎉 Monetag reward tamamlandı!');
+                
+                // Bonus ver
+                const rewardAmount = MONETAG_CONFIG.rewardAmount;
+                currentUserState.totalMoney += rewardAmount;
+                saveUserState();
+                updateEnergyDisplay();
+                
+                // Təbriklər mesajı
+                const message = `🎉 Monetag reklamı tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`;
+                
+                if (window.Telegram?.WebApp) {
+                    Telegram.WebApp.showPopup({
+                        title: '🎉 Təbriklər!',
+                        message: message,
+                        buttons: [{ type: 'ok' }]
+                    });
+                } else {
+                    alert(message);
+                }
+                
+                console.log('💰 Bonus verildi:', rewardAmount);
+            },
+            onError: function(error) {
+                console.error('❌ Monetag xətası:', error);
+                alert('❌ Reklam yüklənmədi. Yenidən cəhd edin.');
+            },
+            onClose: function() {
+                console.log('📺 Reklam bağlandı');
+            }
+        }]);
+        return true;
+    } catch (error) {
+        console.error('❌ Monetag göndərmə xətası:', error);
+        return false;
+    }
+}
+
+// MONETAG BANNER REKLAMLARI
+function initMonetagBanners() {
+    if (typeof _paq !== 'undefined') {
+        // Top banner
+        _paq.push(['displayBanner', 'monetag-banner-1']);
+        
+        // Bottom banner  
+        _paq.push(['displayBanner', 'monetag-banner-2']);
+        
+        console.log('✅ Monetag bannerları aktiv oldu');
+    } else {
+        console.log('🔄 Monetag SDK hələ yüklənməyib, 5s sonra yenidən...');
+        setTimeout(initMonetagBanners, 5000);
+    }
 }
 
 // =================================================================
 // TELEGRAM BOT AYARLARI
 // =================================================================
 const TELEGRAM_BOT_URL = "https://t.me/Casper_Game_bot/directlink";
-
-// =================================================================
-// ADSGRAM REWARD VIDEO SİSTEMİ
-// =================================================================
-
-let adsgramRewardAvailable = true;
-
-// Reward video göstərmək üçün funksiya
-function showAdsGramRewardVideo() {
-    if (!adsgramRewardAvailable) {
-        alert('🎬 Reward video hazır deyil. Bir neçə dəqiqə gözləyin.');
-        return false;
-    }
-    
-    if (window.adsgram) {
-        console.log('🎬 AdsGram reward video başladılır...');
-        adsgramRewardAvailable = false;
-        
-        adsgram.push(['display', 'rewarded', {
-            onReward: function() {
-                console.log('✅ AdsGram reward video tamamlandı!');
-                
-                // Oyunçuya böyük bonus ver
-                const rewardAmount = 0.001; // 0.001 AZN bonus
-                currentUserState.totalMoney += rewardAmount;
-                
-                // Firebase-ə yaz
-                saveUserState();
-                
-                // UI yenilə
-                updateEnergyDisplay();
-                
-                // Təbriklər mesajı
-                showSuccess(`🎉 Reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
-                
-                // 5 dəqiqə gözlə
-                setTimeout(() => {
-                    adsgramRewardAvailable = true;
-                    console.log('🔄 AdsGram reward video yenidən aktiv oldu');
-                }, 300000); // 5 dəqiqə
-            },
-            onClose: function() {
-                console.log('📺 AdsGram reward video bağlandı');
-                // 1 dəqiqə gözlə
-                setTimeout(() => {
-                    adsgramRewardAvailable = true;
-                }, 60000); // 1 dəqiqə
-            },
-            onError: function(error) {
-                console.error('❌ AdsGram reward video xətası:', error);
-                adsgramRewardAvailable = true;
-                alert('❌ Reward video yüklənmədi. Yenidən cəhd edin.');
-            }
-        }]);
-        
-        return true;
-    } else {
-        console.log('❌ AdsGram yüklənməyib');
-        adsgramRewardAvailable = true;
-        alert('🎬 Reklam sistemi hazır deyil. Bir neçə saniyə gözləyin.');
-        return false;
-    }
-}
-
-// Banner reklamları avtomatik başlat
-function initializeAdsGramBanners() {
-    if (window.adsgram) {
-        console.log('🔄 AdsGram bannerlər başladılır...');
-        
-        // Banner reklamları göstər
-        adsgram.push(['display', 'banner', {
-            container: 'adsgram-banner-1',
-            format: '320x50'
-        }]);
-        
-        adsgram.push(['display', 'banner', {
-            container: 'adsgram-banner-2', 
-            format: '320x50'
-        }]);
-        
-        console.log('✅ AdsGram bannerlər aktiv oldu');
-    } else {
-        console.log('❌ AdsGram bannerlər üçün hazır deyil');
-        // 10 saniyə sonra yenidən cəhd et
-        setTimeout(initializeAdsGramBanners, 10000);
-    }
-}
 
 // =================================================================
 // YENİ CG ID SİSTEMİ
@@ -1836,7 +1641,6 @@ async function getNextCGId() {
     try {
         const counterRef = db.collection('counters').doc('userCounter');
         
-        // Firestore increment istifadəsi
         const result = await db.runTransaction(async (transaction) => {
             const doc = await transaction.get(counterRef);
             const currentCount = doc.exists ? doc.data().count : 0;
@@ -1848,7 +1652,6 @@ async function getNextCGId() {
         return `CG${result}`;
     } catch (error) {
         console.error('CG ID xətası:', error);
-        // Fallback üçün timestamp əsaslı ID
         return `CG${Date.now()}${Math.random().toString(36).substr(2, 5)}`.toUpperCase();
     }
 }
@@ -1875,14 +1678,12 @@ async function initializeCounter() {
 // =================================================================
 
 function generateInviteLink() {
-    // Yalnız əsas linki qaytar
     return TELEGRAM_BOT_URL;
 }
 
 function updateInviteLinkDisplay() {
     const inviteLink = generateInviteLink();
     if (inviteLink && currentUserState.referralCode) {
-        // Link və referral kodu ayrı-ayrı göstər
         inviteLinkDisplay.innerHTML = `
             <div style="margin-bottom: 15px; text-align: center;">
                 <strong style="color: #0f3460;">📱 Telegram Bot Linki:</strong><br>
@@ -2062,38 +1863,6 @@ const ADMIN_WHATSAPP_NUMBER = "0513248685";
 
 const BASE_INVITE_URL = window.location.href.split('?')[0];
 
-const ads = [
-    {
-        id: 1,
-        title: "🎮 YENİ OYUN TƏKLİFİ",
-        description: "Bu mobil oyunu yükləyin və xüsusi bonus qazanın!",
-        color: "#ff6b6b",
-        duration: 10,
-        type: "premium"
-    },
-    {
-        id: 2,
-        title: "🛒 ONLAYN ALIŞ-VERİŞ",
-        description: "Xüsusi endirimlərdən yararlanın!",
-        color: "#4ecdc4",
-        duration: 10,
-        type: "special"
-    },
-    {
-        id: 3,
-        title: "📱 TƏTBİQ TƏKLİFİ",
-        description: "Bu faydalı tətbiqi yükləyin!",
-        color: "#45b7d1",
-        duration: 10,
-        type: "bonus"
-    }
-];
-
-let currentAdIndex = 0;
-let adTimerInterval;
-let adTimeLeft = 0;
-let totalAdRewardEarned = 0;
-
 let currentUserState = {
     cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
     maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP,
@@ -2108,8 +1877,6 @@ const splashScreen = document.getElementById('splashScreen');
 const mainContent = document.getElementById('mainContent');
 const loginScreen = document.getElementById('loginScreen');
 const gameScreen = document.getElementById('gameScreen');
-const adScreen = document.getElementById('adScreen');
-const adContent = document.getElementById('adContent');
 const mainIcon = document.getElementById('mainIcon');
 const welcomeText = document.getElementById('welcomeText');
 const welcomeMessage = document.getElementById('welcomeMessage');
@@ -2145,7 +1912,6 @@ const subScreens = document.querySelectorAll('.game-sub-screen');
 // KÖMƏKÇİ FUNKSİYALAR
 // =================================================================
 
-// Xəta mesajı göstərmək üçün köməkçi funksiya
 function showError(message) {
     const errorElement = document.getElementById('errorMessage');
     errorElement.textContent = message;
@@ -2159,7 +1925,6 @@ function showError(message) {
     }, 5000);
 }
 
-// Uğur mesajı göstərmək üçün köməkçi funksiya
 function showSuccess(message) {
     const successElement = document.getElementById('successMessage');
     successElement.textContent = message;
@@ -2369,103 +2134,6 @@ function generateReferralCode(username) {
     const timestamp = Date.now().toString(36);
     const randomString = Math.random().toString(36).substring(2, 6).toUpperCase();
     return `${username.substring(0, 3).toUpperCase()}${randomString}${timestamp.slice(-4)}`;
-}
-
-// =================================================================
-// REKLAM SİSTEMİ FUNKSİYALARI
-// =================================================================
-
-function showAd() {
-    if (adScreen.style.display === 'flex') return;
-    
-    currentAdIndex = 0;
-    totalAdRewardEarned = 0;
-    
-    showNextAd();
-}
-
-function showNextAd() {
-    if (currentAdIndex >= AD_COUNT) {
-        closeAd();
-        return;
-    }
-    
-    const currentAd = ads[currentAdIndex];
-    adTimeLeft = AD_DURATION;
-    
-    let adHtml = `
-        <div class="ad-pulse">
-            <h3 style="font-size: 24px; margin-bottom: 10px; color: ${currentAd.color}">${currentAd.title}</h3>
-            <p style="margin-bottom: 20px; color: #ccc; font-size: 14px;">${currentAd.description}</p>
-            <div class="ad-timer" id="adTimer">${adTimeLeft}</div>
-            <div class="ad-counter">Reklam ${currentAdIndex + 1}/${AD_COUNT}</div>
-            <div class="ad-reward">Bu reklam üçün: +${formatMoney(AD_REWARD_PER_AD)}</div>
-            <p class="ad-message">Reklam avtomatik bağlanacaq</p>
-            <button class="ad-skip-btn" onclick="skipAd()">Keç (${adTimeLeft}s)</button>
-        </div>
-    `;
-    
-    adContent.innerHTML = adHtml;
-    adContent.className = `ad-content ad-${currentAd.type}`;
-    adScreen.style.display = 'flex';
-    
-    startAdTimer();
-}
-
-function startAdTimer() {
-    clearInterval(adTimerInterval);
-    
-    adTimerInterval = setInterval(() => {
-        adTimeLeft--;
-        
-        document.getElementById('adTimer').textContent = adTimeLeft;
-        document.getElementById('adProgressText').textContent = `Reklam bitir: ${adTimeLeft}s`;
-        
-        const progressPercent = ((AD_DURATION - adTimeLeft) / AD_DURATION) * 100;
-        document.getElementById('adProgressFill').style.width = `${progressPercent}%`;
-        
-        const skipBtn = document.querySelector('.ad-skip-btn');
-        if (skipBtn) {
-            skipBtn.textContent = `Keç (${adTimeLeft}s)`;
-            skipBtn.disabled = true;
-        }
-        
-        if (adTimeLeft <= 0) {
-            clearInterval(adTimerInterval);
-            completeCurrentAd();
-        }
-    }, 1000);
-}
-
-function completeCurrentAd() {
-    currentUserState.totalMoney += AD_REWARD_PER_AD;
-    totalAdRewardEarned += AD_REWARD_PER_AD;
-    
-    currentAdIndex++;
-    
-    setTimeout(() => {
-        showNextAd();
-    }, 500);
-}
-
-function skipAd() {
-    if (adTimeLeft > 3) {
-        return;
-    }
-    
-    clearInterval(adTimerInterval);
-    completeCurrentAd();
-}
-
-function closeAd() {
-    clearInterval(adTimerInterval);
-    adScreen.style.display = 'none';
-    
-    currentUserState.clicksUntilAd = AD_INTERVAL;
-    
-    showSuccess(`🎉 ${AD_COUNT} reklam tamamlandı! Ümumi bonus: +${formatMoney(totalAdRewardEarned)} AZN`);
-    
-    updateEnergyDisplay();
 }
 
 // =================================================================
@@ -3152,14 +2820,12 @@ function clickIcon(e) {
     
     if (state.clicksUntilAd <= 1) { 
         state.clicksUntilAd = 0; 
-        showAd(); 
         return; 
     }
 
     if (state.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) { 
         if (state.clicksUntilAd > 0) {
             state.clicksUntilAd = 0; 
-            showAd();
         }
         return;
     }
@@ -3179,24 +2845,6 @@ function clickIcon(e) {
     createMoneyPopup(e, moneyEarned);
 }
 
-// Real-time Firebase Monitor (ARTIQ İSTİFADƏ EDİLMİR)
-function monitorFirebase() {
-    // Bu funksiya artıq heç nə etmir
-}
-
-// Debug funksiyaları (ARTIQ İSTİFADƏ EDİLMİR)
-function debugFirebase() {
-    // Bu funksiya artıq heç nə etmir
-}
-
-function debugGetAllUsers() {
-    // Bu funksiya artıq heç nə etmir
-}
-
-function debugCheckUser(username) {
-    // Bu funksiya artıq heç nə etmir
-}
-
 // Başlanğıc funksiyası
 window.addEventListener('load', async function() {
     loadImages();
@@ -3208,10 +2856,10 @@ window.addEventListener('load', async function() {
     await initializeCounter();
     console.log('✅ CG ID sistemi hazırdır');
     
-    // ADSGRAM İŞƏ SAL
+    // MONETAG BANNERLARI İŞƏ SAL
     setTimeout(() => {
-        initializeAdsGramBanners();
-    }, 3000); // 3 saniyə sonra
+        initMonetagBanners();
+    }, 3000);
     
     const img = document.getElementById('clickImage');
     img.classList.add('wind-animation', 'floating-ghost');
