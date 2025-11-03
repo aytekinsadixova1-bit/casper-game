@@ -81,18 +81,18 @@
         }
 
         /* 9:16 Aspect Ratio Container */
-        @media (min-aspect-ratio: 9/16) {
+        @media (min-aspect-ratio: 1080/1920) {
             .container {
-                width: calc(100vh * 9 / 16);
+                width: calc(100vh * 1080 / 1920);
                 height: 100vh;
                 margin: 0 auto;
             }
         }
 
-        @media (max-aspect-ratio: 9/16) {
+        @media (max-aspect-ratio: 1080/1920) {
             .container {
                 width: 100vw;
-                height: calc(100vw * 16 / 9);
+                height: calc(100vw * 1920 / 1080);
                 margin: auto;
             }
         }
