@@ -13,7 +13,7 @@
     <!-- MONETAG/PROPELLERADS SDK -->
     <script type="text/javascript">
         var _paq = _paq || [];
-        _paq.push(['setPublisherId', '3097775']); // SİZİN PUBLISHER ID
+        _paq.push(['setPublisherId', '3097775']);
         _paq.push(['setAdType', 'rewarded']);
     </script>
     <script type="text/javascript" src="https://cdn.propellerads.com/static/loader.min.js" async></script>
@@ -1243,7 +1243,9 @@
                                 </div>
                             </div>
                             <div class="ad-counter-container">
-                                <span>Növbəti reklam:</span> <span id="clicksUntilAdDisplay">30</span> klik
+                                <span>Növbəti reklam:</span> 
+                                <span id="clicksUntilAdDisplay">30</span> klik | 
+                                <span id="adsTodayDisplay">0/3</span> bu gün
                             </div>
                         </div>
 
@@ -1253,7 +1255,7 @@
                                 🎬 Video İzlə & 0.004 AZN Qazan! (Monetag)
                             </button>
                             <p style="font-size: 12px; color: #6c757d; margin-top: 5px;">
-                                Hər video üçün 0.004 AZN bonus! Gündəlik limit yoxdur!
+                                Hər video üçün 0.004 AZN bonus! Gündəlik limit: 3 reklam
                             </p>
                         </div>
 
@@ -1554,16 +1556,25 @@ try {
 }
 
 // =================================================================
-// MONETAG/PROPELLERADS KONFİQURASİYASI
+// YENİ REKLAM SİSTEMİ - MONETAG İLƏ
 // =================================================================
 const MONETAG_CONFIG = {
-    publisherId: "3097775", // SİZİN PUBLISHER ID
-    rewardAmount: 0.004, // AZN - Telegram üçün daha yüksək!
+    publisherId: "3097775",
+    rewardAmount: 0.004,
     adFormats: ["rewarded", "banner"]
 };
 
+let adDisplayCount = 0;
+const MAX_ADS_PER_SESSION = 3;
+const AD_INTERVAL = 30;
+
 // MONETAG REWARD VIDEO FUNKSİYASI
 function showMonetagRewardVideo() {
+    if (adDisplayCount >= MAX_ADS_PER_SESSION) {
+        alert('🎬 Gündəlik reklam limitinə çatdınız! Sabah yenidən cəhd edin.');
+        return false;
+    }
+    
     if (typeof _paq === 'undefined') {
         console.error('❌ Monetag SDK yüklənməyib');
         alert('🎬 Reklam sistemi hazır deyil. Bir neçə saniyə gözləyin.');
@@ -1571,6 +1582,7 @@ function showMonetagRewardVideo() {
     }
     
     try {
+        console.log('🎬 Monetag reklamı başladı...');
         _paq.push(['showRewarded', {
             onReward: function() {
                 console.log('🎉 Monetag reward tamamlandı!');
@@ -1578,11 +1590,14 @@ function showMonetagRewardVideo() {
                 // Bonus ver
                 const rewardAmount = MONETAG_CONFIG.rewardAmount;
                 currentUserState.totalMoney += rewardAmount;
+                adDisplayCount++;
+                currentUserState.clicksUntilAd = AD_INTERVAL; // Sayacı sıfırla
+                
                 saveUserState();
                 updateEnergyDisplay();
                 
                 // Təbriklər mesajı
-                const message = `🎉 Monetag reklamı tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`;
+                const message = `🎉 Reklam tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!\n\nBu gün: ${adDisplayCount}/${MAX_ADS_PER_SESSION} reklam`;
                 
                 if (window.Telegram?.WebApp) {
                     Telegram.WebApp.showPopup({
@@ -1611,6 +1626,27 @@ function showMonetagRewardVideo() {
     }
 }
 
+// Reklam göstərmək üçün funksiya
+function showAd() {
+    if (adDisplayCount >= MAX_ADS_PER_SESSION) {
+        console.log('✅ Gündəlik reklam limitinə çatdınız');
+        return;
+    }
+    
+    console.log('🎬 Reklam başladı...');
+    
+    // Monetag reward video göstər
+    const adShown = showMonetagRewardVideo();
+    
+    if (adShown) {
+        console.log(`📊 Reklam sayı: ${adDisplayCount}/${MAX_ADS_PER_SESSION}`);
+    } else {
+        console.log('❌ Reklam göstərilmədi');
+        currentUserState.clicksUntilAd = 10; // Yenidən cəhd etmək üçün
+        updateEnergyDisplay();
+    }
+}
+
 // MONETAG BANNER REKLAMLARI
 function initMonetagBanners() {
     if (typeof _paq !== 'undefined') {
@@ -1621,11 +1657,36 @@ function initMonetagBanners() {
         _paq.push(['displayBanner', 'monetag-banner-2']);
         
         console.log('✅ Monetag bannerları aktiv oldu');
+        
+        // Reward video sistemini test et
+        testMonetagSystem();
     } else {
         console.log('🔄 Monetag SDK hələ yüklənməyib, 5s sonra yenidən...');
         setTimeout(initMonetagBanners, 5000);
     }
 }
+
+// Monetag sistemini test et
+function testMonetagSystem() {
+    setTimeout(() => {
+        console.log('🔍 Monetag sistem testi...');
+        if (typeof _paq !== 'undefined') {
+            console.log('✅ Monetag SDK aktiv');
+        } else {
+            console.log('❌ Monetag SDK aktiv deyil');
+        }
+    }, 2000);
+}
+
+// Gündəlik limiti sıfırla
+function resetDailyAdLimit() {
+    adDisplayCount = 0;
+    console.log('🔄 Gündəlik reklam limiti sıfırlandı');
+    updateEnergyDisplay();
+}
+
+// Hər gün səhər limiti sıfırla
+setInterval(resetDailyAdLimit, 24 * 60 * 60 * 1000); // 24 saat
 
 // =================================================================
 // TELEGRAM BOT AYARLARI
@@ -1839,7 +1900,6 @@ let users = {};
 const ENERGY_CONSUMPTION_PER_CLICK = 1;     
 const MAX_ENERGY_CAP = 100000;              
 
-const AD_INTERVAL = 30;
 const AD_COUNT = 3;
 const AD_DURATION = 10;
 const AD_REWARD_PER_AD = 0.0001;
@@ -1888,6 +1948,7 @@ const energyFillEl = document.getElementById('energyFill');
 const energyTextEl = document.getElementById('energyText');
 const totalMoneyEl = document.getElementById('totalMoney'); 
 const clicksUntilAdDisplay = document.getElementById('clicksUntilAdDisplay');
+const adsTodayDisplay = document.getElementById('adsTodayDisplay');
 
 const profileCGIDEl = document.getElementById('profileCGID');
 const profileUsernameEl = document.getElementById('profileUsername');
@@ -2323,6 +2384,7 @@ function updateEnergyDisplay() {
     
     totalMoneyEl.textContent = formatMoney(state.totalMoney);
     clicksUntilAdDisplay.textContent = state.clicksUntilAd;
+    adsTodayDisplay.textContent = `${adDisplayCount}/${MAX_ADS_PER_SESSION}`;
     
     if (document.getElementById('friendsScreen').classList.contains('active')) {
         updateInviteLinkDisplay();
@@ -2520,6 +2582,53 @@ function enforcePlus994(event) {
 }
 document.getElementById('registerPhone').addEventListener('input', enforcePlus994);
 document.getElementById('withdrawPhone').addEventListener('input', enforcePlus994);
+
+// =================================================================
+// YENİ KLİK FUNKSİYASI - REKLAM İLƏ
+// =================================================================
+function clickIcon(e) {
+    const state = currentUserState;
+    const now = Date.now();
+
+    if (now - state.lastClickTime < 50) return;
+    state.lastClickTime = now;
+    
+    if (!state.username) {
+        alert("Oynamaq üçün zəhmət olmasa daxil olun!");
+        return;
+    }
+    
+    addGhostAnimations(e);
+    
+    // REKLAM ŞƏRTİNİ YOXLA
+    if (state.clicksUntilAd <= 1) { 
+        state.clicksUntilAd = 0; 
+        showAd(); // REKLAMI GÖSTƏR
+        return; 
+    }
+
+    if (state.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) { 
+        if (state.clicksUntilAd > 0) {
+            state.clicksUntilAd = 0; 
+            showAd(); // REKLAMI GÖSTƏR
+        }
+        return;
+    }
+
+    const moneyEarned = MONEY_PER_CLICK;
+
+    state.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK; 
+    state.totalClicks++;
+    state.totalMoney += moneyEarned; 
+    state.energyUsed += ENERGY_CONSUMPTION_PER_CLICK; 
+    
+    if (state.clicksUntilAd > 0) {
+        state.clicksUntilAd--;
+    }
+    
+    updateEnergyDisplay();
+    createMoneyPopup(e, moneyEarned);
+}
 
 // =================================================================
 // GİRİŞ FUNKSİYASI
@@ -2803,48 +2912,6 @@ function createGhostStabEffect(event) {
     }, 600);
 }
 
-// İkon klik funksiyası
-function clickIcon(e) {
-    const state = currentUserState;
-    const now = Date.now();
-
-    if (now - state.lastClickTime < 50) return;
-    state.lastClickTime = now;
-    
-    if (!state.username) {
-        alert("Oynamaq üçün zəhmət olmasa daxil olun!");
-        return;
-    }
-    
-    addGhostAnimations(e);
-    
-    if (state.clicksUntilAd <= 1) { 
-        state.clicksUntilAd = 0; 
-        return; 
-    }
-
-    if (state.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) { 
-        if (state.clicksUntilAd > 0) {
-            state.clicksUntilAd = 0; 
-        }
-        return;
-    }
-
-    const moneyEarned = MONEY_PER_CLICK;
-
-    state.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK; 
-    state.totalClicks++;
-    state.totalMoney += moneyEarned; 
-    state.energyUsed += ENERGY_CONSUMPTION_PER_CLICK; 
-    
-    if (state.clicksUntilAd > 0) {
-        state.clicksUntilAd--;
-    }
-    
-    updateEnergyDisplay();
-    createMoneyPopup(e, moneyEarned);
-}
-
 // Başlanğıc funksiyası
 window.addEventListener('load', async function() {
     loadImages();
@@ -2897,6 +2964,20 @@ window.addEventListener('load', async function() {
 window.addEventListener('beforeunload', function() {
     saveUserState();
 });
+
+// =================================================================
+// ƏLAVƏ DEBUG FUNKSİYALARI
+// =================================================================
+
+function debugAdSystem() {
+    console.log('🔧 REKLAM SİSTEMİ DEBUG:');
+    console.log('- Cari klik:', currentUserState.clicksUntilAd);
+    console.log('- Reklam sayı:', adDisplayCount);
+    console.log('- Maksimum reklam:', MAX_ADS_PER_SESSION);
+    console.log('- Monetag SDK:', typeof _paq !== 'undefined' ? 'Aktiv' : 'Deaktiv');
+}
+
+console.log('🎮 Casper Game - Reklam Sistemi Aktiv');
     </script>
 </body>
 </html>
