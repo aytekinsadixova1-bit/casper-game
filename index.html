@@ -11,18 +11,38 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     
     <!-- ADSGRAM AI REKLAM SİSTEMİ -->
-    <script>
-        // AdsGram konfiqurasiyası
-        window.adsgramConfig = {
-            platformId: 15398,
-            adBlocks: {
-                banner: 'adsgram-banner-1',
-                interstitial: 'adsgram-interstitial-1',
-                rewarded: 'adsgram-rewarded-1'
-            }
-        };
-    </script>
-    <script src="https://cdn.adsgram.ai/widget-v2.js"></script>
+<!-- ✅ YENİ ADSGRAM REKLAM SDK -->
+<script async src="https://adsgram.ai/js/sdk.min.js"></script>
+<script>
+  window.addEventListener("load", () => {
+    if (window.Adsgram) {
+      console.log("✅ AdsGram SDK yükləndi!");
+      Adsgram.init();
+
+      // Banner reklam (yuxarı hissədə)
+      Adsgram.display("banner", {
+        publisher: "15398",   // sənin platformId
+        adslot: "16650",      // sənin unitId
+        container: "adsgram-banner-1",
+        onDisplay: () => console.log("✅ Banner göstərildi!"),
+        onError: (err) => console.error("❌ Banner xətası:", err),
+      });
+
+      // Reward video (video izləyərək bonus qazan)
+      window.showAdsGramRewardVideo = function() {
+        Adsgram.display("rewarded", {
+          publisher: "15398",
+          adslot: "16650",
+          onDisplay: () => console.log("📺 Reward video başladı"),
+          onReward: () => alert("🎉 Video tamamlandı! Bonus qazandınız!"),
+          onError: (err) => console.error("❌ Reward xətası:", err),
+        });
+      };
+    } else {
+      console.error("❌ AdsGram SDK tapılmadı.");
+    }
+  });
+</script>
     
     <style>
         * {
