@@ -1539,19 +1539,107 @@ const BASE_INVITE_URL = window.location.href.split('?')[0];
 };
 
 function loadUserState() {
-    const savedState = localStorage.getItem('userState');
-    if (savedState) {
-        currentUserState = JSON.parse(savedState);
-    }
-    // Əgər username yoxdursa (ilk dəfə girirsə), default dəyərləri təyin edir.
-    if (!currentUserState.username && window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
-        currentUserState.username = window.Telegram.WebApp.initDataUnsafe.user.username || null;
-        currentUserState.name = window.Telegram.WebApp.initDataUnsafe.user.first_name || null;
-        currentUserState.surname = window.Telegram.WebApp.initDataUnsafe.user.last_name || null;
-        currentUserState.registrationDate = Date.now();
-    }
+    const savedState = localStorage.getItem('userState');
+    if (savedState) {
+        // Yaddaşı yükləyir
+        const loadedState = JSON.parse(savedState);
+        
+        // Hər bir açar üçün yüklənmiş dəyəri currentUserState-ə kopyalayır
+        for (const key in currentUserState) {
+            if (loadedState.hasOwnProperty(key)) {
+                // Xüsusi: Bəzi dəyərlər vaxtdır, ona görə də onları int-ə çevirmək lazımdır
+                if (key === 'lastEnergyUpdate' || key === 'lastClickTime') {
+                    currentUserState[key] = parseInt(loadedState[key]);
+                } else if (key === 'totalMoney' || key === 'referralBonusEarned') {
+                    // Pul dəyərləri
+                    currentUserState[key] = parseFloat(loadedState[key]);
+                }
+                else {
+                    currentUserState[key] = loadedState[key];
+                }
+            }
+// ----------------------------------------------------
+// ENERJİ BƏRPASI FUNKSİYALARI
+// ----------------------------------------------------
+
+function updateEnergy() {
+    const now = Date.now();
+    
+    // Keçən vaxtı hesablayır (milisaniyə ilə)
+    const timeElapsed = now - currentUserState.lastEnergyUpdate; 
+    
+    // Enerji bərpa dərəcəsini saniyəyə görə hesablayır (BASE_REGEN_RATE / 60)
+    // BASE_REGEN_RATE (dəqiqədə bərpa olunan enerji) CONSTANT-larda təyin olunub (təxminən 1527-ci sətir)
+    const energyGained = (timeElapsed / 1000) * (currentUserState.energyRegenRate / 60); 
+
+    // Cari enerjini bərpa edir, lakin MAX_ENERGY-ni aşmır
+    currentUserState.currentEnergy = Math.min(
+        currentUserState.maxEnergy,
+        currentUserState.currentEnergy + energyGained
+    );
+
+    // Son yenilənmə vaxtını cari vaxta dəyişir
+    currentUserState.lastEnergyUpdate = now;
+    
+    // Ekranı və yaddaşı yeniləyir (Bu funksiyalar təyin olunmalıdır!)
+    updateEnergyDisplay(); 
+    saveUserState(); 
 }
 
+function startEnergyRegen() {
+    // updateEnergy() funksiyasını hər saniyədə çağırır
+    setInterval(updateEnergy, 1000); 
+    
+    // İlkin yenilənməni də çağırır ki, oyun başlayan kimi enerji düzgün hesablansın
+    updateEnergy(); 
+}
+            
+ // ----------------------------------------------------
+// YENİ ADSGRAM REKLAMINI İDARƏ ETMƏ FUNKSİYASI
+// ----------------------------------------------------
+
+function showAd() {
+    // AdsGram Controller-in mövcudluğunu yoxlayır (bu, 30-33-cü sətirlərdə təyin olunub)
+    if (typeof AdController === 'undefined' || !AdController) {
+        console.error("AdsGram sistemi hazır deyil. Zəhmət olmasa, yenidən yoxlayın.");
+        return;
+    }
+
+    // Reklamı göstərməyi çağırır
+    AdController.show().then(result => {
+        // ✅ REKLAM UĞURLA TAMAMLANDI
+        
+        // SINGLE_AD_REWARD CONSTANT-lardan götürülür (təxminən 1523-cü sətir)
+        const REWARD_AMOUNT = 0.000001; 
+        const AD_INTERVAL = 30; // AD_INTERVAL CONSTANT-lardan götürülür (təxminən 1522-ci sətir)
+        
+        // Pulu əlavə edin
+        currentUserState.totalMoney += REWARD_AMOUNT;
+        
+        // Klik sayğacını sıfırlayın
+        currentUserState.clicksUntilAd = AD_INTERVAL; 
+        
+        // Nəticəni göstərin (formatMoney funksiyası təyin olunmalıdır)
+        showSuccess(`🎉 Reklam uğurla tamamlandı! Bonus: +${REWARD_AMOUNT.toFixed(6)} AZN`);
+        
+        // Oyunu və məlumatları yeniləyin
+        updateEnergyDisplay();
+        saveUserState(); // saveUserState funksiyası təyin olunmalıdır.
+
+    }).catch(error => {
+        // ❌ XƏTA VƏ YA İSTİFADƏÇİ İMTINASI
+        console.error("AdsGram reklam xətası:", error);
+        
+        // Sayğacı sıfırlayır ki, istifadəçi yenidən cəhd etsin
+        currentUserState.clicksUntilAd = AD_INTERVAL;
+        
+        // Oyunu yeniləyin
+        updateEnergyDisplay();
+    });
+}
+
+// 🔥 BURAYA startEnergyRegen funksiyası gəlir (təxminən 1620-ci sətir)
+// ...
 // DOM Elementləri
 const splashScreen = document.getElementById('splashScreen');
 const mainContent = document.getElementById('mainContent');
