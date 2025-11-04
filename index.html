@@ -1561,13 +1561,7 @@ const ads = [
         type: "bonus"
     }
 ];
-
-let currentAdIndex = 0;
-let adTimerInterval;
-let adTimeLeft = 0;
-let totalAdRewardEarned = 0;
-
-let currentUserState = {
+   let currentUserState = {
     cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
     maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP,
     clicksUntilAd: AD_INTERVAL, totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
