@@ -1823,7 +1823,34 @@ function generateReferralCode(username) {
 // =================================================================
 // REKLAM SİSTEMİ FUNKSİYALARI (1 REKLAM, 1 BONUS)
 // =================================================================
+function showAd() {
+    // 30 klikdə və ya düyməyə basanda bu funksiya işə düşür
+    if (!AdController) {
+        console.error("AdsGram sistemi hazır deyil. Zəhmət olmasa, yenidən yoxlayın.");
+        return;
+    }
 
+    AdController.show().then(result => {
+        // ✅ Uğurlu tamamlanma məntiqi
+        
+        // SINGLE_AD_REWARD dəyərini CONSTANT-lardan götürün (məsələn, 1523-cü sətir)
+        const REWARD_AMOUNT = 0.000001; 
+        
+        currentUserState.totalMoney += REWARD_AMOUNT;
+        currentUserState.clicksUntilAd = AD_INTERVAL; // Sayğacı sıfırlayır
+        
+        showSuccess(`🎉 Reklam uğurla tamamlandı! Bonus: +${REWARD_AMOUNT.toFixed(6)} AZN`);
+        
+        updateEnergyDisplay();
+        saveUserState();
+
+    }).catch(error => {
+        // ❌ Xəta və ya istifadəçi imtina edərsə
+        console.error("AdsGram reklam xətası:", error);
+        currentUserState.clicksUntilAd = AD_INTERVAL; // Sayğacı yenə də sıfırlayır
+        updateEnergyDisplay();
+    });
+}
 // =================================================================
 // WHATSAPP GÖNDƏRMƏ FUNKSİYASI
 // =================================================================
