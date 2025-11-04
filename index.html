@@ -25,12 +25,37 @@
     document.addEventListener('DOMContentLoaded', function() {
         
         // ADSGRAM BAŞLANĞICI
-        // Köhnə, xətaya səbəb olan 'const button = document.getElementById('ad');' bloku silinib.
+      
         if (window.AdsGram) {
             // Controller-i global dəyişənə mənimsədirik
             AdController = window.AdsGram.init({ blockId: "16650" }); // Sizin Block ID-nizdir
         } 
     }); 
+
+function loadUserState() {
+    const savedState = localStorage.getItem('userState');
+    if (savedState) {
+        // Yaddaşı yükləyir
+        const loadedState = JSON.parse(savedState);
+        
+        // Hər bir açar üçün yüklənmiş dəyəri currentUserState-ə kopyalayır
+        for (const key in currentUserState) {
+            if (loadedState.hasOwnProperty(key)) {
+                // Xüsusi: Bəzi dəyərlər vaxtdır, ona görə də onları int-ə çevirmək lazımdır
+                if (key === 'lastEnergyUpdate' || key === 'lastClickTime') {
+                    currentUserState[key] = parseInt(loadedState[key]);
+                } else if (key === 'totalMoney' || key === 'referralBonusEarned') {
+                    // Pul dəyərləri
+                    currentUserState[key] = parseFloat(loadedState[key]);
+                }
+                else {
+                    currentUserState[key] = loadedState[key];
+                }
+             }
+        }
+    } 
+}  
+    
 </script>
     <style>
         * {
