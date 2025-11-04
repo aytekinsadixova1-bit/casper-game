@@ -10,19 +10,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     
-    <!-- ADSGRAM AI REKLAM SİSTEMİ -->
-    <script>
-        // AdsGram konfiqurasiyası
-        window.adsgramConfig = {
-            platformId: 15398,
-            adBlocks: {
-                banner: 'adsgram-banner-1',
-                interstitial: 'adsgram-interstitial-1',
-                rewarded: 'adsgram-rewarded-1'
-            }
-        };
-    </script>
-    <script src="https://cdn.adsgram.ai/widget-v2.js"></script>
+    <!-- Telegram Web App & AdsGram SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     
     <style>
         * {
@@ -1195,28 +1185,34 @@ try {
     db = firebase.firestore();
     
     console.log('✅ Firebase uğurla işə salındı');
-    // Firebase statusu artıq göstərilmir
-    
 } catch (error) {
     console.error('❌ Firebase xətası:', error);
-    // Firebase xətası da göstərilmir
-}
-
-// Firebase statusunu yenilə (ARTIQ İSTİFADƏ EDİLMİR)
-function updateFirebaseStatus(status, message) {
-    // Bu funksiya artıq heç nə etmir
 }
 
 // =================================================================
-// TELEGRAM BOT AYARLARI
-// =================================================================
-const TELEGRAM_BOT_URL = "https://t.me/Casper_Game_bot/directlink";
-
-// =================================================================
-// ADSGRAM REWARD VIDEO SİSTEMİ
+// ADSGRAM REKLAM SİSTEMİ
 // =================================================================
 
+let AdsgramController = null;
 let adsgramRewardAvailable = true;
+
+// AdsGram sistemini başlat
+function initializeAdsGram() {
+    try {
+        if (window.Adsgram) {
+            // Block ID-ni burada dəyişin - AdsGram panelindən aldığınız block ID
+            AdsgramController = window.Adsgram.init({ blockId: "your-block-id-here" });
+            console.log('✅ AdsGram sistemi uğurla başladıldı');
+            return true;
+        } else {
+            console.log('❌ AdsGram SDK yüklənməyib');
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ AdsGram başlatma xətası:', error);
+        return false;
+    }
+}
 
 // Reward video göstərmək üçün funksiya
 function showAdsGramRewardVideo() {
@@ -1225,79 +1221,63 @@ function showAdsGramRewardVideo() {
         return false;
     }
     
-    if (window.adsgram) {
-        console.log('🎬 AdsGram reward video başladılır...');
-        adsgramRewardAvailable = false;
-        
-        adsgram.push(['display', 'rewarded', {
-            onReward: function() {
-                console.log('✅ AdsGram reward video tamamlandı!');
-                
-                // Oyunçuya böyük bonus ver
-                const rewardAmount = 0.001; // 0.001 AZN bonus
-                currentUserState.totalMoney += rewardAmount;
-                
-                // Firebase-ə yaz
-                saveUserState();
-                
-                // UI yenilə
-                updateEnergyDisplay();
-                
-                // Təbriklər mesajı
-                showSuccess(`🎉 Reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
-                
-                // 5 dəqiqə gözlə
-                setTimeout(() => {
-                    adsgramRewardAvailable = true;
-                    console.log('🔄 AdsGram reward video yenidən aktiv oldu');
-                }, 300000); // 5 dəqiqə
-            },
-            onClose: function() {
-                console.log('📺 AdsGram reward video bağlandı');
-                // 1 dəqiqə gözlə
-                setTimeout(() => {
-                    adsgramRewardAvailable = true;
-                }, 60000); // 1 dəqiqə
-            },
-            onError: function(error) {
-                console.error('❌ AdsGram reward video xətası:', error);
-                adsgramRewardAvailable = true;
-                alert('❌ Reward video yüklənmədi. Yenidən cəhd edin.');
-            }
-        }]);
-        
-        return true;
-    } else {
-        console.log('❌ AdsGram yüklənməyib');
-        adsgramRewardAvailable = true;
-        alert('🎬 Reklam sistemi hazır deyil. Bir neçə saniyə gözləyin.');
-        return false;
+    if (!AdsgramController) {
+        const initialized = initializeAdsGram();
+        if (!initialized) {
+            alert('❌ Reklam sistemi hazır deyil. Yenidən cəhd edin.');
+            return false;
+        }
     }
+
+    adsgramRewardAvailable = false;
+    
+    AdsgramController.show()
+        .then((result) => {
+            console.log('✅ AdsGram reward video tamamlandı!', result);
+            
+            // Oyunçuya böyük bonus ver
+            const rewardAmount = 0.001; // 0.001 AZN bonus
+            currentUserState.totalMoney += rewardAmount;
+            
+            // Firebase-ə yaz
+            saveUserState();
+            
+            // UI yenilə
+            updateEnergyDisplay();
+            
+            // Təbriklər mesajı
+            showSuccess(`🎉 Reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
+            
+            // 5 dəqiqə gözlə
+            setTimeout(() => {
+                adsgramRewardAvailable = true;
+                console.log('🔄 AdsGram reward video yenidən aktiv oldu');
+            }, 300000); // 5 dəqiqə
+        })
+        .catch((error) => {
+            console.error('❌ AdsGram reward video xətası:', error);
+            
+            let errorMessage = 'Reklam göstərilərkən xəta baş verdi.';
+            
+            if (error && error.description) {
+                errorMessage = error.description;
+            }
+            
+            alert(`❌ ${errorMessage}`);
+            
+            // 1 dəqiqə gözlə
+            setTimeout(() => {
+                adsgramRewardAvailable = true;
+            }, 60000); // 1 dəqiqə
+        });
+    
+    return true;
 }
 
-// Banner reklamları avtomatik başlat
-function initializeAdsGramBanners() {
-    if (window.adsgram) {
-        console.log('🔄 AdsGram bannerlər başladılır...');
-        
-        // Banner reklamları göstər
-        adsgram.push(['display', 'banner', {
-            container: 'adsgram-banner-1',
-            format: '320x50'
-        }]);
-        
-        adsgram.push(['display', 'banner', {
-            container: 'adsgram-banner-2', 
-            format: '320x50'
-        }]);
-        
-        console.log('✅ AdsGram bannerlər aktiv oldu');
-    } else {
-        console.log('❌ AdsGram bannerlər üçün hazır deyil');
-        // 10 saniyə sonra yenidən cəhd et
-        setTimeout(initializeAdsGramBanners, 10000);
-    }
-}
+// =================================================================
+// TELEGRAM BOT AYARLARI
+// =================================================================
+const TELEGRAM_BOT_URL = "https://t.me/Casper_Game_bot/directlink";
 
 // =================================================================
 // YENİ CG ID SİSTEMİ
@@ -1347,14 +1327,12 @@ async function initializeCounter() {
 // =================================================================
 
 function generateInviteLink() {
-    // Yalnız əsas linki qaytar
     return TELEGRAM_BOT_URL;
 }
 
 function updateInviteLinkDisplay() {
     const inviteLink = generateInviteLink();
     if (inviteLink && currentUserState.referralCode) {
-        // Link və referral kodu ayrı-ayrı göstər
         inviteLinkDisplay.innerHTML = `
             <div style="margin-bottom: 15px; text-align: center;">
                 <strong style="color: #0f3460;">📱 Telegram Bot Linki:</strong><br>
@@ -2651,24 +2629,6 @@ function clickIcon(e) {
     createMoneyPopup(e, moneyEarned);
 }
 
-// Real-time Firebase Monitor (ARTIQ İSTİFADƏ EDİLMİR)
-function monitorFirebase() {
-    // Bu funksiya artıq heç nə etmir
-}
-
-// Debug funksiyaları (ARTIQ İSTİFADƏ EDİLMİR)
-function debugFirebase() {
-    // Bu funksiya artıq heç nə etmir
-}
-
-function debugGetAllUsers() {
-    // Bu funksiya artıq heç nə etmir
-}
-
-function debugCheckUser(username) {
-    // Bu funksiya artıq heç nə etmir
-}
-
 // Başlanğıc funksiyası
 window.addEventListener('load', async function() {
     loadImages();
@@ -2682,8 +2642,13 @@ window.addEventListener('load', async function() {
     
     // ADSGRAM İŞƏ SAL
     setTimeout(() => {
-        initializeAdsGramBanners();
-    }, 3000); // 3 saniyə sonra
+        const adsgramInitialized = initializeAdsGram();
+        if (adsgramInitialized) {
+            console.log('✅ AdsGram sistemi uğurla başladıldı');
+        } else {
+            console.log('❌ AdsGram sistemi başladıla bilmədi');
+        }
+    }, 3000);
     
     const img = document.getElementById('clickImage');
     img.classList.add('wind-animation', 'floating-ghost');
