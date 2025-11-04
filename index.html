@@ -12,14 +12,14 @@
     
     <!-- Telegram Web App & AdsGram SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://sad.adsgram.ai/js/sad.min.js:1:16650"></script>
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
      </head>
     <body>
-        <button id="ad">Show ad</button>
+        
         <script>
                  // insert your block id
-            const AdController = window.Adsgram.init({ blockId: "16650" });
+            const AdController = window.Adsgram.init({ blockId:"16650"});
             const button = document.getElementById('ad');
             button.addEventListener('click', () => {
                 AdController.show().then((result) => {
