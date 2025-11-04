@@ -30,12 +30,6 @@
             // Controller-i global dəyişənə mənimsədirik
             AdController = window.AdsGram.init({ blockId: "16650" }); // Sizin Block ID-nizdir
         } 
-        
-        // Sizin digər vacib funksiya çağırışlarınız burda davam edir:
-        loadUserState();
-        updateEnergyDisplay();
-        startEnergyRegen(); 
-        
     }); 
 </script>
     <style>
@@ -1829,114 +1823,6 @@ function generateReferralCode(username) {
 // =================================================================
 // REKLAM SİSTEMİ FUNKSİYALARI (1 REKLAM, 1 BONUS)
 // =================================================================
-
-function showAd() {
-    // AdsGram-ın başladılıb-başladılmadığını yoxla
-    if (!AdController || !currentUserState.username) {
-        console.error("AdsGram sistemi hazır deyil və ya AdController təyin olunmayıb!");
-        alert("Reklam sistemi hazır deyil. Zəhmət olmasa biraz gözləyin və yenidən klikləyin.");
-        currentUserState.clicksUntilAd = AD_INTERVAL;
-        updateEnergyDisplay();
-        return;
-    }
-
-    // AdsGram reklamını göstər
-    AdController.show().then((result) => {
-        // ✅ Uğurlu Tamamlama: İstifadəçi reklama baxdı
-        
-        const SINGLE_AD_REWARD = 0.000001; // Bonus dəyəri (yuxarıda təyin etdiyiniz CONSTANT)
-        currentUserState.totalMoney += SINGLE_AD_REWARD; 
-        
-        currentUserState.clicksUntilAd = AD_INTERVAL; // Sayğacı növbəti 30 klik üçün sıfırla
-        
-        showSuccess(`🎉 Reklam uğurla tamamlandı! Bonus: +${SINGLE_AD_REWARD.toFixed(6)} AZN`);
-        
-        updateEnergyDisplay();
-        saveUserState();
-
-    }).catch((error) => {
-        // ❌ Uğursuzluq: Xəta və ya istifadəçi reklamı vaxtından əvvəl bağladı
-        console.error("AdsGram reklam xətası:", error);
-        alert("Reklam tamamlanmadı və ya ləğv edildi. Bonus qazanılmadı.");
-        
-        currentUserState.clicksUntilAd = AD_INTERVAL; 
-        updateEnergyDisplay();
-    });
-}
-    
-
-        <div class="ad-pulse">
-            <h3 style="font-size: 24px; margin-bottom: 10px; color: ${currentAd.color}">${currentAd.title}</h3>
-            <p style="margin-bottom: 20px; color: #ccc; font-size: 14px;">${currentAd.description}</p>
-            <div class="ad-timer" id="adTimer">${adTimeLeft}</div>
-            <div class="ad-counter">Reklam ${currentAdIndex + 1}/${AD_COUNT}</div>
-            <div class="ad-reward">Bu reklam üçün: +${formatMoney(AD_REWARD_PER_AD)}</div>
-            <p class="ad-message">Reklam avtomatik bağlanacaq</p>
-            <button class="ad-skip-btn" onclick="skipAd()">Keç (${adTimeLeft}s)</button>
-        </div>
-    `;
-    
-    adContent.innerHTML = adHtml;
-    adContent.className = `ad-content ad-${currentAd.type}`;
-    adScreen.style.display = 'flex';
-    
-    startAdTimer();
-
-function startAdTimer() {
-    clearInterval(adTimerInterval);
-    
-    adTimerInterval = setInterval(() => {
-        adTimeLeft--;
-        
-        document.getElementById('adTimer').textContent = adTimeLeft;
-        document.getElementById('adProgressText').textContent = `Reklam bitir: ${adTimeLeft}s`;
-        
-        const progressPercent = ((AD_DURATION - adTimeLeft) / AD_DURATION) * 100;
-        document.getElementById('adProgressFill').style.width = `${progressPercent}%`;
-        
-        const skipBtn = document.querySelector('.ad-skip-btn');
-        if (skipBtn) {
-            skipBtn.textContent = `Keç (${adTimeLeft}s)`;
-            skipBtn.disabled = true;
-        }
-        
-        if (adTimeLeft <= 0) {
-            clearInterval(adTimerInterval);
-            completeCurrentAd();
-        }
-    }, 1000);
-}
-
-function completeCurrentAd() {
-    currentUserState.totalMoney += AD_REWARD_PER_AD;
-    totalAdRewardEarned += AD_REWARD_PER_AD;
-    
-    currentAdIndex++;
-    
-    setTimeout(() => {
-        showNextAd();
-    }, 500);
-}
-
-function skipAd() {
-    if (adTimeLeft > 3) {
-        return;
-    }
-    
-    clearInterval(adTimerInterval);
-    completeCurrentAd();
-}
-
-function closeAd() {
-    clearInterval(adTimerInterval);
-    adScreen.style.display = 'none';
-    
-    currentUserState.clicksUntilAd = AD_INTERVAL;
-    
-    showSuccess(`🎉 ${AD_COUNT} reklam tamamlandı! Ümumi bonus: +${formatMoney(totalAdRewardEarned)} AZN`);
-    
-    updateEnergyDisplay();
-}
 
 // =================================================================
 // WHATSAPP GÖNDƏRMƏ FUNKSİYASI
