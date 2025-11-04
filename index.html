@@ -1569,6 +1569,22 @@ const ads = [
     lastClickTime: Date.now(), successfulReferrals: 0, referralBonusEarned: 0.00, 
     lastWithdrawalDate: null, registrationDate: null
 };
+// ... [let currentUserState = {...} obyekti burda bitir, təxminən 1583-cü sətir]
+
+// 🔥 BURAYA loadUserState funksiyasını əlavə edin
+function loadUserState() {
+    const savedState = localStorage.getItem('userState');
+    if (savedState) {
+        currentUserState = JSON.parse(savedState);
+    }
+    // Əgər username yoxdursa (ilk dəfə girirsə), default dəyərləri təyin edir.
+    if (!currentUserState.username && window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+        currentUserState.username = window.Telegram.WebApp.initDataUnsafe.user.username || null;
+        currentUserState.name = window.Telegram.WebApp.initDataUnsafe.user.first_name || null;
+        currentUserState.surname = window.Telegram.WebApp.initDataUnsafe.user.last_name || null;
+        currentUserState.registrationDate = Date.now();
+    }
+}
 
 // DOM Elementləri
 const splashScreen = document.getElementById('splashScreen');
