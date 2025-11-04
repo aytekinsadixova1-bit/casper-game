@@ -28,7 +28,7 @@
         // Köhnə, xətaya səbəb olan 'const button = document.getElementById('ad');' bloku silinib.
         if (window.AdsGram) {
             // Controller-i global dəyişənə mənimsədirik
-            AdController = window.AdsGram.init({ blockId: "16658" }); // Sizin Block ID-nizdir
+            AdController = window.AdsGram.init({ blockId: "16650" }); // Sizin Block ID-nizdir
         } 
         
         // Sizin digər vacib funksiya çağırışlarınız burda davam edir:
@@ -1508,7 +1508,7 @@ function loadImages() {
 // OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR
 // =================================================================
 
-let users = {};
+const AD_INTERVAL = 30; // 30 klikdən sonra reklam
 const ENERGY_CONSUMPTION_PER_CLICK = 1;     
 const MAX_ENERGY_CAP = 100000;              
 
