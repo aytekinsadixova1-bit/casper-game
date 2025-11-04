@@ -915,14 +915,14 @@
                         </div>
 
                         <!-- YENİ ADSGRAM REWARD VIDEO DÜYMƏSİ -->
-                        <div class="bonus-info" style="margin: 15px 0; text-align: center;">
-                            <button onclick="showAdsGramRewardVideo()" class="adsgram-video-btn">
-                                🎬 Video İzlə & 0.001 AZN Qazan!
-                            </button>
-                            <p style="font-size: 12px; color: #6c757d; margin-top: 5px;">
-                                Hər video üçün 0.001 AZN bonus! Gündəlik limit yoxdur!
-                            </p>
-                        </div>
+                 <div class="bonus-info" style="margin: 15px 0; text-align: center;">
+    <button onclick="showAd()" class="adsgram-video-btn">
+        🎬 Video İzlə & 0.000001 AZN Qazan!
+    </button>
+    <p style="font-size: 12px; color: #6c757d; margin-top: 5px;">
+        Hər video üçün 0.000001 AZN bonus! Gündəlik limit yoxdur!
+    </p>
+</div>
 
                         <div class="bonus-info">
                             <strong>Reklam Bonusu:</strong> Hər reklam üçün <strong>0.0001 AZN</strong> (hər biri 10 saniyə)
@@ -1519,10 +1519,9 @@ let users = {};
 const ENERGY_CONSUMPTION_PER_CLICK = 1;     
 const MAX_ENERGY_CAP = 100000;              
 
-const AD_INTERVAL = 30;
-const AD_COUNT = 3;
-const AD_DURATION = 10;
-const AD_REWARD_PER_AD = 0.0001;
+const AD_COUNT = 1;
+const AD_DURATION = 0;
+const SINGLE_AD_REWARD = 0.000001; // Yeni bonus dəyəri
 
 const ENERGY_REGEN_INTERVAL = 1000;         
 const MONEY_PER_CLICK = 0.000003;
@@ -1853,26 +1852,42 @@ function generateReferralCode(username) {
 }
 
 // =================================================================
-// REKLAM SİSTEMİ FUNKSİYALARI
+// REKLAM SİSTEMİ FUNKSİYALARI (1 REKLAM, 1 BONUS)
 // =================================================================
 
 function showAd() {
-    if (adScreen.style.display === 'flex') return;
-    
-    currentAdIndex = 0;
-    totalAdRewardEarned = 0;
-    
-    showNextAd();
-}
-
-function showNextAd() {
-    if (currentAdIndex >= AD_COUNT) {
-        closeAd();
+    // AdsGram-ın başladılıb-başladılmadığını yoxla
+    if (!AdController || !currentUserState.username) {
+        console.error("AdsGram sistemi hazır deyil və ya AdController təyin olunmayıb!");
+        alert("Reklam sistemi hazır deyil. Zəhmət olmasa biraz gözləyin və yenidən klikləyin.");
+        currentUserState.clicksUntilAd = AD_INTERVAL;
+        updateEnergyDisplay();
         return;
     }
-    
-    const currentAd = ads[currentAdIndex];
-    adTimeLeft = AD_DURATION;
+
+    // AdsGram reklamını göstər
+    AdController.show().then((result) => {
+        // ✅ Uğurlu Tamamlama: İstifadəçi reklama baxdı
+        
+        const SINGLE_AD_REWARD = 0.000001; // Bonus dəyəri (yuxarıda təyin etdiyiniz CONSTANT)
+        currentUserState.totalMoney += SINGLE_AD_REWARD; 
+        
+        currentUserState.clicksUntilAd = AD_INTERVAL; // Sayğacı növbəti 30 klik üçün sıfırla
+        
+        showSuccess(`🎉 Reklam uğurla tamamlandı! Bonus: +${SINGLE_AD_REWARD.toFixed(6)} AZN`);
+        
+        updateEnergyDisplay();
+        saveUserState();
+
+    }).catch((error) => {
+        // ❌ Uğursuzluq: Xəta və ya istifadəçi reklamı vaxtından əvvəl bağladı
+        console.error("AdsGram reklam xətası:", error);
+        alert("Reklam tamamlanmadı və ya ləğv edildi. Bonus qazanılmadı.");
+        
+        currentUserState.clicksUntilAd = AD_INTERVAL; 
+        updateEnergyDisplay();
+    });
+}
     
     let adHtml = `
         <div class="ad-pulse">
