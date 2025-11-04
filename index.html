@@ -18,33 +18,26 @@
     <body>
         
 <script>
-        // Bütün kodun bu funksiyanın daxilində olduğuna əmin olun
-        document.addEventListener('DOMContentLoaded', function() {
-            
-            // Insert your block id
-            const AdController = window.Adsgram.init({ blockId: "16650" });
-            const button = document.getElementById('ad');
+    // AdsGram Controller-i global olaraq təyin edirik ki, həm düymə, həm də 30 klik onu görsün.
+    let AdController = null; 
 
-            // Əlavə olaraq yoxlama əlavə edək (daha təhlükəsizdir)
-            if (button) {
-                button.addEventListener('click', () => {
-                    AdController.show().then((result) => {
-                        // user watch ad till the end or close it in interstitial format
-
-                        // your code to reward user for rewarded format
-                        alert("Reward");
-                    }).catch((result) => {
-                        // user gas error during playing ad
-                        // do nothing or whatever you want
-                        alert(JSON.stringify(result, null, 4));
-                    })
-                });
-            } else {
-                // Elementin tapılmadığını bilmək üçün konsola xəta çıxaraq
-                console.error('Element with ID "ad" not found!');
-            }
-        });
-    </script>
+    // Bütün kodun bu funksiyanın daxilində olduğuna əmin olun
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // ADSGRAM BAŞLANĞICI
+        // Köhnə, xətaya səbəb olan 'const button = document.getElementById('ad');' bloku silinib.
+        if (window.AdsGram) {
+            // Controller-i global dəyişənə mənimsədirik
+            AdController = window.AdsGram.init({ blockId: "16658" }); // Sizin Block ID-nizdir
+        } 
+        
+        // Sizin digər vacib funksiya çağırışlarınız burda davam edir:
+        loadUserState();
+        updateEnergyDisplay();
+        startEnergyRegen(); 
+        
+    }); 
+</script>
     <style>
         * {
             margin: 0;
