@@ -17,22 +17,34 @@
      </head>
     <body>
         
-        <script>
-                 // insert your block id
-            const AdController = window.Adsgram.init({ blockId:"16650"});
+<script>
+        // Bütün kodun bu funksiyanın daxilində olduğuna əmin olun
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Insert your block id
+            const AdController = window.Adsgram.init({ blockId: "16650" });
             const button = document.getElementById('ad');
-            button.addEventListener('click', () => {
-                AdController.show().then((result) => {
-                    // user watch ad till the end or close it in interstitial format
-                    // your code to reward user for rewarded format
-                    alert('Reward');
-                }).catch((result) => {
-                    // user get error during playing ad
-                    // do nothing or whatever you want
-                    alert(JSON.stringify(result, null, 4));
-                })
-            })
-        </script>
+
+            // Əlavə olaraq yoxlama əlavə edək (daha təhlükəsizdir)
+            if (button) {
+                button.addEventListener('click', () => {
+                    AdController.show().then((result) => {
+                        // user watch ad till the end or close it in interstitial format
+
+                        // your code to reward user for rewarded format
+                        alert("Reward");
+                    }).catch((result) => {
+                        // user gas error during playing ad
+                        // do nothing or whatever you want
+                        alert(JSON.stringify(result, null, 4));
+                    })
+                });
+            } else {
+                // Elementin tapılmadığını bilmək üçün konsola xəta çıxaraq
+                console.error('Element with ID "ad" not found!');
+            }
+        });
+    </script>
     <style>
         * {
             margin: 0;
