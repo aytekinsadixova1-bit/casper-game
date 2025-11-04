@@ -1535,32 +1535,6 @@ const ADMIN_WHATSAPP_NUMBER = "0513248685";
 
 const BASE_INVITE_URL = window.location.href.split('?')[0];
 
-const ads = [
-    {
-        id: 1,
-        title: "🎮 YENİ OYUN TƏKLİFİ",
-        description: "Bu mobil oyunu yükləyin və xüsusi bonus qazanın!",
-        color: "#ff6b6b",
-        duration: 10,
-        type: "premium"
-    },
-    {
-        id: 2,
-        title: "🛒 ONLAYN ALIŞ-VERİŞ",
-        description: "Xüsusi endirimlərdən yararlanın!",
-        color: "#4ecdc4",
-        duration: 10,
-        type: "special"
-    },
-    {
-        id: 3,
-        title: "📱 TƏTBİQ TƏKLİFİ",
-        description: "Bu faydalı tətbiqi yükləyin!",
-        color: "#45b7d1",
-        duration: 10,
-        type: "bonus"
-    }
-];
    let currentUserState = {
     cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
     maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP,
@@ -1569,9 +1543,7 @@ const ads = [
     lastClickTime: Date.now(), successfulReferrals: 0, referralBonusEarned: 0.00, 
     lastWithdrawalDate: null, registrationDate: null
 };
-// ... [let currentUserState = {...} obyekti burda bitir, təxminən 1583-cü sətir]
 
-// 🔥 BURAYA loadUserState funksiyasını əlavə edin
 function loadUserState() {
     const savedState = localStorage.getItem('userState');
     if (savedState) {
