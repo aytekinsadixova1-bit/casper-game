@@ -18,45 +18,33 @@
     <body>
         
 <script>
-    // AdsGram Controller-i global olaraq təyin edirik ki, həm düymə, həm də 30 klik onu görsün.
-    let AdController = null; 
+        // Bütün kodun bu funksiyanın daxilində olduğuna əmin olun
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Insert your block id
+            const AdController = window.Adsgram.init({ blockId: "16650" });
+            const button = document.getElementById('ad');
 
-    // Bütün kodun bu funksiyanın daxilində olduğuna əmin olun
-    document.addEventListener('DOMContentLoaded', function() {
-        
-        // ADSGRAM BAŞLANĞICI
-      
-        if (window.AdsGram) {
-            // Controller-i global dəyişənə mənimsədirik
-            AdController = window.AdsGram.init({ blockId: "16650" }); // Sizin Block ID-nizdir
-        } 
-    }); 
+            // Əlavə olaraq yoxlama əlavə edək (daha təhlükəsizdir)
+            if (button) {
+                button.addEventListener('click', () => {
+                    AdController.show().then((result) => {
+                        // user watch ad till the end or close it in interstitial format
 
-function loadUserState() {
-    const savedState = localStorage.getItem('userState');
-    if (savedState) {
-        // Yaddaşı yükləyir
-        const loadedState = JSON.parse(savedState);
-        
-        // Hər bir açar üçün yüklənmiş dəyəri currentUserState-ə kopyalayır
-        for (const key in currentUserState) {
-            if (loadedState.hasOwnProperty(key)) {
-                // Xüsusi: Bəzi dəyərlər vaxtdır, ona görə də onları int-ə çevirmək lazımdır
-                if (key === 'lastEnergyUpdate' || key === 'lastClickTime') {
-                    currentUserState[key] = parseInt(loadedState[key]);
-                } else if (key === 'totalMoney' || key === 'referralBonusEarned') {
-                    // Pul dəyərləri
-                    currentUserState[key] = parseFloat(loadedState[key]);
-                }
-                else {
-                    currentUserState[key] = loadedState[key];
-                }
-             }
-        }
-    } 
-}  
-    
-</script>
+                        // your code to reward user for rewarded format
+                        alert("Reward");
+                    }).catch((result) => {
+                        // user gas error during playing ad
+                        // do nothing or whatever you want
+                        alert(JSON.stringify(result, null, 4));
+                    })
+                });
+            } else {
+                // Elementin tapılmadığını bilmək üçün konsola xəta çıxaraq
+                console.error('Element with ID "ad" not found!');
+            }
+        });
+    </script>
     <style>
         * {
             margin: 0;
@@ -927,14 +915,14 @@ function loadUserState() {
                         </div>
 
                         <!-- YENİ ADSGRAM REWARD VIDEO DÜYMƏSİ -->
-                 <div class="bonus-info" style="margin: 15px 0; text-align: center;">
-    <button onclick="showAd()" class="adgram-video-btn">
-        🎬 Video İzlə & 0.000001 AZN Qazan!
-    </button>
-    <p style="font-size: 12px; color: #6c757d; margin-top: 5px;">
-        Hər video üçün 0.000001 AZN bonus! Gündəlik limit yoxdur!
-    </p>
-</div>
+                        <div class="bonus-info" style="margin: 15px 0; text-align: center;">
+                            <button onclick="showAdsGramRewardVideo()" class="adsgram-video-btn">
+                                🎬 Video İzlə & 0.001 AZN Qazan!
+                            </button>
+                            <p style="font-size: 12px; color: #6c757d; margin-top: 5px;">
+                                Hər video üçün 0.001 AZN bonus! Gündəlik limit yoxdur!
+                            </p>
+                        </div>
 
                         <div class="bonus-info">
                             <strong>Reklam Bonusu:</strong> Hər reklam üçün <strong>0.0001 AZN</strong> (hər biri 10 saniyə)
@@ -1527,13 +1515,14 @@ function loadImages() {
 // OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR
 // =================================================================
 
-const AD_INTERVAL = 30; // 30 klikdən sonra reklam
+let users = {};
 const ENERGY_CONSUMPTION_PER_CLICK = 1;     
 const MAX_ENERGY_CAP = 100000;              
 
-const AD_COUNT = 1;
-const AD_DURATION = 0;
-const SINGLE_AD_REWARD = 0.000001; // Yeni bonus dəyəri
+const AD_INTERVAL = 30;
+const AD_COUNT = 3;
+const AD_DURATION = 10;
+const AD_REWARD_PER_AD = 0.0001;
 
 const ENERGY_REGEN_INTERVAL = 1000;         
 const MONEY_PER_CLICK = 0.000003;
@@ -1554,7 +1543,39 @@ const ADMIN_WHATSAPP_NUMBER = "0513248685";
 
 const BASE_INVITE_URL = window.location.href.split('?')[0];
 
-   let currentUserState = {
+const ads = [
+    {
+        id: 1,
+        title: "🎮 YENİ OYUN TƏKLİFİ",
+        description: "Bu mobil oyunu yükləyin və xüsusi bonus qazanın!",
+        color: "#ff6b6b",
+        duration: 10,
+        type: "premium"
+    },
+    {
+        id: 2,
+        title: "🛒 ONLAYN ALIŞ-VERİŞ",
+        description: "Xüsusi endirimlərdən yararlanın!",
+        color: "#4ecdc4",
+        duration: 10,
+        type: "special"
+    },
+    {
+        id: 3,
+        title: "📱 TƏTBİQ TƏKLİFİ",
+        description: "Bu faydalı tətbiqi yükləyin!",
+        color: "#45b7d1",
+        duration: 10,
+        type: "bonus"
+    }
+];
+
+let currentAdIndex = 0;
+let adTimerInterval;
+let adTimeLeft = 0;
+let totalAdRewardEarned = 0;
+
+let currentUserState = {
     cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
     maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP,
     clicksUntilAd: AD_INTERVAL, totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
@@ -1563,111 +1584,6 @@ const BASE_INVITE_URL = window.location.href.split('?')[0];
     lastWithdrawalDate: null, registrationDate: null
 };
 
-function loadUserState() {
-    const savedState = localStorage.getItem('userState');
-    if (savedState) {
-        // Yaddaşı yükləyir
-        const loadedState = JSON.parse(savedState);
-        
-        // Hər bir açar üçün yüklənmiş dəyəri currentUserState-ə kopyalayır
-        for (const key in currentUserState) {
-            if (loadedState.hasOwnProperty(key)) {
-                // Xüsusi: Bəzi dəyərlər vaxtdır, ona görə də onları int-ə çevirmək lazımdır
-                if (key === 'lastEnergyUpdate' || key === 'lastClickTime') {
-                    currentUserState[key] = parseInt(loadedState[key]);
-                } else if (key === 'totalMoney' || key === 'referralBonusEarned') {
-                    // Pul dəyərləri
-                    currentUserState[key] = parseFloat(loadedState[key]);
-                }
-                else {
-                    currentUserState[key] = loadedState[key];
-                }
-             }
-        }
-    } 
-}  
-// ----------------------------------------------------
-// ENERJİ BƏRPASI FUNKSİYALARI
-// ----------------------------------------------------
-
-function updateEnergy() {
-    const now = Date.now();
-    
-    // Keçən vaxtı hesablayır (milisaniyə ilə)
-    const timeElapsed = now - currentUserState.lastEnergyUpdate; 
-    
-    // Enerji bərpa dərəcəsini saniyəyə görə hesablayır (BASE_REGEN_RATE / 60)
-    // BASE_REGEN_RATE (dəqiqədə bərpa olunan enerji) CONSTANT-larda təyin olunub (təxminən 1527-ci sətir)
-    const energyGained = (timeElapsed / 1000) * (currentUserState.energyRegenRate / 60); 
-
-    // Cari enerjini bərpa edir, lakin MAX_ENERGY-ni aşmır
-    currentUserState.currentEnergy = Math.min(
-        currentUserState.maxEnergy,
-        currentUserState.currentEnergy + energyGained
-    );
-
-    // Son yenilənmə vaxtını cari vaxta dəyişir
-    currentUserState.lastEnergyUpdate = now;
-    
-    // Ekranı və yaddaşı yeniləyir (Bu funksiyalar təyin olunmalıdır!)
-    updateEnergyDisplay(); 
-    saveUserState(); 
-}
-
-function startEnergyRegen() {
-    // updateEnergy() funksiyasını hər saniyədə çağırır
-    setInterval(updateEnergy, 1000); 
-    
-    // İlkin yenilənməni də çağırır ki, oyun başlayan kimi enerji düzgün hesablansın
-    updateEnergy(); 
-}
-            
- // ----------------------------------------------------
-// YENİ ADSGRAM REKLAMINI İDARƏ ETMƏ FUNKSİYASI
-// ----------------------------------------------------
-
-function showAd() {
-    // AdsGram Controller-in mövcudluğunu yoxlayır (bu, 30-33-cü sətirlərdə təyin olunub)
-    if (typeof AdController === 'undefined' || !AdController) {
-        console.error("AdsGram sistemi hazır deyil. Zəhmət olmasa, yenidən yoxlayın.");
-        return;
-    }
-
-    // Reklamı göstərməyi çağırır
-    AdController.show().then(result => {
-        // ✅ REKLAM UĞURLA TAMAMLANDI
-        
-        // SINGLE_AD_REWARD CONSTANT-lardan götürülür (təxminən 1523-cü sətir)
-        const REWARD_AMOUNT = 0.000001; 
-        const AD_INTERVAL = 30; // AD_INTERVAL CONSTANT-lardan götürülür (təxminən 1522-ci sətir)
-        
-        // Pulu əlavə edin
-        currentUserState.totalMoney += REWARD_AMOUNT;
-        
-        // Klik sayğacını sıfırlayın
-        currentUserState.clicksUntilAd = AD_INTERVAL; 
-        
-        // Nəticəni göstərin (formatMoney funksiyası təyin olunmalıdır)
-        showSuccess(`🎉 Reklam uğurla tamamlandı! Bonus: +${REWARD_AMOUNT.toFixed(6)} AZN`);
-        
-        // Oyunu və məlumatları yeniləyin
-        updateEnergyDisplay();
-        saveUserState(); // saveUserState funksiyası təyin olunmalıdır.
-
-    }).catch(error => {
-        // ❌ XƏTA VƏ YA İSTİFADƏÇİ İMTINASI
-        console.error("AdsGram reklam xətası:", error);
-        
-        // Sayğacı sıfırlayır ki, istifadəçi yenidən cəhd etsin
-        currentUserState.clicksUntilAd = AD_INTERVAL;
-        
-        // Oyunu yeniləyin
-        updateEnergyDisplay();
-    });
-}
-
-// 🔥 BURAYA startEnergyRegen funksiyası gəlir (təxminən 1620-ci sətir)
-// ...
 // DOM Elementləri
 const splashScreen = document.getElementById('splashScreen');
 const mainContent = document.getElementById('mainContent');
@@ -1937,36 +1853,102 @@ function generateReferralCode(username) {
 }
 
 // =================================================================
-// REKLAM SİSTEMİ FUNKSİYALARI (1 REKLAM, 1 BONUS)
+// REKLAM SİSTEMİ FUNKSİYALARI
 // =================================================================
+
 function showAd() {
-    // 30 klikdə və ya düyməyə basanda bu funksiya işə düşür
-    if (!AdController) {
-        console.error("AdsGram sistemi hazır deyil. Zəhmət olmasa, yenidən yoxlayın.");
+    if (adScreen.style.display === 'flex') return;
+    
+    currentAdIndex = 0;
+    totalAdRewardEarned = 0;
+    
+    showNextAd();
+}
+
+function showNextAd() {
+    if (currentAdIndex >= AD_COUNT) {
+        closeAd();
         return;
     }
-
-    AdController.show().then(result => {
-        // ✅ Uğurlu tamamlanma məntiqi
-        
-        // SINGLE_AD_REWARD dəyərini CONSTANT-lardan götürün (məsələn, 1523-cü sətir)
-        const REWARD_AMOUNT = 0.000001; 
-        
-        currentUserState.totalMoney += REWARD_AMOUNT;
-        currentUserState.clicksUntilAd = AD_INTERVAL; // Sayğacı sıfırlayır
-        
-        showSuccess(`🎉 Reklam uğurla tamamlandı! Bonus: +${REWARD_AMOUNT.toFixed(6)} AZN`);
-        
-        updateEnergyDisplay();
-        saveUserState();
-
-    }).catch(error => {
-        // ❌ Xəta və ya istifadəçi imtina edərsə
-        console.error("AdsGram reklam xətası:", error);
-        currentUserState.clicksUntilAd = AD_INTERVAL; // Sayğacı yenə də sıfırlayır
-        updateEnergyDisplay();
-    });
+    
+    const currentAd = ads[currentAdIndex];
+    adTimeLeft = AD_DURATION;
+    
+    let adHtml = `
+        <div class="ad-pulse">
+            <h3 style="font-size: 24px; margin-bottom: 10px; color: ${currentAd.color}">${currentAd.title}</h3>
+            <p style="margin-bottom: 20px; color: #ccc; font-size: 14px;">${currentAd.description}</p>
+            <div class="ad-timer" id="adTimer">${adTimeLeft}</div>
+            <div class="ad-counter">Reklam ${currentAdIndex + 1}/${AD_COUNT}</div>
+            <div class="ad-reward">Bu reklam üçün: +${formatMoney(AD_REWARD_PER_AD)}</div>
+            <p class="ad-message">Reklam avtomatik bağlanacaq</p>
+            <button class="ad-skip-btn" onclick="skipAd()">Keç (${adTimeLeft}s)</button>
+        </div>
+    `;
+    
+    adContent.innerHTML = adHtml;
+    adContent.className = `ad-content ad-${currentAd.type}`;
+    adScreen.style.display = 'flex';
+    
+    startAdTimer();
 }
+
+function startAdTimer() {
+    clearInterval(adTimerInterval);
+    
+    adTimerInterval = setInterval(() => {
+        adTimeLeft--;
+        
+        document.getElementById('adTimer').textContent = adTimeLeft;
+        document.getElementById('adProgressText').textContent = `Reklam bitir: ${adTimeLeft}s`;
+        
+        const progressPercent = ((AD_DURATION - adTimeLeft) / AD_DURATION) * 100;
+        document.getElementById('adProgressFill').style.width = `${progressPercent}%`;
+        
+        const skipBtn = document.querySelector('.ad-skip-btn');
+        if (skipBtn) {
+            skipBtn.textContent = `Keç (${adTimeLeft}s)`;
+            skipBtn.disabled = true;
+        }
+        
+        if (adTimeLeft <= 0) {
+            clearInterval(adTimerInterval);
+            completeCurrentAd();
+        }
+    }, 1000);
+}
+
+function completeCurrentAd() {
+    currentUserState.totalMoney += AD_REWARD_PER_AD;
+    totalAdRewardEarned += AD_REWARD_PER_AD;
+    
+    currentAdIndex++;
+    
+    setTimeout(() => {
+        showNextAd();
+    }, 500);
+}
+
+function skipAd() {
+    if (adTimeLeft > 3) {
+        return;
+    }
+    
+    clearInterval(adTimerInterval);
+    completeCurrentAd();
+}
+
+function closeAd() {
+    clearInterval(adTimerInterval);
+    adScreen.style.display = 'none';
+    
+    currentUserState.clicksUntilAd = AD_INTERVAL;
+    
+    showSuccess(`🎉 ${AD_COUNT} reklam tamamlandı! Ümumi bonus: +${formatMoney(totalAdRewardEarned)} AZN`);
+    
+    updateEnergyDisplay();
+}
+
 // =================================================================
 // WHATSAPP GÖNDƏRMƏ FUNKSİYASI
 // =================================================================
