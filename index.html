@@ -1564,11 +1564,11 @@ function showAdsGramRewardVideo() {
             // Təbriklər mesajı
             showSuccess(`🎉 Reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
             
-            // 10 saniyə gözlə
+            // 1 saniyə gözlə
             setTimeout(() => {
                 adsgramRewardAvailable = true;
                 console.log('🔄 AdsGram reward video yenidən aktiv oldu');
-            }, 10000); // 10 saniyə (DƏYİŞDİRİLDİ)
+            }, 1000); // 1 saniyə (DƏYİŞDİRİLDİ)
         })
         .catch((error) => {
             console.error('❌ AdsGram reward video xətası:', error);
