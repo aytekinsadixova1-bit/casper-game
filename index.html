@@ -1504,76 +1504,92 @@ try {
 } catch (error) {
     console.error('❌ Firebase xətası:', error);
 }
+
 // =================================================================
-// ADSGRAM REKLAM SİSTEMİ (YENİLƏNMİŞ VERSİYA - 30 SANİYƏ ARAYLA)
+// ADSGRAM REKLAM SİSTEMİ
 // =================================================================
 
-// Reward video göstərmək üçün funksiya (30 klik üçün də istifadə olunur)
-function showAdsGramRewardVideo(isAutoAd = false) { 
+let AdsgramController = null;
+let adsgramRewardAvailable = true;
+
+// AdsGram sistemini başlat
+function initializeAdsGram() {
+    try {
+        if (window.Adsgram) {
+            // Block ID-ni burada dəyişin - AdsGram panelindən aldığınız block ID
+            AdsgramController = window.Adsgram.init({ blockId: "16650" });
+            console.log('✅ AdsGram sistemi uğurla başladıldı');
+            return true;
+        } else {
+            console.log('❌ AdsGram SDK yüklənməyib');
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ AdsGram başlatma xətası:', error);
+        return false;
+    }
+}
+
+// Reward video göstərmək üçün funksiya
+function showAdsGramRewardVideo() {
+    if (!adsgramRewardAvailable) {
+        alert('🎬 Reward video hazır deyil. Bir neçə dəqiqə gözləyin.');
+        return false;
+    }
+    
     if (!AdsgramController) {
         const initialized = initializeAdsGram();
         if (!initialized) {
-            console.log('❌ Reklam sistemi hazır deyil. Yenidən cəhd edin.');
+            alert('❌ Reklam sistemi hazır deyil. Yenidən cəhd edin.');
             return false;
         }
     }
+
+    adsgramRewardAvailable = false;
     
-    // YALNIZ MÜKAFATLI BUTTON KLİKİ ÜÇÜN mövcudluq yoxlaması
-    if (!isAutoAd && !adsgramRewardAvailable) { 
-        alert('🎬 Reward video hazır deyil. Bir neçə saniyə gözləyin.');
-        return false;
-    }
-
-    // YALNIZ MÜKAFATLI BUTTON KLİKİ ÜÇÜN aralıq tətbiq olunur
-    if (!isAutoAd) {
-        adsgramRewardAvailable = false;
-    }
-
-    isAdShowing = true; // 🌟 OYUNU DONDUR
-
     AdsgramController.show()
         .then((result) => {
-            console.log('✅ AdsGram video tamamlandı!', result);
+            console.log('✅ AdsGram reward video tamamlandı!', result);
             
-            isAdShowing = false; // 🌟 OYUNU BƏRPA ET (Reklam uğurla bağlandı)
-
-            // YALNIZ MÜKAFATLI BUTTON KLİKİ ÜÇÜN bonus verilir
-            if (!isAutoAd) {
-                const rewardAmount = 0.001; 
-                currentUserState.totalMoney += rewardAmount;
-                saveUserState();
-                updateEnergyDisplay();
-                showSuccess(`🎉 Reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
-                
-                // 30 SANİYƏ GÖZLƏMƏNİ YENİDƏN BAŞLAT
-                setTimeout(() => {
-                    adsgramRewardAvailable = true;
-                    console.log('🔄 AdsGram reward video yenidən aktiv oldu');
-                }, 30000); 
-            }
+            // Oyunçuya böyük bonus ver
+            const rewardAmount = 0.001; // 0.001 AZN bonus
+            currentUserState.totalMoney += rewardAmount;
+            
+            // Firebase-ə yaz
+            saveUserState();
+            
+            // UI yenilə
+            updateEnergyDisplay();
+            
+            // Təbriklər mesajı
+            showSuccess(`🎉 Reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
+            
+            // 5 dəqiqə gözlə
+            setTimeout(() => {
+                adsgramRewardAvailable = true;
+                console.log('🔄 AdsGram reward video yenidən aktiv oldu');
+            }, 300000); // 1 dəqiqə
         })
         .catch((error) => {
-            console.error('❌ AdsGram video xətası:', error);
+            console.error('❌ AdsGram reward video xətası:', error);
             
-            isAdShowing = false; // 🌟 OYUNU BƏRPA ET (Reklamda xəta oldu)
+            let errorMessage = 'Reklam göstərilərkən xəta baş verdi.';
             
-            // YALNIZ MÜKAFATLI BUTTON KLİKİ ÜÇÜN xəta bildirişi
-            if (!isAutoAd) {
-                let errorMessage = 'Reklam göstərilərkən xəta baş verdi.';
-                if (error && error.description) {
-                    errorMessage = error.description;
-                }
-                alert(`❌ ${errorMessage}`);
-                
-                // 30 SANİYƏ GÖZLƏMƏNİ YENİDƏN BAŞLAT
-                setTimeout(() => {
-                    adsgramRewardAvailable = true;
-                }, 30000); 
+            if (error && error.description) {
+                errorMessage = error.description;
             }
+            
+            alert(`❌ ${errorMessage}`);
+            
+            // 1 dəqiqə gözlə
+            setTimeout(() => {
+                adsgramRewardAvailable = true;
+            }, 60000); // 1 dəqiqə
         });
     
     return true;
 }
+
 // =================================================================
 // TELEGRAM BOT AYARLARI
 // =================================================================
@@ -1787,11 +1803,12 @@ function loadImages() {
 let users = {};
 const ENERGY_CONSUMPTION_PER_CLICK = 1;     
 const MAX_ENERGY_CAP = 100000;              
-        
-const AD_DISPLAY_CLICKS = 30; // Reklamın çıxması üçün lazım olan klik sayı
-let clickCounter = 0;       // Klik sayğacı, hər klikdə artırılır
-let isAdShowing = false;    // Reklam göstərilən zaman klikləri dondurur
-        
+
+const AD_INTERVAL = 30;
+const AD_COUNT = 3;
+const AD_DURATION = 10;
+const AD_REWARD_PER_AD = 0.0001;
+
 const ENERGY_REGEN_INTERVAL = 1000;         
 const MONEY_PER_CLICK = 0.000003;
 const MONEY_DECIMAL_PLACES = 6;         
@@ -1838,21 +1855,18 @@ const ads = [
     }
 ];
 
+let currentAdIndex = 0;
+let adTimerInterval;
+let adTimeLeft = 0;
+let totalAdRewardEarned = 0;
+
 let currentUserState = {
     cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
-    // 👇 MAX_ENERGY_CAP-i yoxlamalıyıq ki, yerində olsun.
     maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP,
-    
-    // ❌ SİLİNMİŞ KÖHNƏ DƏYİŞƏNLƏR ÇIXARILDI: AD_INTERVAL, clicksUntilAd
-    totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
-    
-    // ❌ BASE_REGEN_RATE ya düzəldilməli, ya da sabit rəqəmlə əvəz edilməlidir.
-    // Əgər BASE_REGEN_RATE yuxarıda elan edilməyibsə:
-    energyRegenRate: 1, // Və ya yuxarıda elan edilmiş dəyərlə əvəz edin
-    
-    scorePerClick: 1, lastEnergyUpdate: Date.now(), 
+    clicksUntilAd: AD_INTERVAL, totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
+    energyRegenRate: BASE_REGEN_RATE, scorePerClick: 1, lastEnergyUpdate: Date.now(), 
     lastClickTime: Date.now(), successfulReferrals: 0, referralBonusEarned: 0.00, 
-    lastWithdrawalDate: null, registrationDate: null 
+    lastWithdrawalDate: null, registrationDate: null
 };
 
 // DOM Elementləri
@@ -2889,64 +2903,48 @@ function createGhostStabEffect(event) {
 
 // İkon klik funksiyası
 function clickIcon(e) {
-    // 🌟 1. KLİKLƏRİ BLOKLAMA
-    if (isAdShowing) {
-        return; 
-    }
-    
     const state = currentUserState;
     const now = Date.now();
 
-    // 1. Klikləmə sürəti yoxlaması
     if (now - state.lastClickTime < 50) return;
     state.lastClickTime = now;
     
-    // 2. Login yoxlaması
     if (!state.username) {
         alert("Oynamaq üçün zəhmət olmasa daxil olun!");
         return;
     }
     
-    // 3. Animasiyalar
     addGhostAnimations(e);
     
-    // 🌟 4. ENERJİ VƏ KLİK İŞLƏMİ
-    
-    if (state.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) {
+    if (state.clicksUntilAd <= 1) { 
+        state.clicksUntilAd = 0; 
+        showAd(); 
+        return; 
+    }
+
+    if (state.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) { 
+        if (state.clicksUntilAd > 0) {
+            state.clicksUntilAd = 0; 
+            showAd();
+        }
         return;
     }
 
-    // 4.1. Əsas oyun məntiqi
     const moneyEarned = MONEY_PER_CLICK;
 
-    state.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK;
+    state.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK; 
     state.totalClicks++;
-    state.totalMoney += moneyEarned;
-    state.energyUsed += ENERGY_CONSUMPTION_PER_CLICK;
+    state.totalMoney += moneyEarned; 
+    state.energyUsed += ENERGY_CONSUMPTION_PER_CLICK; 
     
-    // 4.2. Yeni klik sayğacını artır
-    clickCounter++;
+    if (state.clicksUntilAd > 0) {
+        state.clicksUntilAd--;
+    }
     
-    // 4.3. Displayləri və Popup-u yenilə
     updateEnergyDisplay();
     createMoneyPopup(e, moneyEarned);
-
-    // -----------------------------------------------------------------
-    // 🌟 5. ADSGRAM 30 KLİK REKLAM YOXLAMASI
-    // -----------------------------------------------------------------
-    if (clickCounter >= AD_DISPLAY_CLICKS) {
-        console.log('✅ 30 klik tamamlandı. Adsgram reklamı göstərilir.');
-        
-        // isAutoAd=true ilə çağırırıq ki, reward bonusu verməsin
-        const adShown = showAdsGramRewardVideo(true); 
-
-        if (adShown) {
-            clickCounter = 0; // Reklam başladığı üçün sayğacı sıfırla
-        } else {
-            console.log('❌ Adsgram reklamı göstərilə bilmədi.');
-        }
-    }
 }
+
 // Başlanğıc funksiyası
 window.addEventListener('load', async function() {
     loadImages();
