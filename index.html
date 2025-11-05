@@ -1808,6 +1808,9 @@ const AD_INTERVAL = 30;
 const AD_COUNT = 3;
 const AD_DURATION = 10;
 const AD_REWARD_PER_AD = 0.0001;
+const AD_DISPLAY_CLICKS = 30; // 🌟 Reklamın çıxması üçün lazım olan klik sayı
+let clickCounter = 0; // 🌟 Klik sayğacı, hər klikdə artırılır
+      
 
 const ENERGY_REGEN_INTERVAL = 1000;         
 const MONEY_PER_CLICK = 0.000003;
@@ -2906,43 +2909,61 @@ function clickIcon(e) {
     const state = currentUserState;
     const now = Date.now();
 
+    // 1. Klikləmə sürəti yoxlaması
     if (now - state.lastClickTime < 50) return;
     state.lastClickTime = now;
     
+    // 2. Login yoxlaması
     if (!state.username) {
         alert("Oynamaq üçün zəhmət olmasa daxil olun!");
         return;
     }
     
+    // 3. Animasiyalar
     addGhostAnimations(e);
     
-    if (state.clicksUntilAd <= 1) { 
-        state.clicksUntilAd = 0; 
-        showAd(); 
-        return; 
-    }
-
-    if (state.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) { 
-        if (state.clicksUntilAd > 0) {
-            state.clicksUntilAd = 0; 
-            showAd();
-        }
+    // 🌟 4. ENERJİ VƏ KLİK İŞLƏMİ (Köhnə reklam kodları SİLİNDİ)
+    
+    if (state.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) {
+        // Enerji yoxdursa, reklam çıxarmaq əvəzinə sadəcə çıx
         return;
     }
 
+    // 4.1. Əsas oyun məntiqi
     const moneyEarned = MONEY_PER_CLICK;
 
-    state.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK; 
+    state.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK;
     state.totalClicks++;
-    state.totalMoney += moneyEarned; 
-    state.energyUsed += ENERGY_CONSUMPTION_PER_CLICK; 
+    state.totalMoney += moneyEarned;
+    state.energyUsed += ENERGY_CONSUMPTION_PER_CLICK;
     
-    if (state.clicksUntilAd > 0) {
-        state.clicksUntilAd--;
-    }
+    // 4.2. Yeni klik sayğacını artır
+    clickCounter++;
     
+    // 4.3. Displayləri və Popup-u yenilə
     updateEnergyDisplay();
     createMoneyPopup(e, moneyEarned);
+
+    // -------------------------------------------------------------
+    // 🌟 5. ADSGRAM 30 KLİK REKLAM YOXLAMASI
+    // -------------------------------------------------------------
+
+    if (clickCounter >= AD_DISPLAY_CLICKS) {
+        console.log('✅ 30 klik tamamlandı. Adsgram reklamı göstərilir.');
+        
+        // ⚠️ BURANI ADSGRAM-IN 30 KLİK ÜÇÜN VERDİYİ ID İLƏ ƏVƏZ EDİN!
+        const AD_PLACEMENT_ID_30_CLICKS = 'int-16936'; 
+
+        // Button reklamınızda işləyən funksiyanı çağırın (showAdsgramAd funksiyasının koda əlavə olunduğunu fərz edirik)
+        const adShown = showAdsgramAd(AD_PLACEMENT_ID_30_CLICKS); 
+
+        if (adShown) {
+            clickCounter = 0; // Reklam göstərildisə, sayğacı sıfırla
+        } else {
+            console.log('❌ Adsgram reklamı göstərilə bilmədi.');
+            // Reklam göstərilmədisə, sayğacı sıfırlamırıq ki, növbəti klikdə yenə yoxlasın.
+        }
+    }
 }
 
 // Başlanğıc funksiyası
