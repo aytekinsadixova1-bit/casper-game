@@ -1838,18 +1838,21 @@ const ads = [
     }
 ];
 
-let currentAdIndex = 0;
-let adTimerInterval;
-let adTimeLeft = 0;
-let totalAdRewardEarned = 0;
-
 let currentUserState = {
     cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
+    // 👇 MAX_ENERGY_CAP-i yoxlamalıyıq ki, yerində olsun.
     maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP,
-    clicksUntilAd: AD_INTERVAL, totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
-    energyRegenRate: BASE_REGEN_RATE, scorePerClick: 1, lastEnergyUpdate: Date.now(), 
+    
+    // ❌ SİLİNMİŞ KÖHNƏ DƏYİŞƏNLƏR ÇIXARILDI: AD_INTERVAL, clicksUntilAd
+    totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
+    
+    // ❌ BASE_REGEN_RATE ya düzəldilməli, ya da sabit rəqəmlə əvəz edilməlidir.
+    // Əgər BASE_REGEN_RATE yuxarıda elan edilməyibsə:
+    energyRegenRate: 1, // Və ya yuxarıda elan edilmiş dəyərlə əvəz edin
+    
+    scorePerClick: 1, lastEnergyUpdate: Date.now(), 
     lastClickTime: Date.now(), successfulReferrals: 0, referralBonusEarned: 0.00, 
-    lastWithdrawalDate: null, registrationDate: null
+    lastWithdrawalDate: null, registrationDate: null 
 };
 
 // DOM Elementləri
