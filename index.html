@@ -1553,7 +1553,7 @@ function showAdsGramRewardVideo() {
             
             // Oyunçuya böyük bonus ver
             const rewardAmount = 0.001; // 0.001 AZN bonus
-            currentUserState.totalMoney += rewardAmount;
+   currentUserState.totalMoney += rewardAmount;
             
             // Firebase-ə yaz
             saveUserState();
@@ -1564,11 +1564,11 @@ function showAdsGramRewardVideo() {
             // Təbriklər mesajı
             showSuccess(`🎉 Reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
             
-            // 5 dəqiqə gözlə
+            // 10 saniyə gözlə
             setTimeout(() => {
                 adsgramRewardAvailable = true;
                 console.log('🔄 AdsGram reward video yenidən aktiv oldu');
-            }, 300000); // 1 dəqiqə
+            }, 10000); // 10 saniyə (DƏYİŞDİRİLDİ)
         })
         .catch((error) => {
             console.error('❌ AdsGram reward video xətası:', error);
@@ -1581,15 +1581,14 @@ function showAdsGramRewardVideo() {
             
             alert(`❌ ${errorMessage}`);
             
-            // 1 dəqiqə gözlə
+            // 10 saniyə gözlə
             setTimeout(() => {
                 adsgramRewardAvailable = true;
-            }, 60000); // 1 dəqiqə
+            }, 10000); // 10 saniyə (DƏYİŞDİRİLDİ)
         });
     
     return true;
 }
-
 // =================================================================
 // TELEGRAM BOT AYARLARI
 // =================================================================
