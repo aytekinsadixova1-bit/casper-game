@@ -1647,17 +1647,28 @@ function startButtonVideoCooldown() {
 }
 
 // =================================================================
-// ADSGRAM 30 KLİK REWARD VIDEO SİSTEMİ - YENİ
+// ADSGRAM 30 KLİK REWARD VIDEO SİSTEMİ - YENİLƏNİB
 // =================================================================
 
 let Adsgram30ClickController = null;
+let isAdsGram30ClickReady = false;
 
 // AdsGram 30 klik reward video sistemini başlat
 function initializeAdsGram30Click() {
     try {
         if (window.Adsgram) {
             // 30 klikdən sonra gələcək reklam üçün YENİ UnitID
-            Adsgram30ClickController = window.Adsgram.init({ blockId: "17053" });
+            Adsgram30ClickController = window.Adsgram.init({ 
+                blockId: "17053",
+                onReady: function() {
+                    console.log('✅ AdsGram 30 Klik Reward Video HAZIRDIR');
+                    isAdsGram30ClickReady = true;
+                },
+                onError: function(error) {
+                    console.error('❌ AdsGram 30 Klik Reward Video xətası:', error);
+                    isAdsGram30ClickReady = false;
+                }
+            });
             console.log('✅ AdsGram 30 Klik Reward Video sistemi uğurla başladıldı');
             return true;
         } else {
@@ -1670,7 +1681,7 @@ function initializeAdsGram30Click() {
     }
 }
 
-// 30 klikdən sonra gələcək AdsGram reward video funksiyası
+// 30 klikdən sonra gələcək AdsGram reward video funksiyası - YENİLƏNİB
 function showAdsGram30ClickReward() {
     console.log('🔄 30 klik reklamı başladı...');
     
@@ -1680,35 +1691,52 @@ function showAdsGram30ClickReward() {
         return false;
     }
     
-    // 1. ƏVVƏLCƏ AdsGram sisteminin tam yükləndiyindən ƏMIN OL
-    if (typeof Adsgram30ClickController === 'undefined') {
-        console.error('❌ AdsGram controller tapılmadı!');
+    // 1. AdsGram sisteminin tam yükləndiyindən və hazır olduğundan əmin ol
+    if (!Adsgram30ClickController || !isAdsGram30ClickReady) {
+        console.error('❌ AdsGram controller hazır deyil!');
         
-        // ✅ HƏR HALDA KLİK SAYĞACINI SIFIRLA - DONMAYA QARŞI
+        // Reklam hazır deyilsə, yenidən başlatmağa çalış
+        if (!Adsgram30ClickController) {
+            initializeAdsGram30Click();
+        }
+        
+        // HƏR HALDA KLİK SAYĞACINI SIFIRLA - DONMAYA QARŞI
         currentUserState.clicksUntilAd = AD_INTERVAL;
         updateEnergyDisplay();
+        
+        // İstifadəçiyə məlumat ver
+        showError("Reklam sistemi hazırlaşır. Bir neçə saniyə gözləyin...");
         return false;
     }
 
-    // 2. REKLAMIN HAZIR OLUB-OLMADIĞINI MƏCburi YOXLA
+    // 2. Reklamın mövcud olub-olmadığını yoxla
     if (typeof Adsgram30ClickController.isReady === 'function') {
-        if (!Adsgram30ClickController.isReady()) {
+        const isReady = Adsgram30ClickController.isReady();
+        console.log('🔍 Reklam hazırlıq statusu:', isReady);
+        
+        if (!isReady) {
             console.warn('⚠️ Reklam hazır deyil, isReady() false qaytarır');
             
-            // ✅ HƏR HALDA KLİK SAYĞACINI SIFIRLA
+            // HƏR HALDA KLİK SAYĞACINI SIFIRLA
             currentUserState.clicksUntilAd = AD_INTERVAL;
             updateEnergyDisplay();
+            
+            showError("Reklam hazır deyil. Bir neçə saniyə gözləyin...");
             return false;
         }
     }
 
-    // 3. TRY-CATCH İÇƏRISINDA REKLAMI GÖSTƏR
+    // 3. Reklamı göstər - GÜCLÜ ERROR HANDLING ilə
     try {
         console.log('🎬 Reklam göstərilməyə çalışılır...');
+        
+        // Reklam ekranını göstər (loading state)
+        showAdLoadingScreen();
         
         Adsgram30ClickController.show()
             .then((result) => {
                 console.log('✅ AdsGram 30 klik reward video tamamlandı!', result);
+                hideAdLoadingScreen();
                 
                 // Bonus ver
                 const rewardAmount = 0.0001; 
@@ -1718,7 +1746,7 @@ function showAdsGram30ClickReward() {
                 saveUserState();
                 updateEnergyDisplay();
                 
-                // "Sayğac sıfırlandı" mesajını GÖSTƏRMƏ - sadəcə bonus mesajı göster
+                // Təbriklər mesajı
                 showSuccess(`🎉 +${formatMoney(rewardAmount)} AZN qazandınız!`);
                 
                 // Klik sayını sıfırla
@@ -1733,6 +1761,7 @@ function showAdsGram30ClickReward() {
             })
             .catch((error) => {
                 console.error('❌ AdsGram 30 klik reward video xətası:', error);
+                hideAdLoadingScreen();
                 
                 let errorMessage = 'Reklam göstərilərkən xəta baş verdi.';
                 if (error && error.description) {
@@ -1740,9 +1769,9 @@ function showAdsGram30ClickReward() {
                 }
                 
                 // Xəta mesajını göstər
-                alert(`❌ ${errorMessage}`);
+                showError(`❌ ${errorMessage}`);
                 
-                // ✅ ÇOX ƏHƏMIYYƏTLİ: XƏTA OLSA BELƏ SAYĞACI SIFIRLA
+                // ÇOX ƏHƏMİYYƏTLİ: XƏTA OLSA BELƏ SAYĞACI SIFIRLA
                 currentUserState.clicksUntilAd = AD_INTERVAL;
                 updateEnergyDisplay();
                 
@@ -1756,10 +1785,11 @@ function showAdsGram30ClickReward() {
     } catch (e) {
         // "attempt to call show..." kimi dərhal baş verən xətalar
         console.error("🚨 AdsGram show() çağırışında dərhal xəta:", e.message);
+        hideAdLoadingScreen();
         
-        alert('Reklam sistemində texniki xəta. Yenidən cəhd edin.');
+        showError('Reklam sistemində texniki xəta. Yenidən cəhd edin.');
         
-        // ✅ ƏN ƏHƏMIYYƏTLİSİ: HƏR HALDA SAYĞACI SIFIRLA
+        // ƏN ƏHƏMİYYƏTLİSİ: HƏR HALDA SAYĞACI SIFIRLA
         currentUserState.clicksUntilAd = AD_INTERVAL;
         updateEnergyDisplay();
         
@@ -1773,6 +1803,65 @@ function showAdsGram30ClickReward() {
     }
     
     return true;
+}
+
+// Reklam yüklənmə ekranını göstər
+function showAdLoadingScreen() {
+    const loadingScreen = document.createElement('div');
+    loadingScreen.id = 'adLoadingScreen';
+    loadingScreen.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        z-index: 9999;
+        font-family: Arial, sans-serif;
+    `;
+    
+    loadingScreen.innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 24px; margin-bottom: 20px;">🎬</div>
+            <div style="font-size: 18px; margin-bottom: 10px;">Reklam yüklənir...</div>
+            <div style="font-size: 14px; opacity: 0.8;">Zəhmət olmasa gözləyin</div>
+            <div style="margin-top: 20px; width: 50px; height: 5px; background: #333; border-radius: 3px; overflow: hidden;">
+                <div id="adLoadingProgress" style="height: 100%; background: #00b894; width: 0%; transition: width 0.3s;"></div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(loadingScreen);
+    
+    // Loading progress animasiyası
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+        progress += 5;
+        if (progress > 90) progress = 90;
+        document.getElementById('adLoadingProgress').style.width = progress + '%';
+    }, 500);
+    
+    // 10 saniyədən sonra timeout
+    setTimeout(() => {
+        clearInterval(progressInterval);
+        if (document.getElementById('adLoadingScreen')) {
+            hideAdLoadingScreen();
+            showError('Reklam yüklənmədi. Yenidən cəhd edin.');
+        }
+    }, 10000);
+}
+
+// Reklam yüklənmə ekranını gizlət
+function hideAdLoadingScreen() {
+    const loadingScreen = document.getElementById('adLoadingScreen');
+    if (loadingScreen) {
+        loadingScreen.remove();
+    }
 }
 
 // 30 klik reklamı cooldown sayğacını başlat
@@ -1791,6 +1880,16 @@ function startThirtyClickCooldown() {
             timerElement.innerHTML = `⏱️ 30 klik reklamı: <span class="video-cooldown">${thirtyClickCooldown}s sonra hazır</span>`;
         }
     }, 1000);
+}
+
+// Reklam sistemini periodik olaraq yoxla və yenidən başlat
+function monitorAdsGramSystem() {
+    setInterval(() => {
+        if (!isAdsGram30ClickReady && currentUserState.username) {
+            console.log('🔄 AdsGram sistemini yenidən başladır...');
+            initializeAdsGram30Click();
+        }
+    }, 30000); // Hər 30 saniyədən bir yoxla
 }
 
 // =================================================================
@@ -3140,6 +3239,12 @@ window.addEventListener('load', async function() {
             console.log('❌ AdsGram 30 Klik Reward Video sistemi başladıla bilmədi');
         }
     }, 5000);
+    
+    // REKLAM SİSTEMİNİ MONITOR ET
+    setTimeout(() => {
+        monitorAdsGramSystem();
+        console.log('✅ Reklam monitor sistemi işə salındı');
+    }, 10000);
     
     const img = document.getElementById('clickImage');
     img.classList.add('wind-animation', 'floating-ghost');
