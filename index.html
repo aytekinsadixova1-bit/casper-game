@@ -2984,14 +2984,30 @@ function clickIcon(e) {
     // 30 klikdən sonra YENİ AdsGram reklamı göstər
     if (state.clicksUntilAd <= 1) { 
         state.clicksUntilAd = 0; 
-        showAd(); // Bu artıq AdsGram 30 klik reward video göstərəcək
+        
+        // 🟢 DÜZƏLİŞ: showAd() yerinə setTimeout ilə showAdsGram30ClickReward() çağırırıq
+        console.log("30 klik tamamlandı. Reward video çağırılır...");
+        
+        // 500ms gecikmə tətbiq edin
+        setTimeout(() => {
+             // Əgər sizdə showAd() funksiyası showAdsGram30ClickReward() funksiyasını çağırırsa,
+             // onu buraya qoymalısınız. Əks halda, birbaşa aşağıdakı funksiyanı çağırın.
+             showAdsGram30ClickReward(); 
+        }, 500); 
+        
         return; 
     }
 
     if (state.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) { 
         if (state.clicksUntilAd > 0) {
             state.clicksUntilAd = 0; 
-            showAd(); // Bu artıq AdsGram 30 klik reward video göstərəcək
+            
+            // 🟢 DÜZƏLİŞ: Enerji yoxdursa və reklam vaxtıdırsa, yenə də gecikmə tətbiq edin
+            console.log("Enerji bitdi, lakin reklam vaxtıdır. Reward video çağırılır...");
+            
+            setTimeout(() => {
+                 showAdsGram30ClickReward();
+            }, 500);
         }
         return;
     }
@@ -3010,7 +3026,6 @@ function clickIcon(e) {
     updateEnergyDisplay();
     createMoneyPopup(e, moneyEarned);
 }
-
 // Başlanğıc funksiyası
 window.addEventListener('load', async function() {
     loadImages();
