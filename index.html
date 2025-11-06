@@ -1619,37 +1619,46 @@ function initializeAdsGram30Click() {
 function showAdsGram30ClickReward() {
     console.log('🔄 30 klik reklamı başladı...');
     
-    // 1. ƏVVƏLCƏ AdsGram sisteminin tam yükləndiyindən ƏMIN OL
+    // 1. AdsGram-in TAM yükləndiyindən əmin ol
     if (typeof Adsgram30ClickController === 'undefined') {
-        console.error('❌ AdsGram controller tapılmadı!');
-        alert('Reklam sistemi hazır deyil. 10 saniyə gözləyin və yenidən cəhd edin.');
+        console.log('⏳ AdsGram hələ yüklənməyib, 1 saniyə gözləyir...');
         
-        // ✅ HƏR HALDA KLİK SAYĞACINI SIFIRLA - DONMAYA QARŞI
-        currentUserState.clicksUntilAd = AD_INTERVAL;
-        updateEnergyDisplay();
+        // 1 saniyə gözlə və yenidən cəhd et
+        setTimeout(() => {
+            showAdsGram30ClickReward();
+        }, 2000);
         return false;
     }
 
-    // 2. REKLAMIN HAZIR OLUB-OLMADIĞINI MƏCburi YOXLA
+    // 2. Reklamın HAZIR olduğunu təsdiqlə
     if (typeof Adsgram30ClickController.isReady === 'function') {
         if (!Adsgram30ClickController.isReady()) {
-            console.warn('⚠️ Reklam hazır deyil, isReady() false qaytarır');
-            alert('Reklam hazır deyil. 5 saniyə gözləyin və yenidən cəhd edin.');
+            console.log('⏳ Reklam hazır deyil, 1 saniyə gözləyir...');
             
-            // ✅ HƏR HALDA KLİK SAYĞACINI SIFIRLA
-            currentUserState.clicksUntilAd = AD_INTERVAL;
-            updateEnergyDisplay();
+            // 1 saniyə gözlə və yenidən cəhd et
+            setTimeout(() => {
+                showAdsGram30ClickController.isReady() ? 
+                    showAdsGram30ClickReward() : 
+                    resetAdCounterSilently();
+            }, 1500);
             return false;
         }
+    } else {
+        // isReady funksiyası yoxdursa, bir az gözlə
+        console.log('⏳ Reklam yüklənir, 2 saniyə gözləyir...');
+        setTimeout(() => {
+            showAdsGram30ClickReward();
+        }, 1000);
+        return false;
     }
 
-    // 3. TRY-CATCH İÇƏRISINDA REKLAMI GÖSTƏR
+    // 3. REKLAMI GÖSTƏR - ARTIQ HAZIRDIR
     try {
-        console.log('🎬 Reklam göstərilməyə çalışılır...');
+        console.log('🎬 Reklam göstərilir...');
         
         Adsgram30ClickController.show()
             .then((result) => {
-                console.log('✅ AdsGram 30 klik reward video tamamlandı!', result);
+                console.log('✅ AdsGram 30 klik reward video tamamlandı!');
                 
                 // Bonus ver
                 const rewardAmount = 0.0001; 
@@ -1658,46 +1667,125 @@ function showAdsGram30ClickReward() {
                 // Məlumatları yadda saxla və UI yenilə
                 saveUserState();
                 updateEnergyDisplay();
+                
+                // Uğur mesajı göndər
                 showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
                 
                 // Klik sayını sıfırla
                 currentUserState.clicksUntilAd = AD_INTERVAL;
                 updateEnergyDisplay();
-                
-                console.log('✅ Reklam uğurla tamamlandı, sayğac sıfırlandı');
             })
             .catch((error) => {
-                console.error('❌ AdsGram 30 klik reward video xətası:', error);
+                console.error('❌ AdsGram reward video xətası:', error);
                 
-                let errorMessage = 'Reklam göstərilərkən xəta baş verdi.';
-                if (error && error.description) {
-                    errorMessage = error.description;
-                }
-                
-                alert(`❌ ${errorMessage}\nSayğac avtomatik sıfırlandı. Yenidən cəhd edin.`);
-                
-                // ✅ ÇOX ƏHƏMIYYƏTLİ: XƏTA OLSA BELƏ SAYĞACI SIFIRLA
-                currentUserState.clicksUntilAd = AD_INTERVAL;
-                updateEnergyDisplay();
-                console.log('🔄 Xəta olsa belə sayğac sıfırlandı');
+                // SESSİZ şəkildə sayğacı sıfırla
+                resetAdCounterSilently();
             });
 
     } catch (e) {
-        // "attempt to call show..." kimi dərhal baş verən xətalar
-        console.error("🚨 AdsGram show() çağırışında dərhal xəta:", e.message);
+        console.error("🚨 AdsGram show() xətası:", e.message);
         
-        alert('Reklam sistemində texniki xəta. Sayğac sıfırlandı, yenidən cəhd edin.');
-        
-        // ✅ ƏN ƏHƏMIYYƏTLİSİ: HƏR HALDA SAYĞACI SIFIRLA
-        currentUserState.clicksUntilAd = AD_INTERVAL;
-        updateEnergyDisplay();
-        console.log('🔄 Catch blokunda sayğac sıfırlandı');
-        
+        // SESSİZ şəkildə sayğacı sıfırla
+        resetAdCounterSilently();
         return false;
     }
     
     return true;
 }
+
+// ✅ SESSİZ SAYĞAC SIFIRLAMA (heç bir xəta göstərmir)
+function resetAdCounterSilently() {
+    currentUserState.clicksUntilAd = AD_INTERVAL;
+    updateEnergyDisplay();
+    console.log('🔄 Sayğac sessiz şəkildə sıfırlandı');
+}
+
+// ✅ ADSGRAM SİSTEMİNİ YÜKLƏMƏK ÜÇÜN GÖZLƏMƏ FUNKSİYASI
+function waitForAdsGram(callback, maxAttempts = 1) {
+    let attempts = 0;
+    
+    const checkAdsGram = () => {
+        attempts++;
+        
+        if (typeof Adsgram30ClickController !== 'undefined' && 
+            typeof Adsgram30ClickController.isReady === 'function' && 
+            Adsgram30ClickController.isReady()) {
+            console.log('✅ AdsGram hazırdır!');
+            callback(true);
+            return;
+        }
+        
+        if (attempts >= maxAttempts) {
+            console.log('❌ AdsGram yüklənmədi, sayğac sıfırlanır');
+            resetAdCounterSilently();
+            callback(false);
+            return;
+        }
+        
+        console.log(`⏳ AdsGram gözlənilir... (${attempts}/${maxAttempts})`);
+        setTimeout(checkAdsGram, 1000);
+    };
+    
+    checkAdsGram();
+}
+
+// ✅ YENİ KLİK HANDLER - AVTOMATİK VƏ GÖZLƏMƏLİ
+function clickHandler() {
+    // Normal klik prosesi
+    currentUserState.clicksUntilAd--;
+    currentUserState.totalMoney += 0.00001;
+    updateEnergyDisplay();
+    saveUserState();
+    
+    // 30 klikə çatdıqda AVTOMATİK reklam
+    if (currentUserState.clicksUntilAd <= 0) {
+        console.log('🎯 30 klik tamamlandı! AdsGram gözlənilir...');
+        
+        // AdsGram hazır olana qədər gözlə
+        waitForAdsGram((success) => {
+            if (success) {
+                // 1 saniyə gözlə və reklamı göstər
+                setTimeout(() => {
+                    showAdsGram30ClickReward();
+                }, 1000);
+            }
+        });
+    }
+}
+
+// ✅ SAYFA YÜKLƏNDİKDƏ ADSGRAM-İ ÖN YÜKLƏ
+function preloadAdsGram() {
+    console.log('🔧 AdsGram ön yüklənməsi başladı...');
+    
+    // Sayfa yükləndikdə AdsGram sistemini aktiv et
+    if (typeof initializeAdsGram30Click === 'function') {
+        initializeAdsGram30Click();
+    }
+    
+    // 1 saniyə sonra yenidən yoxla
+    setTimeout(() => {
+        if (typeof Adsgram30ClickController === 'undefined') {
+            console.log('🔄 AdsGram yenidən yüklənir...');
+            if (typeof initializeAdsGram30Click === 'function') {
+                initializeAdsGram30Click();
+            }
+        }
+    }, 1000);
+}
+
+// ✅ SAYFA YÜKLƏNDİKDƏ ÖN YÜKLƏMƏNİ BAŞLAT
+document.addEventListener('DOMContentLoaded', function() {
+    preloadAdsGram();
+});
+
+// ✅ HER 5 SANİYƏDƏ BİR ADSGRAM-İ YENİLƏ
+setInterval(() => {
+    if (typeof Adsgram30ClickController === 'undefined' && 
+        typeof initializeAdsGram30Click === 'function') {
+        console.log('🔄 AdsGram avtomatik yenilənir...');
+        initializeAdsGram30Click();
+    }
+}, 5000);
 
 // ✅ ƏLAVƏ TƏHLÜKƏSİZLİK FUNKSİYASI: Manual reset üçün
 function resetAdCounterEmergency() {
@@ -1712,10 +1800,12 @@ function reinitializeAdsGram() {
     console.log('🔄 AdsGram sistemi yenidən başladılır...');
     try {
         // Burada AdsGram sistemini yenidən yükləyən kodu əlavə et
-        // Məsələn: yenidən script yükləmə və ya init funksiyası çağırma
-        initializeAdsGram30Click();
-        console.log('✅ AdsGram sistemi yenidən başladıldı');
-        return true;
+        if (typeof initializeAdsGram30Click === 'function') {
+            initializeAdsGram30Click();
+            console.log('✅ AdsGram sistemi yenidən başladıldı');
+            return true;
+        }
+        return false;
     } catch (e) {
         console.error('❌ AdsGram yenidən başlatmada xəta:', e);
         return false;
