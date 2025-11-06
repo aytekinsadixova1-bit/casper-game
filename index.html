@@ -1624,7 +1624,19 @@ function showAdsGram30ClickReward() {
             return false;
         }
     }
-
+// =================================================================
+    // 🚨 YÜKLƏNMƏ XƏTASINI ARADAN QALDIRAN ƏSAS KOD BLOKU
+    // =================================================================
+    if (!Adsgram30ClickController.isReady()) {
+        console.log('⚠️ AdsGram 30 klik reward video hələ hazır deyil (yüklənir).');
+        
+        // İstifadəçiyə dostyana bir xəbərdarlıq verin
+        alert('Reklam hələ yüklənməyib. Zəhmət olmasa bir neçə saniyə gözləyin və növbəti kliklə yenidən cəhd edin.');
+        
+        // Reklam göstərilmədiyi üçün klik sayını sıfırlamağa ehtiyac yoxdur.
+        return false; 
+    }
+    // =================================================================
     Adsgram30ClickController.show()
         .then((result) => {
             console.log('✅ AdsGram 30 klik reward video tamamlandı!', result);
@@ -3010,7 +3022,7 @@ window.addEventListener('load', async function() {
         } else {
             console.log('❌ AdsGram 30 Klik Reward Video sistemi başladıla bilmədi');
         }
-    }, 4000);
+    }, 5000);
     
     const img = document.getElementById('clickImage');
     img.classList.add('wind-animation', 'floating-ghost');
