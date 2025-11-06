@@ -1208,7 +1208,7 @@
                                 🎬 Video İzlə & 0.001 AZN Qazan!
                             </button>
                             <p style="font-size: 10px; color: #6c757d; margin-top: 3px;">
-                                Hər video üçün 0.001 AZN bonus! 1 dəqiqədən bir yenilənir!
+                                Hər video üçün 0.001 AZN bonus! 30 saniyədən bir yenilənir!
                             </p>
                         </div>
 
@@ -1564,11 +1564,11 @@ function showAdsGramRewardVideo() {
             // Təbriklər mesajı
             showSuccess(`🎉 Reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
             
-            // 1 dəqiqə sonra reward video yenidən aktiv olacaq
+            // 30 saniye sonra reward video yenidən aktiv olacaq
             setTimeout(() => {
                 adsgramRewardAvailable = true;
                 console.log('🔄 Reward video yenidən aktiv oldu');
-            }, 60000);
+            }, 30000);
         })
         .catch((error) => {
             console.error('❌ AdsGram reward video xətası:', error);
@@ -1581,11 +1581,11 @@ function showAdsGramRewardVideo() {
             
             alert(`❌ ${errorMessage}`);
             
-            // Xəta olsa belə, 1 dəqiqə sonra reward video yenidən aktiv olacaq
+            // Xəta olsa belə, 30saniye sonra reward video yenidən aktiv olacaq
             setTimeout(() => {
                 adsgramRewardAvailable = true;
                 console.log('🔄 Reward video yenidən aktiv oldu');
-            }, 60000);
+            }, 30000);
         });
     
     return true;
