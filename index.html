@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CASPER GAME</title> 
+    <title>CASPER GAME</title>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -1320,8 +1320,8 @@
                             <div class="social-icon-btn telegram" onclick="shareOnTelegram()">
                                 <i class="fa-brands fa-telegram"></i>
                             </div>
-                            <div class="social-icon-btn" style="background: #1877F2;" onclick="shareOnFacebook()">
-                                <i class="fa-brands fa-facebook"></i>
+                            <div class="social-icon-btn tiktok" onclick="shareOnTikTok()">
+                                <i class="fa-brands fa-tiktok"></i>
                             </div>
                             <div class="social-icon-btn" style="background: #252525;" onclick="copyInviteLink()">
                                 <i class="fa-solid fa-link"></i>
@@ -1813,7 +1813,7 @@ Salam! Casper Game-də mənə qoşul və pul qazan!
     window.open(url, '_blank');
 }
 
-function shareOnFacebook() {
+function shareOnTikTok() {
     const inviteLink = generateInviteLink();
     const referralCode = currentUserState.referralCode;
     if (!inviteLink || !referralCode) return;
@@ -1827,8 +1827,25 @@ Dəvət Kodum: ${referralCode}
 Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
     
     const encodedMessage = encodeURIComponent(message);
-    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(inviteLink)}&quote=${encodedMessage}`;
-    window.open(url, '_blank');
+    
+    // TikTok üçün ən yaxşı paylaşım üsulu
+    if (navigator.share) {
+        navigator.share({
+            title: 'Casper Game - Dost Dəvəti',
+            text: message,
+            url: inviteLink
+        }).then(() => {
+            console.log('TikTok paylaşım uğurlu');
+        }).catch((error) => {
+            console.log('TikTok paylaşım xətası:', error);
+            // Fallback - məlumatları kopyala
+            copyInviteLink();
+        });
+    } else {
+        // Fallback - məlumatları kopyala
+        copyInviteLink();
+        alert("TikTok paylaşımı üçün məlumatlar kopyalandı! TikTok-da paylaşın.");
+    }
 }
 
 function checkUrlForReferralCode() {
