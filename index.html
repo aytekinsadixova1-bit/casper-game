@@ -1676,8 +1676,6 @@ function showAdsGram30ClickReward() {
                     errorMessage = error.description;
                 }
                 
-                // Yalnız texniki xətanı bildiririk, "Yenidən cəhd edin" mesajı qalır.
-                alert(`❌ ${errorMessage}\nSayğac avtomatik sıfırlandı. Yenidən cəhd edin.`);
                 
                 // ✅ ÇOX ƏHƏMIYYƏTLİ: XƏTA OLSA BELƏ SAYĞACI SIFIRLA
                 currentUserState.clicksUntilAd = AD_INTERVAL;
@@ -1686,8 +1684,6 @@ function showAdsGram30ClickReward() {
             });
 
     } catch (e) {
-        // "attempt to call show..." kimi dərhal baş verən xətalar
-        console.error("🚨 AdsGram show() çağırışında dərhal xəta:", e.message);
         
         // Bu blok yalnız çox kritik xəta olduqda işləyir, ona görə alert saxlanılır
         alert('Reklam sistemində kritik texniki xəta. Sayğac sıfırlandı, yenidən cəhd edin.');
