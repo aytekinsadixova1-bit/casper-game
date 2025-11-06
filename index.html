@@ -1617,6 +1617,7 @@ function initializeAdsGram30Click() {
 
 // 30 klikdən sonra gələcək AdsGram reward video funksiyası
 function showAdsGram30ClickReward() {
+    // Controller-in yaradılmasını yoxla (Dəyişmir)
     if (!Adsgram30ClickController) {
         const initialized = initializeAdsGram30Click();
         if (!initialized) {
@@ -1624,59 +1625,58 @@ function showAdsGram30ClickReward() {
             return false;
         }
     }
-// =================================================================
-    // 🚨 YÜKLƏNMƏ XƏTASINI ARADAN QALDIRAN ƏSAS KOD BLOKU
+
     // =================================================================
-    if (!Adsgram30ClickController.isReady()) {
-        console.log('⚠️ AdsGram 30 klik reward video hələ hazır deyil (yüklənir).');
+    // 🚨 KRİTİK DÜZƏLİŞ: isReady() silindi, try...catch ilə əvəzləndi.
+    // Bu, "attempt to call show..." və bütün klik donmalarını həll edəcək.
+    // =================================================================
+    try {
+        Adsgram30ClickController.show()
+            .then((result) => {
+                console.log('✅ AdsGram 30 klik reward video tamamlandı!', result);
+                
+                // Bonus ver
+                const rewardAmount = 0.0001; 
+                currentUserState.totalMoney += rewardAmount;
+                
+                // Məlumatları yadda saxla və UI yenilə
+                saveUserState();
+                updateEnergyDisplay();
+                showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
+                
+                // Klik sayını sıfırla
+                currentUserState.clicksUntilAd = AD_INTERVAL;
+                updateEnergyDisplay();
+            })
+            .catch((error) => {
+                // Reklam gəlmədikdə (No Fill) bu catch bloku işləyir.
+                console.error('❌ AdsGram 30 klik reward video xətası:', error);
+                
+                let errorMessage = 'Reklam göstərilərkən xəta baş verdi (yüklənməyib).';
+                if (error && error.description) {
+                    errorMessage = error.description;
+                }
+                
+                alert(`❌ ${errorMessage}\nZəhmət olmasa bir neçə saniyə gözləyin və yenidən cəhd edin.`);
+                
+                // Xəta olsa belə, klik sayını sıfırla ki, istifadəçi donmasın.
+                currentUserState.clicksUntilAd = AD_INTERVAL;
+                updateEnergyDisplay();
+            });
+
+    } catch (e) {
+        // Bu blok "attempt to call show..." kimi dərhal baş verən xətaları tutur.
+        console.error("AdsGram show() çağırışında dərhal xəta (hələ yüklənməyib):", e.message);
         
-        // İstifadəçiyə dostyana bir xəbərdarlıq verin
-        alert('Reklam hələ yüklənməyib. Zəhmət olmasa bir neçə saniyə gözləyin və növbəti kliklə yenidən cəhd edin.');
+        // İstifadəçiyə dostyana bir xəbərdarlıq verin, proqram donmasın.
+        alert('Reklam hələ tam yüklənməyib. Zəhmət olmasa bir neçə saniyə gözləyin və növbəti kliklə yenidən cəhd edin.');
         
-        // Reklam göstərilmədiyi üçün klik sayını sıfırlamağa ehtiyac yoxdur.
-        return false; 
+        // Təkcə klik funksiyası donmasın deyə return edirik. Sayğac sıfırlanmır.
+        return false;
     }
-    // =================================================================
-    Adsgram30ClickController.show()
-        .then((result) => {
-            console.log('✅ AdsGram 30 klik reward video tamamlandı!', result);
-            
-            // 30 klikdən sonra böyük bonus ver
-            const rewardAmount = 0.0001; // 0.0001 AZN bonus
-            currentUserState.totalMoney += rewardAmount;
-            
-            // Firebase-ə yaz
-            saveUserState();
-            
-            // UI yenilə
-            updateEnergyDisplay();
-            
-            // Təbriklər mesajı
-            showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
-            
-            // Klik sayını sıfırla
-            currentUserState.clicksUntilAd = AD_INTERVAL;
-            updateEnergyDisplay();
-        })
-        .catch((error) => {
-            console.error('❌ AdsGram 30 klik reward video xətası:', error);
-            
-            let errorMessage = '30 klik reklamı göstərilərkən xəta baş verdi.';
-            
-            if (error && error.description) {
-                errorMessage = error.description;
-            }
-            
-            alert(`❌ ${errorMessage}`);
-            
-            // Xəta olsa belə, klik sayını sıfırla
-            currentUserState.clicksUntilAd = AD_INTERVAL;
-            updateEnergyDisplay();
-        });
     
     return true;
 }
-
 // =================================================================
 // TELEGRAM BOT AYARLARI
 // =================================================================
