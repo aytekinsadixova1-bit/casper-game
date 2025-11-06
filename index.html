@@ -1622,26 +1622,26 @@ function showAdsGram30ClickReward() {
     // 1. AdsGram controller tapılıb-tapılmadığını yoxla
     if (!Adsgram30ClickController) {
         console.error('❌ AdsGram controller tapılmadı! Yenidən başladılır...');
-        // Yenidən başlatma cəhdi
         const initialized = initializeAdsGram30Click(); 
         if (!initialized) {
-            alert('❌ Reklam sistemi hazır deyil. Yenidən cəhd edin.');
+            console.error('❌ Reklam sistemi hazır deyil. İlkinləşmə uğursuz oldu.'); 
             
-            // Kontroller yoxdursa, sayğacı sıfırlamaq məqsədsizdir, amma təhlükəsizlik üçün edək.
+            // Xəbərdarlıq Mesajı 1 SİLİNDİ! (alert)
+            
             currentUserState.clicksUntilAd = AD_INTERVAL;
             updateEnergyDisplay();
             return false;
         }
     }
 
-    // 2. REKLAMIN HAZIR OLUB-OLMADIĞINI YOXLA (Mesajı Sil)
+    // 2. REKLAMIN HAZIR OLUB-OLMADIĞINI YOXLA
     if (typeof Adsgram30ClickController.isReady === 'function') {
         if (!Adsgram30ClickController.isReady()) {
-            console.warn('⚠️ Reklam hazır deyil, isReady() false qaytarır. Mesaj göstərilmir.');
+            console.warn('⚠️ Reklam hazır deyil, isReady() false qaytarır.');
             
-            // XƏBƏRDARLIQ MESAJI BURADAN SİLİNDİ!
+            // Xəbərdarlıq Mesajı 2 SİLİNDİ! (alert)
             
-            // Bu halda, klik sayğacı sıfırlanmır ki, növbəti klikdə yenidən yoxlansın.
+            // Hazır deyilsə, növbəti klikdə yoxlamaq üçün return edirik.
             return false;
         }
     }
@@ -1652,43 +1652,40 @@ function showAdsGram30ClickReward() {
         
         Adsgram30ClickController.show()
             .then((result) => {
+                // Uğurlu Hal
                 console.log('✅ AdsGram 30 klik reward video tamamlandı!', result);
                 
-                // Bonus ver
                 const rewardAmount = 0.0001; 
                 currentUserState.totalMoney += rewardAmount;
-                
-                // Məlumatları yadda saxla və UI yenilə
                 saveUserState();
                 updateEnergyDisplay();
                 showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
                 
-                // Klik sayını sıfırla
                 currentUserState.clicksUntilAd = AD_INTERVAL;
                 updateEnergyDisplay();
                 console.log('✅ Reklam uğurla tamamlandı, sayğac sıfırlandı');
             })
             .catch((error) => {
+                // Reklam uğursuz olduqda (No Fill, bağlamaq və s.)
                 console.error('❌ AdsGram 30 klik reward video xətası:', error);
                 
-                let errorMessage = 'Reklam göstərilərkən xəta baş verdi.';
-                if (error && error.description) {
-                    errorMessage = error.description;
-                }
+                // Xəbərdarlıq Mesajı 3 SİLİNDİ! (alert)
+                // Sadəcə konsola yazırıq ki, istifadəçini narahat etməyək.
                 
-                
-                // ✅ ÇOX ƏHƏMIYYƏTLİ: XƏTA OLSA BELƏ SAYĞACI SIFIRLA
+                // Sayğacı sıfırla ki, növbəti klikə keçsin
                 currentUserState.clicksUntilAd = AD_INTERVAL;
                 updateEnergyDisplay();
                 console.log('🔄 Xəta olsa belə sayğac sıfırlandı');
             });
 
     } catch (e) {
+        // "attempt to call show..." kimi dərhal baş verən xətalar (Əsas problem)
+        console.error("🚨 AdsGram show() çağırışında dərhal xəta (hələ yüklənib-hazır deyil):", e.message);
         
-        // Bu blok yalnız çox kritik xəta olduqda işləyir, ona görə alert saxlanılır
-        alert('Reklam sistemində kritik texniki xəta. Sayğac sıfırlandı, yenidən cəhd edin.');
+        // Xəbərdarlıq Mesajı 4 SİLİNDİ! (alert)
         
-        // ✅ ƏN ƏHƏMIYYƏTLİSİ: HƏR HALDA SAYĞACI SIFIRLA
+        // Bu xəta baş verəndə sayğacı sıfırlamaq (yenə də) 
+        // ən təhlükəsiz yoldur ki, tətbiq donmasın.
         currentUserState.clicksUntilAd = AD_INTERVAL;
         updateEnergyDisplay();
         console.log('🔄 Catch blokunda sayğac sıfırlandı');
