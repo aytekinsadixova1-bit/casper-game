@@ -1057,6 +1057,33 @@
         .main-icon::after {
             display: none !important;
         }
+
+        /* Yeni reklam zamanı sayğac üslubları */
+        .video-timer-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .video-timer {
+            font-size: 14px;
+            color: #ffd700;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .video-available {
+            color: #00b894;
+            font-weight: bold;
+        }
+
+        .video-cooldown {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -1204,16 +1231,24 @@
 
                         <!-- YENİ ADSGRAM REWARD VIDEO DÜYMƏSİ -->
                         <div class="bonus-info" style="margin: 12px 0; text-align: center;">
-                            <button onclick="showAdsGramRewardVideo()" class="adsgram-video-btn">
-                                🎬 Video İzlə & 0.001 AZN Qazan!
-                            </button>
-                            <p style="font-size: 10px; color: #6c757d; margin-top: 3px;">
-                                Hər video üçün 0.001 AZN bonus! 1 dəqiqədən bir yenilənir!
-                            </p>
+                            <div class="video-timer-container">
+                                <div class="video-timer" id="buttonVideoTimer">
+                                    🎬 Video hazır: <span class="video-available">İndi izləyə bilərsiniz!</span>
+                                </div>
+                                <button onclick="showAdsGramRewardVideo()" class="adsgram-video-btn">
+                                    🎬 Video İzlə & 0.001 AZN Qazan!
+                                </button>
+                                <p style="font-size: 10px; color: #6c757d; margin-top: 3px;">
+                                    Hər video üçün 0.001 AZN bonus! Hər 30 saniyədən bir yenilənir!
+                                </p>
+                            </div>
                         </div>
 
                         <div class="bonus-info">
-                            <strong> 30 klik Bonusu:</strong> Hər reklam üçün <strong>0.0001 AZN</strong>
+                            <strong>30 klik Bonusu:</strong> Hər reklam üçün <strong>0.0001 AZN</strong>
+                            <div class="video-timer" id="thirtyClickTimer" style="margin-top: 5px;">
+                                ⏱️ 30 klik reklamı: <span class="video-available">Hazır</span>
+                            </div>
                         </div>
 
                         <div class="click-area">
@@ -1511,6 +1546,8 @@ try {
 
 let AdsgramController = null;
 let adsgramRewardAvailable = true;
+let buttonVideoCooldown = 0; // Button video cooldown sayğacı
+let thirtyClickCooldown = 0; // 30 klik reklamı cooldown sayğacı
 
 // AdsGram sistemini başlat - BUTTON REKLAMI
 function initializeAdsGram() {
@@ -1532,8 +1569,9 @@ function initializeAdsGram() {
 
 // Reward video göstərmək üçün funksiya - BUTTON REKLAMI
 function showAdsGramRewardVideo() {
-    if (!adsgramRewardAvailable) {
-        alert('🎬 Reward video hazır deyil. Bir neçə dəqiqə gözləyin.');
+    // Cooldown yoxlanışı
+    if (buttonVideoCooldown > 0) {
+        alert(`🎬 Reward video ${buttonVideoCooldown} saniyə sonra aktiv olacaq.`);
         return false;
     }
     
@@ -1564,11 +1602,11 @@ function showAdsGramRewardVideo() {
             // Təbriklər mesajı
             showSuccess(`🎉 Reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
             
-            // 1 dəqiqə sonra reward video yenidən aktiv olacaq
-            setTimeout(() => {
-                adsgramRewardAvailable = true;
-                console.log('🔄 Reward video yenidən aktiv oldu');
-            }, 60000);
+            // 30 saniyə cooldown tətbiq et
+            buttonVideoCooldown = 30;
+            startButtonVideoCooldown();
+            
+            console.log('🔄 Button video 30 saniyə cooldown-a girdi');
         })
         .catch((error) => {
             console.error('❌ AdsGram reward video xətası:', error);
@@ -1581,14 +1619,31 @@ function showAdsGramRewardVideo() {
             
             alert(`❌ ${errorMessage}`);
             
-            // Xəta olsa belə, 1 dəqiqə sonra reward video yenidən aktiv olacaq
-            setTimeout(() => {
-                adsgramRewardAvailable = true;
-                console.log('🔄 Reward video yenidən aktiv oldu');
-            }, 60000);
+            // Xəta olsa belə, 30 saniyə cooldown tətbiq et
+            buttonVideoCooldown = 30;
+            startButtonVideoCooldown();
         });
     
     return true;
+}
+
+// Button video cooldown sayğacını başlat
+function startButtonVideoCooldown() {
+    const timerElement = document.getElementById('buttonVideoTimer');
+    
+    const cooldownInterval = setInterval(() => {
+        buttonVideoCooldown--;
+        
+        if (buttonVideoCooldown <= 0) {
+            clearInterval(cooldownInterval);
+            buttonVideoCooldown = 0;
+            adsgramRewardAvailable = true;
+            timerElement.innerHTML = `🎬 Video hazır: <span class="video-available">İndi izləyə bilərsiniz!</span>`;
+            console.log('✅ Button video yenidən aktiv oldu');
+        } else {
+            timerElement.innerHTML = `🎬 Video: <span class="video-cooldown">${buttonVideoCooldown}s sonra hazır</span>`;
+        }
+    }, 1000);
 }
 
 // =================================================================
@@ -1619,10 +1674,15 @@ function initializeAdsGram30Click() {
 function showAdsGram30ClickReward() {
     console.log('🔄 30 klik reklamı başladı...');
     
+    // Cooldown yoxlanışı
+    if (thirtyClickCooldown > 0) {
+        console.log('⏳ 30 klik reklamı cooldown-da:', thirtyClickCooldown);
+        return false;
+    }
+    
     // 1. ƏVVƏLCƏ AdsGram sisteminin tam yükləndiyindən ƏMIN OL
     if (typeof Adsgram30ClickController === 'undefined') {
         console.error('❌ AdsGram controller tapılmadı!');
-        alert('Reklam sistemi hazır deyil. 10 saniyə gözləyin və yenidən cəhd edin.');
         
         // ✅ HƏR HALDA KLİK SAYĞACINI SIFIRLA - DONMAYA QARŞI
         currentUserState.clicksUntilAd = AD_INTERVAL;
@@ -1634,7 +1694,6 @@ function showAdsGram30ClickReward() {
     if (typeof Adsgram30ClickController.isReady === 'function') {
         if (!Adsgram30ClickController.isReady()) {
             console.warn('⚠️ Reklam hazır deyil, isReady() false qaytarır');
-            alert('Reklam hazır deyil. 5 saniyə gözləyin və yenidən cəhd edin.');
             
             // ✅ HƏR HALDA KLİK SAYĞACINI SIFIRLA
             currentUserState.clicksUntilAd = AD_INTERVAL;
@@ -1658,13 +1717,19 @@ function showAdsGram30ClickReward() {
                 // Məlumatları yadda saxla və UI yenilə
                 saveUserState();
                 updateEnergyDisplay();
-                showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
+                
+                // "Sayğac sıfırlandı" mesajını GÖSTƏRMƏ - sadəcə bonus mesajı göster
+                showSuccess(`🎉 +${formatMoney(rewardAmount)} AZN qazandınız!`);
                 
                 // Klik sayını sıfırla
                 currentUserState.clicksUntilAd = AD_INTERVAL;
                 updateEnergyDisplay();
                 
-                console.log('✅ Reklam uğurla tamamlandı, sayğac sıfırlandı');
+                // 30 saniyə cooldown tətbiq et
+                thirtyClickCooldown = 30;
+                startThirtyClickCooldown();
+                
+                console.log('✅ Reklam uğurla tamamlandı, sayğac sıfırlandı, 30s cooldown başladı');
             })
             .catch((error) => {
                 console.error('❌ AdsGram 30 klik reward video xətası:', error);
@@ -1674,24 +1739,35 @@ function showAdsGram30ClickReward() {
                     errorMessage = error.description;
                 }
                 
-                alert(`❌ ${errorMessage}\nSayğac avtomatik sıfırlandı. Yenidən cəhd edin.`);
+                // Xəta mesajını göstər
+                alert(`❌ ${errorMessage}`);
                 
                 // ✅ ÇOX ƏHƏMIYYƏTLİ: XƏTA OLSA BELƏ SAYĞACI SIFIRLA
                 currentUserState.clicksUntilAd = AD_INTERVAL;
                 updateEnergyDisplay();
-                console.log('🔄 Xəta olsa belə sayğac sıfırlandı');
+                
+                // 30 saniyə cooldown tətbiq et
+                thirtyClickCooldown = 30;
+                startThirtyClickCooldown();
+                
+                console.log('🔄 Xəta olsa belə sayğac sıfırlandı, 30s cooldown başladı');
             });
 
     } catch (e) {
         // "attempt to call show..." kimi dərhal baş verən xətalar
         console.error("🚨 AdsGram show() çağırışında dərhal xəta:", e.message);
         
-        alert('Reklam sistemində texniki xəta. Sayğac sıfırlandı, yenidən cəhd edin.');
+        alert('Reklam sistemində texniki xəta. Yenidən cəhd edin.');
         
         // ✅ ƏN ƏHƏMIYYƏTLİSİ: HƏR HALDA SAYĞACI SIFIRLA
         currentUserState.clicksUntilAd = AD_INTERVAL;
         updateEnergyDisplay();
-        console.log('🔄 Catch blokunda sayğac sıfırlandı');
+        
+        // 30 saniyə cooldown tətbiq et
+        thirtyClickCooldown = 30;
+        startThirtyClickCooldown();
+        
+        console.log('🔄 Catch blokunda sayğac sıfırlandı, 30s cooldown başladı');
         
         return false;
     }
@@ -1699,28 +1775,24 @@ function showAdsGram30ClickReward() {
     return true;
 }
 
-// ✅ ƏLAVƏ TƏHLÜKƏSİZLİK FUNKSİYASI: Manual reset üçün
-function resetAdCounterEmergency() {
-    currentUserState.clicksUntilAd = AD_INTERVAL;
-    updateEnergyDisplay();
-    alert('🚨 Təcili sayğac sıfırlandı! Yenidən klikləyə bilərsiniz.');
-    console.log('🚨 Təcili reset edildi');
+// 30 klik reklamı cooldown sayğacını başlat
+function startThirtyClickCooldown() {
+    const timerElement = document.getElementById('thirtyClickTimer');
+    
+    const cooldownInterval = setInterval(() => {
+        thirtyClickCooldown--;
+        
+        if (thirtyClickCooldown <= 0) {
+            clearInterval(cooldownInterval);
+            thirtyClickCooldown = 0;
+            timerElement.innerHTML = `⏱️ 30 klik reklamı: <span class="video-available">Hazır</span>`;
+            console.log('✅ 30 klik reklamı yenidən aktiv oldu');
+        } else {
+            timerElement.innerHTML = `⏱️ 30 klik reklamı: <span class="video-cooldown">${thirtyClickCooldown}s sonra hazır</span>`;
+        }
+    }, 1000);
 }
 
-// ✅ AdsGram sistemini YENIDƏN başlatmaq üçün funksiya
-function reinitializeAdsGram() {
-    console.log('🔄 AdsGram sistemi yenidən başladılır...');
-    try {
-        // Burada AdsGram sistemini yenidən yükləyən kodu əlavə et
-        // Məsələn: yenidən script yükləmə və ya init funksiyası çağırma
-        initializeAdsGram30Click();
-        console.log('✅ AdsGram sistemi yenidən başladıldı');
-        return true;
-    } catch (e) {
-        console.error('❌ AdsGram yenidən başlatmada xəta:', e);
-        return false;
-    }
-}
 // =================================================================
 // TELEGRAM BOT AYARLARI
 // =================================================================
