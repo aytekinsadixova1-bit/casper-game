@@ -1617,20 +1617,36 @@ function initializeAdsGram30Click() {
 
 // 30 klikdən sonra gələcək AdsGram reward video funksiyası
 function showAdsGram30ClickReward() {
-    // Controller-in yaradılmasını yoxla (Dəyişmir)
-    if (!Adsgram30ClickController) {
-        const initialized = initializeAdsGram30Click();
-        if (!initialized) {
-            alert('❌ 30 klik reklam sistemi hazır deyil. Yenidən cəhd edin.');
+    console.log('🔄 30 klik reklamı başladı...');
+    
+    // 1. ƏVVƏLCƏ AdsGram sisteminin tam yükləndiyindən ƏMIN OL
+    if (typeof Adsgram30ClickController === 'undefined') {
+        console.error('❌ AdsGram controller tapılmadı!');
+        alert('Reklam sistemi hazır deyil. 10 saniyə gözləyin və yenidən cəhd edin.');
+        
+        // ✅ HƏR HALDA KLİK SAYĞACINI SIFIRLA - DONMAYA QARŞI
+        currentUserState.clicksUntilAd = AD_INTERVAL;
+        updateEnergyDisplay();
+        return false;
+    }
+
+    // 2. REKLAMIN HAZIR OLUB-OLMADIĞINI MƏCburi YOXLA
+    if (typeof Adsgram30ClickController.isReady === 'function') {
+        if (!Adsgram30ClickController.isReady()) {
+            console.warn('⚠️ Reklam hazır deyil, isReady() false qaytarır');
+            alert('Reklam hazır deyil. 5 saniyə gözləyin və yenidən cəhd edin.');
+            
+            // ✅ HƏR HALDA KLİK SAYĞACINI SIFIRLA
+            currentUserState.clicksUntilAd = AD_INTERVAL;
+            updateEnergyDisplay();
             return false;
         }
     }
 
-    // =================================================================
-    // 🚨 KRİTİK DÜZƏLİŞ: isReady() silindi, try...catch ilə əvəzləndi.
-    // Bu, "attempt to call show..." və bütün klik donmalarını həll edəcək.
-    // =================================================================
+    // 3. TRY-CATCH İÇƏRISINDA REKLAMI GÖSTƏR
     try {
+        console.log('🎬 Reklam göstərilməyə çalışılır...');
+        
         Adsgram30ClickController.show()
             .then((result) => {
                 console.log('✅ AdsGram 30 klik reward video tamamlandı!', result);
@@ -1647,35 +1663,63 @@ function showAdsGram30ClickReward() {
                 // Klik sayını sıfırla
                 currentUserState.clicksUntilAd = AD_INTERVAL;
                 updateEnergyDisplay();
+                
+                console.log('✅ Reklam uğurla tamamlandı, sayğac sıfırlandı');
             })
             .catch((error) => {
-                // Reklam gəlmədikdə (No Fill) bu catch bloku işləyir.
                 console.error('❌ AdsGram 30 klik reward video xətası:', error);
                 
-                let errorMessage = 'Reklam göstərilərkən xəta baş verdi (yüklənməyib).';
+                let errorMessage = 'Reklam göstərilərkən xəta baş verdi.';
                 if (error && error.description) {
                     errorMessage = error.description;
                 }
                 
-                alert(`❌ ${errorMessage}\nZəhmət olmasa bir neçə saniyə gözləyin və yenidən cəhd edin.`);
+                alert(`❌ ${errorMessage}\nSayğac avtomatik sıfırlandı. Yenidən cəhd edin.`);
                 
-                // Xəta olsa belə, klik sayını sıfırla ki, istifadəçi donmasın.
+                // ✅ ÇOX ƏHƏMIYYƏTLİ: XƏTA OLSA BELƏ SAYĞACI SIFIRLA
                 currentUserState.clicksUntilAd = AD_INTERVAL;
                 updateEnergyDisplay();
+                console.log('🔄 Xəta olsa belə sayğac sıfırlandı');
             });
 
     } catch (e) {
-        // Bu blok "attempt to call show..." kimi dərhal baş verən xətaları tutur.
-        console.error("AdsGram show() çağırışında dərhal xəta (hələ yüklənməyib):", e.message);
+        // "attempt to call show..." kimi dərhal baş verən xətalar
+        console.error("🚨 AdsGram show() çağırışında dərhal xəta:", e.message);
         
-        // İstifadəçiyə dostyana bir xəbərdarlıq verin, proqram donmasın.
-        alert('Reklam hələ tam yüklənməyib. Zəhmət olmasa bir neçə saniyə gözləyin və növbəti kliklə yenidən cəhd edin.');
+        alert('Reklam sistemində texniki xəta. Sayğac sıfırlandı, yenidən cəhd edin.');
         
-        // Təkcə klik funksiyası donmasın deyə return edirik. Sayğac sıfırlanmır.
+        // ✅ ƏN ƏHƏMIYYƏTLİSİ: HƏR HALDA SAYĞACI SIFIRLA
+        currentUserState.clicksUntilAd = AD_INTERVAL;
+        updateEnergyDisplay();
+        console.log('🔄 Catch blokunda sayğac sıfırlandı');
+        
         return false;
     }
     
     return true;
+}
+
+// ✅ ƏLAVƏ TƏHLÜKƏSİZLİK FUNKSİYASI: Manual reset üçün
+function resetAdCounterEmergency() {
+    currentUserState.clicksUntilAd = AD_INTERVAL;
+    updateEnergyDisplay();
+    alert('🚨 Təcili sayğac sıfırlandı! Yenidən klikləyə bilərsiniz.');
+    console.log('🚨 Təcili reset edildi');
+}
+
+// ✅ AdsGram sistemini YENIDƏN başlatmaq üçün funksiya
+function reinitializeAdsGram() {
+    console.log('🔄 AdsGram sistemi yenidən başladılır...');
+    try {
+        // Burada AdsGram sistemini yenidən yükləyən kodu əlavə et
+        // Məsələn: yenidən script yükləmə və ya init funksiyası çağırma
+        initializeAdsGram30Click();
+        console.log('✅ AdsGram sistemi yenidən başladıldı');
+        return true;
+    } catch (e) {
+        console.error('❌ AdsGram yenidən başlatmada xəta:', e);
+        return false;
+    }
 }
 // =================================================================
 // TELEGRAM BOT AYARLARI
