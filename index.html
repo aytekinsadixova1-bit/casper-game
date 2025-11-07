@@ -7,6 +7,8 @@
     
     <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script> 
+    <script src='//libtl.com/sdk.js' data-zone='10135032' data-sdk='show_10135032'></script>
     
     <!-- Adexium Reklam Skripti -->
     <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
@@ -20,7 +22,6 @@
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
     <style>
-        /* CSS kodunuz eyni qalır */
         * {
             margin: 0;
             padding: 0;
@@ -29,15 +30,1048 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* ... bütün CSS kodunuz eyni qalır ... */
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+        }
 
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            touch-action: manipulation;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            max-height: 100vh;
+            background: white;
+            border-radius: 0;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            margin: 0;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .splash-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 1000;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.5s ease 5s, visibility 0s 5.5s;
+        }
+        
+        .splash-image { 
+            width: 150px; 
+            height: 150px; 
+            margin-bottom: 15px; 
+            border-radius: 0;
+            overflow: visible;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .splash-image img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain;
+            border-radius: 0;
+            background: transparent !important;
+        }
+        .splash-text { 
+            color: white; 
+            font-size: 20px; 
+            font-weight: bold; 
+            text-align: center; 
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5); 
+            margin-bottom: 10px;
+        }
+        .splash-subtext {
+            color: rgba(255,255,255,0.8);
+            font-size: 12px;
+            text-align: center;
+            margin-bottom: 15px;
+            max-width: 280px;
+            line-height: 1.4;
+            padding: 0 10px;
+        }
+        .loading-bar { 
+            width: 200px; 
+            height: 4px; 
+            background: rgba(255,255,255,0.3); 
+            border-radius: 2px; 
+            margin-top: 15px; 
+            overflow: hidden; 
+        }
+        .loading-progress { 
+            width: 0%; 
+            height: 100%; 
+            background: white; 
+            border-radius: 2px; 
+            animation: loading 5s linear forwards; 
+        }
+        @keyframes loading { 
+            0% { width: 0%; } 
+            100% { width: 100%; } 
+        }
+        
+        .splash-fade-out { 
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
+            color: white; 
+            text-align: center; 
+            padding: 15px; 
+            flex-shrink: 0;
+        }
+        
+        .header h1 { 
+            font-size: 24px; 
+            margin-bottom: 0px; 
+            font-weight: 900; 
+            letter-spacing: 1px; 
+        }
+        .header p { 
+            font-size: 14px; 
+            opacity: 0.9; 
+            margin-top: 3px; 
+        }
+        
+        .content {
+            padding: 15px; 
+            flex-grow: 1; 
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .game-screen { 
+            display: none; 
+            flex-direction: column; 
+            height: 100%; 
+            justify-content: space-between; 
+            flex-grow: 1; 
+            background: linear-gradient(135deg, #87CEEB 0%, #4682B4 100%) !important;
+        }
+        
+        .login-screen { 
+            display: none; 
+            flex-direction: column; 
+            height: 100%; 
+            flex-grow: 1;
+        }
+        
+        .energy-container { 
+            margin-bottom: 5px; 
+            padding: 8px 0; 
+            border-bottom: 1px solid #e9ecef; 
+            border-top: 1px solid #e9ecef; 
+        }
+        .energy-bar { 
+            width: 100%; 
+            height: 16px; 
+            background: #e9ecef; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            position: relative; 
+        }
+        .energy-fill { 
+            height: 100%; 
+            border-radius: 8px; 
+            transition: width 0.3s ease, background 0.5s ease; 
+            position: relative; 
+        }
+        .energy-text { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            font-size: 10px; 
+            font-weight: bold; 
+            color: white; 
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5); 
+        }
+        .ad-counter-container { 
+            text-align: center; 
+            margin-top: 3px; 
+            font-size: 11px; 
+            color: #6c757d; 
+        }
+        .click-area { 
+            text-align: center; 
+            margin: 15px 0 5px 0; 
+            position: relative; 
+        } 
+        
+        .main-icon { 
+            width: 180px !important; 
+            height: 180px !important; 
+            background: transparent !important;
+            border-radius: 0;
+            margin: 0 auto; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: none !important;
+            transition: all 0.3s ease; 
+            user-select: none; 
+            border: none !important;
+            overflow: visible !important;
+            position: relative;
+        }
+
+        .main-icon img { 
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain !important;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 5px 15px rgba(255, 255, 255, 0.5));
+            background: transparent !important;
+            display: block !important;
+        }
+
+        @keyframes windEffect {
+            0%, 100% { 
+                transform: translateX(0) rotate(0deg) scale(1);
+            }
+            25% { 
+                transform: translateX(-3px) rotate(-2deg) scale(1.02);
+            }
+            50% { 
+                transform: translateX(2px) rotate(1deg) scale(0.98);
+            }
+            75% { 
+                transform: translateX(-1px) rotate(-1deg) scale(1.01);
+            }
+        }
+
+        .wind-animation {
+            animation: windEffect 4s ease-in-out infinite;
+        }
+
+        @keyframes ghostHit {
+            0% { 
+                transform: translateX(0) rotate(0deg) scale(1);
+            }
+            15% { 
+                transform: translateX(-8px) rotate(-8deg) scale(1.1);
+            }
+            30% { 
+                transform: translateX(12px) rotate(12deg) scale(0.9);
+            }
+            45% { 
+                transform: translateX(-6px) rotate(-6deg) scale(1.05);
+            }
+            60% { 
+                transform: translateX(4px) rotate(4deg) scale(0.95);
+            }
+            80% { 
+                transform: translateX(-2px) rotate(-2deg) scale(1.02);
+            }
+            100% { 
+                transform: translateX(0) rotate(0deg) scale(1);
+            }
+        }
+
+        .ghost-hit-animation {
+            animation: ghostHit 0.8s ease-out;
+        }
+
+        @keyframes ghostStab {
+            0% { 
+                transform: scale(1) rotate(0deg);
+            }
+            20% { 
+                transform: scale(1.3) rotate(5deg);
+            }
+            40% { 
+                transform: scale(0.8) rotate(-3deg);
+            }
+            60% { 
+                transform: scale(1.2) rotate(2deg);
+            }
+            80% { 
+                transform: scale(0.9) rotate(-1deg);
+            }
+            100% { 
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .ghost-stab-animation {
+            animation: ghostStab 0.6s ease-out;
+        }
+
+        @keyframes ghostExplosion {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .ghost-explosion {
+            animation: ghostExplosion 0.4s ease-out;
+        }
+
+        @keyframes ghostScared {
+            0% { transform: translateY(0) scale(1); }
+            25% { transform: translateY(-15px) scale(1.1); }
+            50% { transform: translateY(5px) scale(0.9); }
+            75% { transform: translateY(-8px) scale(1.05); }
+            100% { transform: translateY(0) scale(1); }
+        }
+
+        .ghost-scared-animation {
+            animation: ghostScared 0.5s ease-out;
+        }
+
+        @keyframes floatingGhost {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg) scale(1);
+            }
+            25% { 
+                transform: translateY(-8px) rotate(-1deg) scale(1.02);
+            }
+            50% { 
+                transform: translateY(-12px) rotate(1deg) scale(1.05);
+            }
+            75% { 
+                transform: translateY(-5px) rotate(-0.5deg) scale(1.03);
+            }
+        }
+        
+        .floating-ghost {
+            animation: floatingGhost 6s ease-in-out infinite;
+        }
+
+        @keyframes stabExpand {
+            0% {
+                transform: scale(0.5);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .stats-block { 
+            margin: 15px 0 10px 0; 
+            padding: 8px; 
+            border-radius: 10px; 
+            background: #f8f9fa; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+        }
+        .money-stat-small { 
+            background: #d4edda; 
+            color: #155724; 
+            padding: 8px 12px; 
+            border-radius: 8px; 
+            text-align: center; 
+            margin-bottom: 0; 
+        }
+        .money-stat-small .stat-value { 
+            font-size: 16px; 
+            font-weight: bold; 
+        }
+        .money-stat-small .stat-label { 
+            font-size: 10px; 
+            text-transform: uppercase; 
+            margin-top: 2px; 
+        }
+        .score-popup, .money-popup { 
+            position: absolute; 
+            font-weight: bold; 
+            pointer-events: none; 
+            animation: floatUp 1.2s ease-out forwards; 
+            z-index: 50; 
+        }
+        .money-popup { 
+            color: #155724; 
+            font-size: 14px; 
+        }
+        @keyframes floatUp { 
+            0% { 
+                opacity: 1; 
+                transform: translate(-50%, 0) scale(1); 
+            } 
+            100% { 
+                opacity: 0; 
+                transform: translate(-50%, -50px) scale(1.2); 
+            } 
+        }
+        
+        .navbar { 
+            display: flex; 
+            justify-content: space-around; 
+            background: #1a1a2e; 
+            padding: 8px 0; 
+            border-top: 3px solid #0f3460; 
+            flex-shrink: 0; 
+        }
+        .nav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            color: #6c757d; 
+            font-size: 10px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            text-align: center; 
+            width: 60px; 
+        }
+        .nav-icon-wrapper { 
+            width: 40px; 
+            height: 40px; 
+            background: rgba(255, 255, 255, 0.1); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin-bottom: 3px; 
+            transition: all 0.3s ease; 
+        }
+        .nav-item i { 
+            font-size: 18px; 
+            color: #6c757d; 
+            transition: color 0.3s ease; 
+        }
+        .nav-item.active { 
+            color: white; 
+        }
+        .nav-item.active .nav-icon-wrapper { 
+            background: #0f3460; 
+            box-shadow: 0 0 8px #0f3460; 
+        }
+        .nav-item.active i { 
+            color: white; 
+        }
+
+        .tabs { 
+            display: flex; 
+            margin-bottom: 15px; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            background: #f8f9fa; 
+            border: 2px solid #e9ecef; 
+        }
+        .tab { 
+            flex: 1; 
+            padding: 10px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            font-weight: 600; 
+            color: #6c757d; 
+            font-size: 12px; 
+        }
+        .tab.active { 
+            background: #0f3460; 
+            color: white; 
+        }
+        .form { 
+            display: none; 
+        }
+        .form.active { 
+            display: block; 
+            animation: fadeIn 0.5s ease; 
+        }
+        .input-group { 
+            margin-bottom: 12px; 
+        }
+        .input-group label { 
+            display: block; 
+            margin-bottom: 5px; 
+            font-weight: 600; 
+            color: #495057; 
+            font-size: 12px; 
+        }
+        .input-group input, .input-group select { 
+            width: 100%; 
+            padding: 10px; 
+            border: 2px solid #e9ecef; 
+            border-radius: 6px; 
+            font-size: 12px; 
+            transition: border-color 0.3s; 
+        }
+        .input-group input:focus, .input-group select:focus { 
+            border-color: #0f3460; 
+            outline: none; 
+            box-shadow: 0 0 0 2px rgba(15, 52, 96, 0.1); 
+        }
+        .btn {
+            width: 100%; 
+            padding: 12px; 
+            background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 14px; 
+            font-weight: 600;
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            margin-top: 8px;
+        }
+        .message { 
+            padding: 8px; 
+            border-radius: 5px; 
+            margin-bottom: 12px; 
+            text-align: center; 
+            display: none; 
+            font-weight: 600; 
+            font-size: 12px; 
+        }
+        .error { 
+            background: #ffe6e6; 
+            color: #d63031; 
+            border: 1px solid #ff7675; 
+        }
+        .success { 
+            background: #e6f7e6; 
+            color: #00b894; 
+            border: 1px solid #55efc4; 
+        }
+
+        .sub-header { 
+            font-size: 16px; 
+            color: #0f3460; 
+            margin-bottom: 12px; 
+            padding-bottom: 3px; 
+            border-bottom: 1px solid #0f3460; 
+        }
+        .profile-item { 
+            background: #f8f9fa; 
+            padding: 12px; 
+            border-radius: 8px; 
+            margin-bottom: 8px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+        }
+        .profile-info h4 { 
+            font-size: 12px; 
+            color: #1a1a2e; 
+            margin-bottom: 3px; 
+            font-weight: 700; 
+        }
+        .profile-info p { 
+            font-size: 12px; 
+            color: #6c757d; 
+            font-weight: 500; 
+        }
+        .referral-container { 
+            background: #d4edda; 
+            padding: 12px; 
+            border-radius: 8px; 
+            margin-top: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-align: center; 
+        }
+        .referral-code { 
+            font-size: 14px; 
+            font-weight: bold; 
+            color: #155724; 
+            margin: 8px 0; 
+            padding: 5px 8px; 
+            background: white; 
+            border-radius: 5px; 
+            border: 1px dashed #00b894; 
+        }
+        .copy-btn { 
+            background: linear-gradient(135deg, #00b894, #00cec9); 
+            color: white; 
+            padding: 6px 12px; 
+            border-radius: 6px; 
+            font-size: 10px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            border: none; 
+            transition: opacity 0.3s; 
+            margin-top: 8px; 
+        }
+        .friend-item { 
+            background: #f8f9fa; 
+            padding: 12px; 
+            border-radius: 8px; 
+            margin-bottom: 8px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+        }
+        .settings-btn-group { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+            margin-top: 12px; 
+        }
+        .settings-btn { 
+            padding: 10px; 
+            border-radius: 6px; 
+            font-size: 12px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            text-align: left; 
+            transition: background 0.3s; 
+            border: 1px solid #e9ecef; 
+        }
+        .settings-btn i { 
+            margin-right: 8px; 
+            color: #0f3460; 
+        }
+        .delete-btn { 
+            background: #f8d7da; 
+            color: #721c24; 
+            border: 1px solid #f5c6cb; 
+            margin-top: 12px; 
+        }
+
+        .social-share-container { 
+            display: flex; 
+            justify-content: space-around; 
+            margin: 15px 0; 
+            padding: 8px;
+            border-top: 1px solid #e9ecef;
+        }
+        .social-icon-btn {
+            width: 50px; 
+            height: 50px;
+            border-radius: 50%;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+        }
+        .social-icon-btn:hover {
+            transform: scale(1.1);
+        }
+        .whatsapp { background: #25d366; }
+        .telegram { background: #0088cc; }
+        .tiktok { background: #000000; }
+
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 3000; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%;
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.4); 
+            justify-content: center; 
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff; 
+            margin: auto; 
+            padding: 15px; 
+            border-radius: 12px;
+            width: 90%; 
+            max-width: 320px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s;
+        }
+        .close-btn { 
+            color: #aaa; 
+            float: right; 
+            font-size: 24px; 
+            font-weight: bold; 
+        }
+        .close-btn:hover, .close-btn:focus { 
+            color: #000; 
+            text-decoration: none; 
+            cursor: pointer; 
+        }
+        .modal h2 { 
+            margin-top: 0; 
+            color: #0f3460; 
+            border-bottom: 1px solid #0f3460; 
+            padding-bottom: 8px; 
+            margin-bottom: 12px; 
+            font-size: 18px;
+        }
+        @keyframes slideUp { 
+            from { 
+                transform: translateY(100px); 
+                opacity: 0; 
+            } 
+            to { 
+                transform: translateY(0); 
+                opacity: 1; 
+            } 
+        }
+
+        .withdrawal-info {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+            text-align: center;
+            border-left: 3px solid #2196f3;
+            font-size: 12px;
+        }
+
+        .withdrawal-warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            text-align: center;
+            border: 1px solid #ffeeba;
+        }
+
+        .user-id-container {
+            background: linear-gradient(135deg, #0f3460, #1a1a2e);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+            text-align: center;
+            border: 1px solid #00b894;
+            box-shadow: 0 4px 15px rgba(15, 52, 96, 0.3);
+        }
+
+        .user-id-badge {
+            background: white;
+            color: #0f3460;
+            padding: 8px 12px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 14px;
+            display: inline-block;
+            margin: 8px 0;
+            border: 1px solid #00b894;
+        }
+
+        .ad-screen {
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); 
+            z-index: 2000; 
+            align-items: center; 
+            justify-content: center; 
+            flex-direction: column; 
+            color: white; 
+            text-align: center;
+            padding: 15px;
+        }
+
+        .ad-content {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px 20px;
+            border-radius: 15px;
+            max-width: 300px;
+            width: 90%;
+            border: 2px solid;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            margin-bottom: 15px;
+        }
+
+        .ad-timer {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #00b894;
+            text-shadow: 0 0 8px rgba(0, 184, 148, 0.5);
+        }
+
+        .ad-message {
+            font-size: 12px;
+            color: #ccc;
+            margin-top: 8px;
+        }
+
+        .ad-counter {
+            font-size: 14px;
+            color: #ffd700;
+            margin: 8px 0;
+            font-weight: bold;
+        }
+
+        .ad-reward {
+            font-size: 14px;
+            color: #00b894;
+            font-weight: bold;
+            margin: 12px 0;
+            background: rgba(0, 184, 148, 0.2);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #00b894;
+        }
+
+        .ad-progress-container {
+            width: 90%;
+            max-width: 300px;
+            margin-top: 15px;
+        }
+
+        .ad-progress-bar {
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .ad-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00b894, #55efc4);
+            border-radius: 3px;
+            width: 100%;
+            transition: width 1s linear;
+        }
+
+        .ad-progress-text {
+            font-size: 11px;
+            color: #ccc;
+            text-align: center;
+        }
+
+        .ad-premium { border-color: #ff6b6b; }
+        .ad-special { border-color: #4ecdc4; }
+        .ad-bonus { border-color: #45b7d1; }
+
+        .ad-skip-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 10px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .ad-skip-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes adPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .ad-pulse {
+            animation: adPulse 2s ease-in-out infinite;
+        }
+
+        .bonus-info {
+            background: #e3f2fd;
+            padding: 8px;
+            border-radius: 6px;
+            margin: 8px 0;
+            text-align: center;
+            border-left: 3px solid #2196f3;
+            font-size: 12px;
+        }
+
+        .welcome-message {
+            background: linear-gradient(135deg, #00b894, #55efc4);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3);
+            animation: fadeIn 0.8s ease;
+        }
+
+        .welcome-message h3 {
+            margin-bottom: 3px;
+            font-size: 16px;
+        }
+
+        .welcome-message p {
+            margin: 0;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .invite-link-container {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+            border: 1px dashed #0f3460;
+        }
+
+        .invite-link {
+            background: white;
+            padding: 8px;
+            border-radius: 6px;
+            margin: 8px 0;
+            border: 1px solid #e9ecef;
+            word-break: break-all;
+            font-size: 12px;
+            color: #0f3460;
+            font-weight: 600;
+        }
+
+        .amount-input-hint {
+            font-size: 10px;
+            color: #6c757d;
+            margin-top: 3px;
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        /* Firebase statusunu gizlə */
+        .firebase-status {
+            display: none !important;
+        }
+
+        .debug-panel {
+            display: none !important;
+        }
+
+        .cg-id-badge {
+            background: linear-gradient(135deg, #0f3460, #1a1a2e);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 12px;
+            display: inline-block;
+            margin: 3px 0;
+            box-shadow: 0 2px 8px rgba(15, 52, 96, 0.3);
+            border: 1px solid #00b894;
+        }
+        
+        .withdraw-btn-disabled {
+            background: #6c757d !important;
+            cursor: not-allowed !important;
+            opacity: 0.6 !important;
+        }
+        
+        .referral-stats {
+            display: flex;
+            justify-content: space-between;
+            margin: 12px 0;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .stat-value {
+            font-size: 14px;
+            font-weight: bold;
+            color: #0f3460;
+        }
+        
+        .stat-label {
+            font-size: 10px;
+            color: #6c757d;
+            margin-top: 3px;
+        }
+
+        .adsgram-video-btn {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 3px;
+            box-shadow: 0 3px 8px rgba(255, 107, 107, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .adsgram-video-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.4);
+        }
+
+        .adsgram-video-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Şəkil yüklənmə xətaları üçün */
+        .splash-image img,
+        #clickImage {
+            background: transparent !important;
+        }
+
+        /* Köhnə gradient fonları sil */
+        .main-icon::before,
+        .main-icon::after {
+            display: none !important;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
-    <!-- HTML strukturunuz eyni qalır -->
+    <!-- Firebase Status Indicator - GİZLƏ -->
     <div class="firebase-status" id="firebaseStatus" style="display: none;">Firebase: Yüklənir...</div>
 
+    <!-- Debug Panel - GİZLƏ -->
     <div class="debug-panel" style="display: none;">
         <button class="debug-btn" onclick="debugFirebase()">Firebase Status</button>
         <button class="debug-btn" onclick="debugGetAllUsers()">All Users</button>
@@ -45,53 +1079,462 @@
     </div>
 
     <div class="container">
-        <!-- Bütün HTML məzmununuz eyni qalır -->
         <div class="splash-screen" id="splashScreen">
-            <!-- ... splash screen content ... -->
+            <div class="splash-image pulse-animation">
+                <img src="https://i.ibb.co/JFndRdvY/casper.jpg" alt="Casper Game Logo" 
+                    onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22150%22 viewBox=%220 0 150 150%22><rect width=%22150%22 height=%22150%22 fill=%22%230f3460%22/><text x=%2275%22 y=%2275%22 font-family=%22Arial%22 font-size=%2260%22 fill=%22white%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>👻</text></svg>'">
+            </div>
+            <div class="splash-text">CASPER GAME</div>
+            <div class="splash-subtext">Pul qazanmaq üçün kliklə və qazan! 🚀</div>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
         </div>
         
         <div class="ad-screen" id="adScreen">
-            <!-- ... ad screen content ... -->
+            <div class="ad-content" id="adContent">
+                </div>
+            <div class="ad-progress-container">
+                <div class="ad-progress-bar">
+                    <div class="ad-progress-fill" id="adProgressFill"></div>
+                </div>
+                <div class="ad-progress-text" id="adProgressText">Reklam bitir: 10s</div>
+            </div>
         </div>
         
         <div class="main-content" id="mainContent" style="height: 100%; flex-grow: 1; display: none; flex-direction: column; justify-content: space-between;">
             
             <div class="login-screen" id="loginScreen" style="height: 100%; display: none;">
-                <!-- ... login screen content ... -->
+                <div class="header">
+                    <h1>CASPER GAME</h1>
+                    <p>Xoş gəlmisiniz!</p>
+                </div>
+                
+                <div class="content">
+                    <div class="tabs">
+                        <div class="tab active" id="loginTab">GİRİŞ</div>
+                        <div class="tab" id="registerTab">QEYDİYYAT</div>
+                    </div>
+                    
+                    <div class="message error" id="errorMessage"></div>
+                    <div class="message success" id="successMessage"></div>
+                    
+                    <form class="form active" id="loginForm">
+                        <div class="input-group">
+                            <label for="loginUsername">İstifadəçi adı (Login)</label>
+                            <input type="text" id="loginUsername" placeholder="İstifadəçi adınızı daxil edin" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="loginPassword">Şifrə</label>
+                            <input type="password" id="loginPassword" placeholder="Şifrənizi daxil edin" required>
+                        </div>
+                        
+                        <button type="submit" class="btn">DAXİL OL</button>
+                    </form>
+                    
+                    <form class="form" id="registerForm">
+                        <div class="input-group">
+                            <label for="registerUsername">İstifadəçi adı (Login) *</label>
+                            <input type="text" id="registerUsername" placeholder="Yeni istifadəçi adı" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="registerName">Ad *</label>
+                            <input type="text" id="registerName" placeholder="Adınızı daxil edin" required>
+                        </div>
+
+                         <div class="input-group">
+                            <label for="registerSurname">Soyad *</label>
+                            <input type="text" id="registerSurname" placeholder="Soyadınızı daxil edin" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="registerPhone">Telefon Nömrəsi *</label>
+                            <input type="tel" id="registerPhone" value="+994" placeholder="xx xxx xx xx" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="registerEmail">E-poçt (Mail) *</label>
+                            <input type="email" id="registerEmail" placeholder="E-poçtunuzu daxil edin" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="registerPassword">Şifrə *</label>
+                            <input type="password" id="registerPassword" placeholder="Ən azı 6 simvol" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="confirmPassword">Şifrəni təsdiqlə *</label>
+                            <input type="password" id="confirmPassword" placeholder="Şifrənizi təkrar daxil edin" required>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="registerReferralCode">Dəvət Kodu</label>
+                            <input type="text" id="registerReferralCode" placeholder="Dəvət kodunuzu daxil edin">
+                            <small style="color: #6c757d; font-size: 10px;">İstəyə bağlı - dostunuzun dəvət kodunu daxil edin</small>
+                        </div>
+                        
+                        <button type="submit" class="btn">QEYDİYYATDAN KEÇ</button>
+                    </form>
+                </div>
             </div>
             
             <div class="game-screen" id="gameScreen" style="display: none;">
-                <!-- ... game screen content ... -->
+                
+                <!-- ADSGRAM BANNER REKLAM SİLİNDİ -->
+
+                <div class="header">
+                    <h1>CASPER GAME</h1>
+                    <p id="welcomeText">Xoş gəldiniz, İstifadəçi! 👋</p>
+                </div>
+                
+                <div class="content">
+                    <div class="welcome-message" id="welcomeMessage" style="display: none;">
+                        <h3>🎉 Xoş gəldiniz!</h3>
+                        <p id="personalWelcomeText">Sizi yenidən görmək əladır! Oynamağa davam edin və daha çox qazanın! 🚀</p>
+                    </div>
+                    
+                    <div class="game-sub-screen active" id="tapScreen">
+                        
+                        <!-- REKLAM VƏ BONUS MƏLUMAT HİSSƏSİ -->
+                        <div class="energy-container">
+                            <div class="energy-bar">
+                                <div class="energy-fill" id="energyFill" style="width: 100%">
+                                    <div class="energy-text" id="energyText">100.000</div>
+                                </div>
+                            </div>
+                            <div class="ad-counter-container">
+                                <span>Növbəti reklam:</span> <span id="clicksUntilAdDisplay">30</span> klik
+                            </div>
+                        </div>
+
+                        <!-- YENİ ADSGRAM REWARD VIDEO DÜYMƏSİ -->
+                       <div class="bonus-info" style="margin: 12px 0; text-align: center;">
+    <button onclick="showLibtlRewardVideo()" class="adsgram-video-btn">
+        🎬 Video İzlə & 0.001 AZN Qazan!
+    </button>
+</div>
+                            <p style="font-size: 10px; color: #6c757d; margin-top: 3px;">
+                                Hər video üçün 0.001 AZN bonus! 30 saniyədən bir yenilənir!
+                            </p>
+                        </div>
+
+                        <div class="bonus-info">
+                            <strong> 30 klik Bonusu:</strong> Hər reklam üçün <strong>0.0001 AZN</strong>
+                        </div>
+
+                        <div class="click-area">
+                            <div class="main-icon" id="mainIcon">
+                                <img id="clickImage" src="https://i.ibb.co/hp0mdt1/2025-10-31-T103543-300-removebg-preview.png" alt="Casper" 
+                                    onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22 viewBox=%220 0 180 180%22><rect width=%22180%22 height=%22180%22 fill=%23ff7e5f/><text x=%2290%22 y=%2290%22 font-family=%22Arial%22 font-size=%2260%22 fill=%22white%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>👻</text></svg>'"
+                                    style="width: 100% !important; height: 100% !important; object-fit: contain !important; display: block !important; background: transparent !important;">
+                            </div>
+                        </div>
+                        
+                        <div class="stats-block">
+                            <div class="money-stat-small">
+                                <div class="stat-value" id="totalMoney">0.000000 AZN</div> 
+                                <div class="stat-label">CƏMİ QAZANC</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="game-sub-screen" id="profileScreen" style="display: none;">
+                        <h3 class="sub-header">👤 Profil Məlumatları</h3>
+                        
+                        <div class="profile-item">
+                            <div class="profile-info">
+                                <h4>CG ID:</h4>
+                                <div class="cg-id-badge" id="profileCGID">CG1</div>
+                            </div>
+                        </div>
+
+                        <div class="profile-item">
+                            <div class="profile-info">
+                                <h4>İstifadəçi Adı (Login):</h4>
+                                <p id="profileUsername">N/A</p>
+                            </div>
+                        </div>
+
+                        <div class="profile-item">
+                            <div class="profile-info">
+                                <h4>Ad Soyad:</h4>
+                                <p id="profileFullName">N/A</p>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-item">
+                            <div class="profile-info">
+                                <h4>Telefon Nömrəsi:</h4>
+                                <p id="profilePhone">N/A</p>
+                            </div>
+                        </div>
+
+                        <div class="profile-item">
+                            <div class="profile-info">
+                                <h4>E-poçt (Mail):</h4>
+                                <p id="profileEmail">N/A</p>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-item">
+                            <div class="profile-info">
+                                <h4>Qazanılmış Cəmi AZN:</h4> <p id="profileMoney">0.000000 AZN</p> </div>
+                        </div>
+
+                        <div class="referral-container">
+                            <h4>Dəvət Kodu (Dostlarınızla Paylaşın)</h4>
+                            <div class="referral-code" id="profileReferralCode">LOADING...</div>
+                            <button class="copy-btn" onclick="copyReferralCode()">Kodu Kopyala</button>
+                        </div>
+
+                        <h3 class="sub-header" style="margin-top: 15px;">⚙️ Tənzimləmələr</h3>
+                        
+                        <div class="settings-btn-group">
+                            <button class="settings-btn" onclick="openModal('editProfileModal')">
+                                <i class="fa-solid fa-pen-to-square"></i> <span>Adı / Məlumatları Dəyişdir</span>
+                            </button>
+                            <button class="settings-btn delete-btn" onclick="openModal('deleteProfileModal')">
+                                <i class="fa-solid fa-trash-can"></i> <span>Hesabı Sil</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="game-sub-screen" id="friendsScreen" style="display: none;">
+                        <h3 class="sub-header">🤝 Dostlarınızı Dəvət Edin</h3>
+                        
+                        <div class="bonus-info">
+                            <strong>Hər dəvət üçün 0.10 AZN bonus qazanın!</strong>
+                        </div>
+
+                        <div class="invite-link-container">
+                            <h4 style="text-align: center; margin-bottom: 12px;">🎁 Dəvət Məlumatlarınız</h4>
+                            <div class="invite-link" id="inviteLinkDisplay">
+                                Məlumatlar yüklənir...
+                            </div>
+                            <button class="copy-btn" onclick="copyInviteLink()" style="width: 100%;">
+                                <i class="fa-solid fa-copy"></i> Məlumatları Kopyala
+                            </button>
+                            <p style="text-align: center; margin-top: 8px; font-size: 10px; color: #6c757d;">
+                                Dostunuz qeydiyyat zamanı sizin dəvət kodunuzu daxil etməlidir!
+                            </p>
+                        </div>
+                        
+                        <div class="social-share-container">
+                            <div class="social-icon-btn whatsapp" onclick="shareOnWhatsApp()">
+                                <i class="fa-brands fa-whatsapp"></i>
+                            </div>
+                            <div class="social-icon-btn telegram" onclick="shareOnTelegram()">
+                                <i class="fa-brands fa-telegram"></i>
+                            </div>
+                            <div class="social-icon-btn tiktok" onclick="shareOnTikTok()">
+                                <i class="fa-brands fa-tiktok"></i>
+                            </div>
+                            <div class="social-icon-btn" style="background: #252525;" onclick="copyInviteLink()">
+                                <i class="fa-solid fa-link"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="referral-stats">
+                            <div class="stat-item">
+                                <div class="stat-value" id="successfulReferrals">0</div>
+                                <div class="stat-label">Uğurlu Dəvət</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="referralBonusTotal">0.00 AZN</div>
+                                <div class="stat-label">Cəmi Bonus</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="referralLimit">10</div>
+                                <div class="stat-label">Maksimum Limit</div>
+                            </div>
+                        </div>
+                        
+                        <div class="referral-container" style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba;">
+                            <h4 style="color: #856404;">Dəvət Bonus Qaydası</h4>
+                            <p style="font-size: 12px; margin-top: 3px;">
+                                Hər qeydiyyatdan keçən dostunuz üçün sizə **0.10 AZN** bonus verilir. Bonus yalnız ilk **10 uğurlu dəvət** üçün nəzərdə tutulub. </p>
+                        </div>
+                    </div>
+
+                    <div class="game-sub-screen" id="withdrawalScreen" style="display: none;">
+                        <h3 class="sub-header">💸 AZN Çıxarışı</h3> 
+                        
+                        <div class="user-id-container">
+                            <h4 style="margin-bottom: 8px; color: white;">🆔 Sizin User ID</h4>
+                            <div class="user-id-badge" id="withdrawalUserIdDisplay">Yüklənir...</div>
+                            <p style="color: #e0e0e0; font-size: 10px; margin-top: 6px;">
+                                Bu ID çıxarış sorğunuzda avtomatik olaraq adminə göndəriləcək
+                            </p>
+                        </div>
+
+                        <div class="withdrawal-info">
+                            <p><strong>Minimum çıxarış məbləği: 1.00 AZN</strong></p>
+                            <p><strong>Çıxarış limiti: 10 gündə 1 dəfə</strong></p>
+                            <p><strong>Maksimum çıxarış: 1000.00 AZN</strong></p>
+                            <p><strong>Çıxarış məlumatları avtomatik olaraq adminə göndəriləcək</strong></p>
+                        </div>
+
+                        <div class="withdrawal-warning">
+                            <p id="withdrawalTimerInfo">Növbəti çıxarış üçün: <strong id="nextWithdrawalTime">Hazır</strong></p>
+                        </div>
+                        
+                        <div class="friend-item">
+                            <div class="boost-info">
+                                <h4>Mövcud Balans:</h4>
+                                <p id="availableMoney">0.000000 AZN</p> 
+                            </div>
+                        </div>
+
+                        <form id="withdrawalForm">
+                            <div class="input-group">
+                                <label for="withdrawAmount">Çıxarmaq İstədiyiniz Məbləğ (AZN)</label> 
+                                <input type="number" step="0.01" id="withdrawAmount" placeholder="Məbləği daxil edin (Məs: 1.00)" required> 
+                                <div class="amount-input-hint" id="amountHint"></div>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="withdrawName">Ad</label>
+                                <input type="text" id="withdrawName" placeholder="Adınızı daxil edin" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="withdrawSurname">Soyad</label>
+                                <input type="text" id="withdrawSurname" placeholder="Soyadınızı daxil edin" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="withdrawPhone">Telefon Nömrəsi</label>
+                                <input type="tel" id="withdrawPhone" value="+994" placeholder="xx xxx xx xx" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="withdrawCardNumber">Kart Nömrəsi (16 Rəqəm)</label>
+                                <input type="text" id="withdrawCardNumber" placeholder="Kart Nömrəsini daxil edin" required pattern="\d{16}" maxlength="16">
+                            </div>
+                            <div class="input-group">
+                                <label for="withdrawCardHolder">Kart Sahibinin Adı Soyadı</label>
+                                <input type="text" id="withdrawCardHolder" placeholder="Kartın sahibinin ad/soyadı" required>
+                            </div>
+
+                            <button type="submit" class="btn" id="withdrawSubmitBtn">ÇIXARIŞ ET</button>
+                        </form>
+                    </div>
+
+                </div>
+                
+                <div class="navbar">
+                    <div class="nav-item" data-target="profileScreen">
+                        <div class="nav-icon-wrapper"><i class="fa-solid fa-user"></i></div>
+                        <span>Profil</span>
+                    </div>
+                    <div class="nav-item" data-target="friendsScreen">
+                        <div class="nav-icon-wrapper"><i class="fa-solid fa-gift"></i></div>
+                        <span>Dəvət</span>
+                    </div>
+                    <div class="nav-item active" data-target="tapScreen">
+                        <div class="nav-icon-wrapper"><i class="fa-solid fa-hand-pointer"></i></div>
+                        <span>Tap</span>
+                    </div>
+                    <div class="nav-item" data-target="withdrawalScreen">
+                        <div class="nav-icon-wrapper"><i class="fa-solid fa-money-bill-transfer"></i></div>
+                        <span>Çıxarış</span>
+                    </div>
+                    <div class="nav-item" data-target="loginScreen" id="logoutNav">
+                        <div class="nav-icon-wrapper"><i class="fa-solid fa-right-from-bracket"></i></div>
+                        <span>Çıxış</span>
+                    </div>
+                </div>
+
+                <!-- ALT BANNER SİLİNDİ -->
+
             </div>
         </div>
         
-        <!-- Modal-lar eyni qalır -->
         <div id="editProfileModal" class="modal">
-            <!-- ... modal content ... -->
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal('editProfileModal')">&times;</span>
+                <h2>Məlumatları Dəyişdir</h2>
+                <form id="editProfileForm">
+                    <div class="input-group">
+                        <label for="editName">Ad</label>
+                        <input type="text" id="editName" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="editSurname">Soyad</label>
+                        <input type="text" id="editSurname" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="editEmail">E-poçt (Mail)</label>
+                        <input type="email" id="editEmail" required>
+                    </div>
+                    <button type="submit" class="btn" style="margin-top: 12px;">Yadda Saxla</button>
+                </form>
+            </div>
         </div>
 
         <div id="deleteProfileModal" class="modal">
-            <!-- ... modal content ... -->
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal('deleteProfileModal')">&times;</span>
+                <h2>Hesabı Silmə</h2>
+                <div class="message error" style="display: block;">
+                    Hesabınızı silməkdə əminsiniz? Bu əməliyyat geri qaytarılmayacaq!
+                </div>
+                <div class="input-group">
+                    <label for="deleteConfirm">Təsdiq üçün "SİL" yazın</label>
+                    <input type="text" id="deleteConfirm" placeholder="SİL" required>
+                </div>
+                <button class="btn delete-btn" onclick="deleteProfile()">Hesabımı Sil</button>
+            </div>
         </div>
     </div>
 
-    <!-- Adexium Initialization -->
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', () => {
-            try {
-                const adexiumWidget = new AdexiumWidget({
-                    wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae', 
-                    adFormat: 'push-like'
-                });
-                adexiumWidget.autoMode();
-                console.log('✅ Adexium reklam sistemi uğurla başladıldı');
-            } catch (error) {
-                console.log('ℹ️ Adexium: Normal brauzer rejimi - Telegram mühiti tələb olunur');
-            }
-        });
-    </script>
-
     <script>
+// =================================================================
+// ADEXIUM REKLAM SİSTEMİ
+// =================================================================
+
+let adexiumWidget = null;
+
+// Adexium sistemini başlat
+function initializeAdexium() {
+    try {
+        if (typeof AdexiumWidget !== 'undefined') {
+            adexiumWidget = new AdexiumWidget({
+                wid: 'a46e28f0-9161-4929-a965-e531e57ce', // Sənəddəki widget ID
+                adformat: 'push-like'
+            });
+            adexiumWidget.autohide();
+            console.log('✅ Adexium reklam sistemi uğurla başladıldı');
+            return true;
+        } else {
+            console.log('❌ Adexium SDK yüklənməyib');
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Adexium başlatma xətası:', error);
+        return false;
+    }
+}
+
+// Adexium reklamlarını göstər
+function showAdexiumAds() {
+    if (!adexiumWidget) {
+        const initialized = initializeAdexium();
+        if (!initialized) {
+            console.log('❌ Adexium sistemi hazır deyil');
+            return false;
+        }
+    }
+    
+    try {
+        // Adexium reklamlarını aktiv et
+        adexiumWidget.show();
+        return true;
+    } catch (error) {
+        console.error('❌ Adexium reklam göstərmə xətası:', error);
+        return false;
+    }
+}
+
 // =================================================================
 // FIREBASE KONFİQURASİYASI
 // =================================================================
@@ -117,100 +1560,44 @@ try {
     console.error('❌ Firebase xətası:', error);
 }
 
-// =================================================================
-// ÇIXARIŞ AYARLARI - YENİLƏNİB
-// =================================================================
-const MIN_WITHDRAWAL_AMOUNT = 1.00; // 1 AZN edildi
-const WITHDRAWAL_COOLDOWN_DAYS = 10;
-const MAX_WITHDRAWAL_AMOUNT = 1000.00;
-const ADMIN_WHATSAPP_NUMBER = "0513248685";
+// game-logic.js (Yenilənmiş AdsGram30Click funksiyalarından sonra əlavə edin)
 
-// =================================================================
-// DƏVƏT BONUS AYARLARI - YENİLƏNİB
-// =================================================================
-const REFERRAL_BONUS_AMOUNT = 0.10;
-const REFERRAL_BONUS_LIMIT = 10;
+// -------------------------------------------------------------
+// TRAF.COM / LIBTL FUNKSİYASI (DÜYMƏ ÜÇÜN)
+// -------------------------------------------------------------
 
-// =================================================================
-// ADSGRAM REKLAM SİSTEMİ
-// =================================================================
+const LIBTL_REWARD_AMOUNT = 0.001; 
 
-let AdsgramController = null;
-let adsgramRewardAvailable = true;
-
-// AdsGram sistemini başlat - BUTTON REKLAMI
-function initializeAdsGram() {
-    try {
-        if (window.Adsgram) {
-            AdsgramController = window.Adsgram.init({ blockId: "16650" });
-            console.log('✅ AdsGram sistemi uğurla başladıldı');
-            return true;
-        } else {
-            console.log('❌ AdsGram SDK yüklənməyib');
-            return false;
-        }
-    } catch (error) {
-        console.error('❌ AdsGram başlatma xətası:', error);
-        return false;
-    }
-}
-
-// Reward video göstərmək üçün funksiya - BUTTON REKLAMI
-function showAdsGramRewardVideo() {
-    if (!adsgramRewardAvailable) {
-        alert('🎬 Reward video hazır deyil. Bir neçə dəqiqə gözləyin.');
-        return false;
-    }
+function showLibtlRewardVideo() {
     
-    if (!AdsgramController) {
-        const initialized = initializeAdsGram();
-        if (!initialized) {
-            alert('❌ Reklam sistemi hazır deyil. Yenidən cəhd edin.');
-            return false;
-        }
+    // Libtl SDK-sı tərəfindən yaradılan funksiyanın mövcudluğunu yoxlayın
+    if (typeof show_10135032 !== 'function') {
+        alert('Reklam sistemi hələ hazır deyil. Bir neçə saniyə gözləyin.');
+        return;
     }
 
-    adsgramRewardAvailable = false;
+    console.log('Traf.com reklamı göstərilir...');
     
-    AdsgramController.show()
-        .then((result) => {
-            console.log('✅ AdsGram reward video tamamlandı!', result);
+    show_10135032()
+        .then(() => {
+            // ✅ REKLAM UĞURLA İZLƏNİLDİ.
+            console.log('Libtl: İstifadəçi reklamı izlədi. Bonus verilir.');
             
-            const rewardAmount = 0.001;
-            currentUserState.totalMoney += rewardAmount;
-            
+            // İstifadəçiyə 0.001 AZN bonus verin
+            currentUserState.totalMoney += LIBTL_REWARD_AMOUNT;
             saveUserState();
-            updateEnergyDisplay();
+            updateEnergyDisplay(); 
             
-            showSuccess(`🎉 Reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
-            
-            setTimeout(() => {
-                adsgramRewardAvailable = true;
-                console.log('🔄 Reward video yenidən aktiv oldu');
-            }, 30000);
+            showSuccess(`🎉 Video tamamlandı! +${formatMoney(LIBTL_REWARD_AMOUNT)} AZN qazandınız!`);
         })
         .catch((error) => {
-            console.error('❌ AdsGram reward video xətası:', error);
-            
-            let errorMessage = 'Reklam göstərilərkən xəta baş verdi.';
-            
-            if (error && error.description) {
-                errorMessage = error.description;
-            }
-            
-            alert(`❌ ${errorMessage}`);
-            
-            setTimeout(() => {
-                adsgramRewardAvailable = true;
-                console.log('🔄 Reward video yenidən aktiv oldu');
-            }, 30000);
+            // ❌ UĞURSUZLUQ (atlanma, xəta, və ya mövcud deyil)
+            console.log('Libtl: Reklam uğursuz oldu və ya atlandı:', error);
+            showErrorMessage('Reklam göstərilmədi və ya atlandı. Zəhmət olmasa, tam izləyin.');
         });
-    
-    return true;
 }
-
 // =================================================================
-// ADSGRAM 30 KLİK REWARD VIDEO SİSTEMİ
+// ADSGRAM 30 KLİK REWARD VIDEO SİSTEMİ - YENİ
 // =================================================================
 
 let Adsgram30ClickController = null;
@@ -219,6 +1606,7 @@ let Adsgram30ClickController = null;
 function initializeAdsGram30Click() {
     try {
         if (window.Adsgram) {
+            // 30 klikdən sonra gələcək reklam üçün YENİ UnitID
             Adsgram30ClickController = window.Adsgram.init({ blockId: "17053" });
             console.log('✅ AdsGram 30 Klik Reward Video sistemi uğurla başladıldı');
             return true;
@@ -236,29 +1624,36 @@ function initializeAdsGram30Click() {
 function showAdsGram30ClickReward() {
     console.log('🔄 30 klik reklamı başladı...');
     
+    // 1. AdsGram controller tapılıb-tapılmadığını yoxla
     if (!Adsgram30ClickController) {
         console.error('❌ AdsGram controller tapılmadı! Yenidən başladılır...');
         const initialized = initializeAdsGram30Click(); 
         if (!initialized) {
-            console.error('❌ Reklam sistemi hazır deyil.');
+            console.error('❌ Reklam sistemi hazır deyil. İlkinləşmə uğursuz oldu.'); 
+            
             currentUserState.clicksUntilAd = AD_INTERVAL;
             updateEnergyDisplay();
             return false;
         }
     }
 
+    // 2. REKLAMIN HAZIR OLUB-OLMADIĞINI YOXLA
     if (typeof Adsgram30ClickController.isReady === 'function') {
         if (!Adsgram30ClickController.isReady()) {
-            console.warn('⚠️ Reklam hazır deyil');
+            console.warn('⚠️ Reklam hazır deyil, isReady() false qaytarır.');
+            
+            // Hazır deyilsə, növbəti klikdə yoxlamaq üçün return edirik.
             return false;
         }
     }
 
+    // 3. TRY-CATCH İÇƏRISINDA REKLAMI GÖSTƏR
     try {
         console.log('🎬 Reklam göstərilməyə çalışılır...');
         
         Adsgram30ClickController.show()
             .then((result) => {
+                // Uğurlu Hal
                 console.log('✅ AdsGram 30 klik reward video tamamlandı!', result);
                 
                 const rewardAmount = 0.0001; 
@@ -269,17 +1664,28 @@ function showAdsGram30ClickReward() {
                 
                 currentUserState.clicksUntilAd = AD_INTERVAL;
                 updateEnergyDisplay();
+                console.log('✅ Reklam uğurla tamamlandı, sayğac sıfırlandı');
             })
             .catch((error) => {
+                // Reklam uğursuz olduqda (No Fill, bağlamaq və s.)
                 console.error('❌ AdsGram 30 klik reward video xətası:', error);
+                
+                // Sayğacı sıfırla ki, növbəti klikə keçsin
                 currentUserState.clicksUntilAd = AD_INTERVAL;
                 updateEnergyDisplay();
+                console.log('🔄 Xəta olsa belə sayğac sıfırlandı');
             });
 
     } catch (e) {
-        console.error("🚨 AdsGram show() xətası:", e.message);
+        // "attempt to call show..." kimi dərhal baş verən xətalar (Əsas problem)
+        console.error("🚨 AdsGram show() çağırışında dərhal xəta (hələ yüklənib-hazır deyil):", e.message);
+        
+        // Bu xəta baş verəndə sayğacı sıfırlamaq (yenə də) 
+        // ən təhlükəsiz yoldur ki, tətbiq donmasın.
         currentUserState.clicksUntilAd = AD_INTERVAL;
         updateEnergyDisplay();
+        console.log('🔄 Catch blokunda sayğac sıfırlandı');
+        
         return false;
     }
     
@@ -300,6 +1706,7 @@ async function getNextCGId() {
     try {
         const counterRef = db.collection('counters').doc('userCounter');
         
+        // Firestore increment istifadəsi
         const result = await db.runTransaction(async (transaction) => {
             const doc = await transaction.get(counterRef);
             const currentCount = doc.exists ? doc.data().count : 0;
@@ -311,6 +1718,7 @@ async function getNextCGId() {
         return `CG${result}`;
     } catch (error) {
         console.error('CG ID xətası:', error);
+        // Fallback üçün timestamp əsaslı ID
         return `CG${Date.now()}${Math.random().toString(36).substr(2, 5)}`.toUpperCase();
     }
 }
@@ -447,6 +1855,7 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
     
     const encodedMessage = encodeURIComponent(message);
     
+    // TikTok üçün ən yaxşı paylaşım üsulu
     if (navigator.share) {
         navigator.share({
             title: 'Casper Game - Dost Dəvəti',
@@ -456,9 +1865,11 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             console.log('TikTok paylaşım uğurlu');
         }).catch((error) => {
             console.log('TikTok paylaşım xətası:', error);
+            // Fallback - məlumatları kopyala
             copyInviteLink();
         });
     } else {
+        // Fallback - məlumatları kopyala
         copyInviteLink();
         alert("TikTok paylaşımı üçün məlumatlar kopyalandı! TikTok-da paylaşın.");
     }
@@ -520,12 +1931,19 @@ const AD_REWARD_PER_AD = 0.0001;
 const ENERGY_REGEN_INTERVAL = 1000;         
 const MONEY_PER_CLICK = 0.000003;
 const MONEY_DECIMAL_PLACES = 6;         
+const REFERRAL_BONUS_AMOUNT = 0.10;
 
 const HOURS_FOR_FULL_CHARGE = 24;
 const SECONDS_FOR_FULL_CHARGE = HOURS_FOR_FULL_CHARGE * 60 * 60;
 const ENERGY_REGEN_PER_SECOND = MAX_ENERGY_CAP / SECONDS_FOR_FULL_CHARGE;
 
 const BASE_REGEN_RATE = 1000 / 60; 
+const REFERRAL_BONUS_LIMIT = 10;
+
+const MIN_WITHDRAWAL_AMOUNT = 5.00;
+const WITHDRAWAL_COOLDOWN_DAYS = 10;
+const MAX_WITHDRAWAL_AMOUNT = 1000.00;
+const ADMIN_WHATSAPP_NUMBER = "0513248685";
 
 const BASE_INVITE_URL = window.location.href.split('?')[0];
 
@@ -641,7 +2059,7 @@ function showSuccess(message) {
 }
 
 // =================================================================
-// YENİ QEYDİYYAT FUNKSİYASI - REFERRAL BONUS İLƏ (YENİLƏNİB)
+// YENİ QEYDİYYAT FUNKSİYASI - REFERRAL BONUS İLƏ
 // =================================================================
 document.getElementById('registerForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -731,7 +2149,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
             registrationDate: new Date().toISOString()
         };
 
-        // ƏGƏR DƏVƏT KODU VARSA - REFERRAL BONUS VER (YENİLƏNİB)
+        // ƏGƏR DƏVƏT KODU VARSA - REFERRAL BONUS VER
         if (referralCodeInput) {
             userData.referredBy = referralCodeInput;
             console.log(`📝 İstifadəçi ${referralCodeInput} kodu ilə qeydiyyatdan keçir`);
@@ -752,7 +2170,6 @@ document.getElementById('registerForm').addEventListener('submit', async functio
                 });
                 
                 console.log(`🎉 Referans bonusu verildi: ${referrer.username} +${REFERRAL_BONUS_AMOUNT} AZN`);
-                console.log(`📊 Yeni dəvət sayı: ${updatedSuccessfulReferrals}`);
                 
                 // Referans verənə bildiriş göndər
                 if (referrer.username !== username) {
@@ -760,9 +2177,6 @@ document.getElementById('registerForm').addEventListener('submit', async functio
                 }
             } else if (referrer && referrer.successfulReferrals >= REFERRAL_BONUS_LIMIT) {
                 console.log(`ℹ️ Referans limiti dolub: ${referrer.username}`);
-                showSuccess(`ℹ️ ${referrer.username} istifadəçisinin dəvət limiti dolub.`);
-            } else {
-                console.log(`❌ Referans verən tapılmadı: ${referralCodeInput}`);
             }
         }
 
@@ -843,7 +2257,7 @@ function generateReferralCode(username) {
 }
 
 // =================================================================
-// REKLAM SİSTEMİ FUNKSİYALARI
+// REKLAM SİSTEMİ FUNKSİYALARI - YENİLƏNİB
 // =================================================================
 
 function showAd() {
@@ -918,7 +2332,7 @@ function sendWithdrawalToWhatsApp(withdrawalData) {
 }
 
 // =================================================================
-// ÇIXARIŞ SİSTEMİ FUNKSİYALARI - YENİLƏNİB
+// ÇIXARIŞ SİSTEMİ FUNKSİYALARI
 // =================================================================
 
 function checkWithdrawalAvailability() {
@@ -1395,7 +2809,7 @@ async function deleteProfile() {
     }
 }
 
-// Çıxarış məbləği real-time validasiyası - YENİLƏNİB
+// Çıxarış məbləği real-time validasiyası
 document.getElementById('withdrawAmount').addEventListener('input', function(e) {
     const amount = parseFloat(e.target.value) || 0;
     const hint = document.getElementById('amountHint');
@@ -1412,7 +2826,7 @@ document.getElementById('withdrawAmount').addEventListener('input', function(e) 
 });
 
 // =================================================================
-// ÇIXARIŞ FORM FUNKSİYASI - YENİLƏNİB
+// ÇIXARIŞ FORM FUNKSİYASI
 // =================================================================
 document.getElementById('withdrawalForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -1435,7 +2849,6 @@ document.getElementById('withdrawalForm').addEventListener('submit', async funct
         return;
     }
 
-    // Minimum çıxarış məbləği 1 AZN - YENİLƏNİB
     if (amountAZN < MIN_WITHDRAWAL_AMOUNT) {
         alert(`Minimum çıxarış məbləği ${MIN_WITHDRAWAL_AMOUNT.toFixed(2)} AZN-dir.`);
         return;
@@ -1569,9 +2982,13 @@ function clickIcon(e) {
     if (state.clicksUntilAd <= 1) { 
         state.clicksUntilAd = 0; 
         
+        // 🟢 DÜZƏLİŞ: showAd() yerinə setTimeout ilə showAdsGram30ClickReward() çağırırıq
         console.log("30 klik tamamlandı. Reward video çağırılır...");
         
+        // 500ms gecikmə tətbiq edin
         setTimeout(() => {
+             // Əgər sizdə showAd() funksiyası showAdsGram30ClickReward() funksiyasını çağırırsa,
+             // onu buraya qoymalısınız. Əks halda, birbaşa aşağıdakı funksiyanı çağırın.
              showAdsGram30ClickReward(); 
         }, 500); 
         
@@ -1582,6 +2999,7 @@ function clickIcon(e) {
         if (state.clicksUntilAd > 0) {
             state.clicksUntilAd = 0; 
             
+            // 🟢 DÜZƏLİŞ: Enerji yoxdursa və reklam vaxtıdırsa, yenə də gecikmə tətbiq edin
             console.log("Enerji bitdi, lakin reklam vaxtıdır. Reward video çağırılır...");
             
             setTimeout(() => {
@@ -1616,6 +3034,16 @@ window.addEventListener('load', async function() {
     // CG ID sistemini initialize et
     await initializeCounter();
     console.log('✅ CG ID sistemi hazırdır');
+    
+    // ADEXIUM REKLAM SİSTEMİNİ İŞƏ SAL
+    setTimeout(() => {
+        const adexiumInitialized = initializeAdexium();
+        if (adexiumInitialized) {
+            console.log('✅ Adexium reklam sistemi uğurla başladıldı');
+        } else {
+            console.log('❌ Adexium reklam sistemi başladıla bilmədi');
+        }
+    }, 2000);
     
     // ADSGRAM BUTTON REKLAMI İŞƏ SAL
     setTimeout(() => {
