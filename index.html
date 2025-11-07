@@ -1506,17 +1506,15 @@ try {
 }
 
 // =================================================================
-// ADSGRAM REKLAM SİSTEMİ - YENİLƏNİB
+// ADSGRAM REKLAM SİSTEMİ
 // =================================================================
 
 let AdsgramController = null;
 let adsgramRewardAvailable = true;
 
-// AdsGram sistemini başlat - BUTTON REKLAMI
 function initializeAdsGram() {
     try {
         if (window.Adsgram) {
-            // Block ID-ni burada dəyişin - AdsGram panelindən aldığınız block ID
             AdsgramController = window.Adsgram.init({ blockId: "16650" });
             console.log('✅ AdsGram sistemi uğurla başladıldı');
             return true;
@@ -1530,7 +1528,6 @@ function initializeAdsGram() {
     }
 }
 
-// Reward video göstərmək üçün funksiya - BUTTON REKLAMI
 function showAdsGramRewardVideo() {
     if (!adsgramRewardAvailable) {
         alert('🎬 Reward video hazır deyil. Bir neçə dəqiqə gözləyin.');
@@ -1551,20 +1548,14 @@ function showAdsGramRewardVideo() {
         .then((result) => {
             console.log('✅ AdsGram reward video tamamlandı!', result);
             
-            // Oyunçuya böyük bonus ver
-            const rewardAmount = 0.001; // 0.001 AZN bonus
+            const rewardAmount = 0.001;
             currentUserState.totalMoney += rewardAmount;
             
-            // Firebase-ə yaz
             saveUserState();
-            
-            // UI yenilə
             updateEnergyDisplay();
             
-            // Təbriklər mesajı
             showSuccess(`🎉 Reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
             
-            // 30 saniye sonra reward video yenidən aktiv olacaq
             setTimeout(() => {
                 adsgramRewardAvailable = true;
                 console.log('🔄 Reward video yenidən aktiv oldu');
@@ -1581,7 +1572,6 @@ function showAdsGramRewardVideo() {
             
             alert(`❌ ${errorMessage}`);
             
-            // Xəta olsa belə, 30saniye sonra reward video yenidən aktiv olacaq
             setTimeout(() => {
                 adsgramRewardAvailable = true;
                 console.log('🔄 Reward video yenidən aktiv oldu');
@@ -1592,16 +1582,14 @@ function showAdsGramRewardVideo() {
 }
 
 // =================================================================
-// ADSGRAM 30 KLİK REWARD VIDEO SİSTEMİ - YENİ
+// ADSGRAM 30 KLİK REWARD VIDEO SİSTEMİ
 // =================================================================
 
 let Adsgram30ClickController = null;
 
-// AdsGram 30 klik reward video sistemini başlat
 function initializeAdsGram30Click() {
     try {
         if (window.Adsgram) {
-            // 30 klikdən sonra gələcək reklam üçün YENİ UnitID
             Adsgram30ClickController = window.Adsgram.init({ blockId: "17053" });
             console.log('✅ AdsGram 30 Klik Reward Video sistemi uğurla başladıldı');
             return true;
@@ -1615,44 +1603,32 @@ function initializeAdsGram30Click() {
     }
 }
 
-// 30 klikdən sonra gələcək AdsGram reward video funksiyası
 function showAdsGram30ClickReward() {
     console.log('🔄 30 klik reklamı başladı...');
     
-    // 1. AdsGram controller tapılıb-tapılmadığını yoxla
     if (!Adsgram30ClickController) {
         console.error('❌ AdsGram controller tapılmadı! Yenidən başladılır...');
         const initialized = initializeAdsGram30Click(); 
         if (!initialized) {
             console.error('❌ Reklam sistemi hazır deyil. İlkinləşmə uğursuz oldu.'); 
-            
-            // Xəbərdarlıq Mesajı 1 SİLİNDİ! (alert)
-            
             currentUserState.clicksUntilAd = AD_INTERVAL;
             updateEnergyDisplay();
             return false;
         }
     }
 
-    // 2. REKLAMIN HAZIR OLUB-OLMADIĞINI YOXLA
     if (typeof Adsgram30ClickController.isReady === 'function') {
         if (!Adsgram30ClickController.isReady()) {
             console.warn('⚠️ Reklam hazır deyil, isReady() false qaytarır.');
-            
-            // Xəbərdarlıq Mesajı 2 SİLİNDİ! (alert)
-            
-            // Hazır deyilsə, növbəti klikdə yoxlamaq üçün return edirik.
             return false;
         }
     }
 
-    // 3. TRY-CATCH İÇƏRISINDA REKLAMI GÖSTƏR
     try {
         console.log('🎬 Reklam göstərilməyə çalışılır...');
         
         Adsgram30ClickController.show()
             .then((result) => {
-                // Uğurlu Hal
                 console.log('✅ AdsGram 30 klik reward video tamamlandı!', result);
                 
                 const rewardAmount = 0.0001; 
@@ -1666,35 +1642,23 @@ function showAdsGram30ClickReward() {
                 console.log('✅ Reklam uğurla tamamlandı, sayğac sıfırlandı');
             })
             .catch((error) => {
-                // Reklam uğursuz olduqda (No Fill, bağlamaq və s.)
                 console.error('❌ AdsGram 30 klik reward video xətası:', error);
-                
-                // Xəbərdarlıq Mesajı 3 SİLİNDİ! (alert)
-                // Sadəcə konsola yazırıq ki, istifadəçini narahat etməyək.
-                
-                // Sayğacı sıfırla ki, növbəti klikə keçsin
                 currentUserState.clicksUntilAd = AD_INTERVAL;
                 updateEnergyDisplay();
                 console.log('🔄 Xəta olsa belə sayğac sıfırlandı');
             });
 
     } catch (e) {
-        // "attempt to call show..." kimi dərhal baş verən xətalar (Əsas problem)
-        console.error("🚨 AdsGram show() çağırışında dərhal xəta (hələ yüklənib-hazır deyil):", e.message);
-        
-        // Xəbərdarlıq Mesajı 4 SİLİNDİ! (alert)
-        
-        // Bu xəta baş verəndə sayğacı sıfırlamaq (yenə də) 
-        // ən təhlükəsiz yoldur ki, tətbiq donmasın.
+        console.error("🚨 AdsGram show() çağırışında dərhal xəta:", e.message);
         currentUserState.clicksUntilAd = AD_INTERVAL;
         updateEnergyDisplay();
         console.log('🔄 Catch blokunda sayğac sıfırlandı');
-        
         return false;
     }
     
     return true;
 }
+
 // =================================================================
 // TELEGRAM BOT AYARLARI
 // =================================================================
@@ -1704,12 +1668,10 @@ const TELEGRAM_BOT_URL = "https://t.me/Casper_Game_bot/directlink";
 // YENİ CG ID SİSTEMİ
 // =================================================================
 
-// Növbəti CG ID almaq üçün funksiya
 async function getNextCGId() {
     try {
         const counterRef = db.collection('counters').doc('userCounter');
         
-        // Firestore increment istifadəsi
         const result = await db.runTransaction(async (transaction) => {
             const doc = await transaction.get(counterRef);
             const currentCount = doc.exists ? doc.data().count : 0;
@@ -1721,12 +1683,10 @@ async function getNextCGId() {
         return `CG${result}`;
     } catch (error) {
         console.error('CG ID xətası:', error);
-        // Fallback üçün timestamp əsaslı ID
         return `CG${Date.now()}${Math.random().toString(36).substr(2, 5)}`.toUpperCase();
     }
 }
 
-// Counter-i initialize etmək üçün funksiya
 async function initializeCounter() {
     try {
         const counterRef = db.collection('counters').doc('userCounter');
@@ -1858,7 +1818,6 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
     
     const encodedMessage = encodeURIComponent(message);
     
-    // TikTok üçün ən yaxşı paylaşım üsulu
     if (navigator.share) {
         navigator.share({
             title: 'Casper Game - Dost Dəvəti',
@@ -1868,11 +1827,9 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             console.log('TikTok paylaşım uğurlu');
         }).catch((error) => {
             console.log('TikTok paylaşım xətası:', error);
-            // Fallback - məlumatları kopyala
             copyInviteLink();
         });
     } else {
-        // Fallback - məlumatları kopyala
         copyInviteLink();
         alert("TikTok paylaşımı üçün məlumatlar kopyalandı! TikTok-da paylaşın.");
     }
@@ -1943,7 +1900,7 @@ const ENERGY_REGEN_PER_SECOND = MAX_ENERGY_CAP / SECONDS_FOR_FULL_CHARGE;
 const BASE_REGEN_RATE = 1000 / 60; 
 const REFERRAL_BONUS_LIMIT = 10;
 
-// MINIMUM ÇIXARIŞ MƏBLƏĞİ 1.00 AZN OLARAQ DƏYİŞDİRİLDİ
+// MINIMUM ÇIXARIŞ MƏBLƏĞİ 1.00 AZN
 const MIN_WITHDRAWAL_AMOUNT = 1.00;
 const WITHDRAWAL_COOLDOWN_DAYS = 10;
 const MAX_WITHDRAWAL_AMOUNT = 1000.00;
@@ -2034,7 +1991,6 @@ const subScreens = document.querySelectorAll('.game-sub-screen');
 // KÖMƏKÇİ FUNKSİYALAR
 // =================================================================
 
-// Xəta mesajı göstərmək üçün köməkçi funksiya
 function showError(message) {
     const errorElement = document.getElementById('errorMessage');
     errorElement.textContent = message;
@@ -2048,7 +2004,6 @@ function showError(message) {
     }, 5000);
 }
 
-// Uğur mesajı göstərmək üçün köməkçi funksiya
 function showSuccess(message) {
     const successElement = document.getElementById('successMessage');
     successElement.textContent = message;
@@ -2063,7 +2018,7 @@ function showSuccess(message) {
 }
 
 // =================================================================
-// YENİ QEYDİYYAT FUNKSİYASI - REFERRAL BONUS İLƏ
+// YENİ QEYDİYYAT FUNKSİYASI - REFERRAL BONUS İLƏ DÜZƏLDİ
 // =================================================================
 document.getElementById('registerForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -2153,7 +2108,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
             registrationDate: new Date().toISOString()
         };
 
-        // ƏGƏR DƏVƏT KODU VARSA - REFERRAL BONUS VER
+        // ƏGƏR DƏVƏT KODU VARSA - REFERRAL BONUS VER (DÜZƏLDİ)
         if (referralCodeInput) {
             userData.referredBy = referralCodeInput;
             console.log(`📝 İstifadəçi ${referralCodeInput} kodu ilə qeydiyyatdan keçir`);
@@ -2175,12 +2130,20 @@ document.getElementById('registerForm').addEventListener('submit', async functio
                 
                 console.log(`🎉 Referans bonusu verildi: ${referrer.username} +${REFERRAL_BONUS_AMOUNT} AZN`);
                 
+                // YENİ DƏVƏT EDİLƏN İSTİFADƏÇİYƏ DƏ BONUS VER (DÜZƏLDİ)
+                userData.totalMoney += REFERRAL_BONUS_AMOUNT;
+                console.log(`🎁 Yeni istifadəçiyə də bonus verildi: ${username} +${REFERRAL_BONUS_AMOUNT} AZN`);
+                
                 // Referans verənə bildiriş göndər
                 if (referrer.username !== username) {
-                    showSuccess(`🎊 ${referrer.username} istifadəçisinə ${REFERRAL_BONUS_AMOUNT} AZN bonus verildi!`);
+                    showSuccess(`🎊 ${referrer.username} istifadəçisinə ${REFERRAL_BONUS_AMOUNT} AZN bonus verildi! Sizə də ${REFERRAL_BONUS_AMOUNT} AZN bonus verildi!`);
                 }
             } else if (referrer && referrer.successfulReferrals >= REFERRAL_BONUS_LIMIT) {
                 console.log(`ℹ️ Referans limiti dolub: ${referrer.username}`);
+                showSuccess(`ℹ️ Dəvət etdiyiniz istifadəçi artıq maksimum dəvət limitinə çatıb. Sizə də ${REFERRAL_BONUS_AMOUNT} AZN bonus verildi!`);
+                
+                // Limit dolsa belə yeni istifadəçiyə bonus ver
+                userData.totalMoney += REFERRAL_BONUS_AMOUNT;
             }
         }
 
@@ -2261,41 +2224,35 @@ function generateReferralCode(username) {
 }
 
 // =================================================================
-// REKLAM SİSTEMİ FUNKSİYALARI - YENİLƏNİB
+// REKLAM SİSTEMİ FUNKSİYALARI
 // =================================================================
 
 function showAd() {
     if (adScreen.style.display === 'flex') return;
     
-    // 30 klikdən sonra AdsGram reward video göstər
     showAdsGram30ClickReward();
 }
 
 function showNextAd() {
-    // AdsGram reward video birbaşa göstərilir
     showAdsGram30ClickReward();
 }
 
 function startAdTimer() {
-    // AdsGram avtomatik işlədiyi üçün timer lazım deyil
     setTimeout(() => {
         completeCurrentAd();
     }, 1000);
 }
 
 function completeCurrentAd() {
-    // AdsGram video tamamlandıqda avtomatik işləyəcək
     currentUserState.clicksUntilAd = AD_INTERVAL;
     updateEnergyDisplay();
 }
 
 function skipAd() {
-    // AdsGram video skip olunmur
     return;
 }
 
 function closeAd() {
-    // AdsGram video özü bağlanır
     currentUserState.clicksUntilAd = AD_INTERVAL;
     updateEnergyDisplay();
 }
@@ -2853,7 +2810,7 @@ document.getElementById('withdrawalForm').addEventListener('submit', async funct
         return;
     }
 
-    // MINIMUM ÇIXARIŞ 1.00 AZN OLARAQ YENİLƏNDİ
+    // MINIMUM ÇIXARIŞ 1.00 AZN
     if (amountAZN < MIN_WITHDRAWAL_AMOUNT) {
         alert(`Minimum çıxarış məbləği ${MIN_WITHDRAWAL_AMOUNT.toFixed(2)} AZN-dir.`);
         return;
@@ -2987,13 +2944,9 @@ function clickIcon(e) {
     if (state.clicksUntilAd <= 1) { 
         state.clicksUntilAd = 0; 
         
-        // 🟢 DÜZƏLİŞ: showAd() yerinə setTimeout ilə showAdsGram30ClickReward() çağırırıq
         console.log("30 klik tamamlandı. Reward video çağırılır...");
         
-        // 500ms gecikmə tətbiq edin
         setTimeout(() => {
-             // Əgər sizdə showAd() funksiyası showAdsGram30ClickReward() funksiyasını çağırırsa,
-             // onu buraya qoymalısınız. Əks halda, birbaşa aşağıdakı funksiyanı çağırın.
              showAdsGram30ClickReward(); 
         }, 500); 
         
@@ -3004,7 +2957,6 @@ function clickIcon(e) {
         if (state.clicksUntilAd > 0) {
             state.clicksUntilAd = 0; 
             
-            // 🟢 DÜZƏLİŞ: Enerji yoxdursa və reklam vaxtıdırsa, yenə də gecikmə tətbiq edin
             console.log("Enerji bitdi, lakin reklam vaxtıdır. Reward video çağırılır...");
             
             setTimeout(() => {
@@ -3028,6 +2980,7 @@ function clickIcon(e) {
     updateEnergyDisplay();
     createMoneyPopup(e, moneyEarned);
 }
+
 // Başlanğıc funksiyası
 window.addEventListener('load', async function() {
     loadImages();
