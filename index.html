@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="az">
-<head>   
+<head>  
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CASPER GAME</title>
@@ -1180,8 +1180,6 @@
             
             <div class="game-screen" id="gameScreen" style="display: none;">
                 
-                <!-- ADSGRAM BANNER REKLAM SİLİNDİ -->
-
                 <div class="header">
                     <h1>CASPER GAME</h1>
                     <p id="welcomeText">Xoş gəldiniz, İstifadəçi! 👋</p>
@@ -1367,7 +1365,7 @@
                         </div>
 
                         <div class="withdrawal-info">
-                            <p><strong>Minimum çıxarış məbləği: 1.00 AZN</strong></p>
+                            <p><strong>Minimum çıxarış məbləği: 5.00 AZN</strong></p>
                             <p><strong>Çıxarış limiti: 10 gündə 1 dəfə</strong></p>
                             <p><strong>Maksimum çıxarış: 1000.00 AZN</strong></p>
                             <p><strong>Çıxarış məlumatları avtomatik olaraq adminə göndəriləcək</strong></p>
@@ -1387,7 +1385,7 @@
                         <form id="withdrawalForm">
                             <div class="input-group">
                                 <label for="withdrawAmount">Çıxarmaq İstədiyiniz Məbləğ (AZN)</label> 
-                                <input type="number" step="0.01" id="withdrawAmount" placeholder="Məbləği daxil edin (Məs: 1.00)" required> 
+                                <input type="number" step="0.01" id="withdrawAmount" placeholder="Məbləği daxil edin (Məs: 5.00)" required> 
                                 <div class="amount-input-hint" id="amountHint"></div>
                             </div>
                             
@@ -1441,8 +1439,6 @@
                     </div>
                 </div>
 
-                <!-- ALT BANNER SİLİNDİ -->
-
             </div>
         </div>
         
@@ -1484,54 +1480,23 @@
         </div>
     </div>
 
+    <!-- Adexium Initialization -->
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const adexiumWidget = new AdexiumWidget({
+                    wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae', 
+                    adFormat: 'push-like'
+                });
+                adexiumWidget.autoMode();
+                console.log('✅ Adexium reklam sistemi uğurla başladıldı');
+            } catch (error) {
+                console.log('ℹ️ Adexium: Normal brauzer rejimi - Telegram mühiti tələb olunur');
+            }
+        });
+    </script>
+
     <script>
-// =================================================================
-// ADEXIUM REKLAM SİSTEMİ
-// =================================================================
-
-let adexiumWidget = null;
-
-// Adexium sistemini başlat
-function initializeAdexium() {
-    try {
-        if (typeof AdexiumWidget !== 'undefined') {
-            adexiumWidget = new AdexiumWidget({
-                wid: 'a46e28f0-9161-4929-a965-e531e57ce', // Sənəddəki widget ID
-                adformat: 'push-like'
-            });
-            adexiumWidget.autohide();
-            console.log('✅ Adexium reklam sistemi uğurla başladıldı');
-            return true;
-        } else {
-            console.log('❌ Adexium SDK yüklənməyib');
-            return false;
-        }
-    } catch (error) {
-        console.error('❌ Adexium başlatma xətası:', error);
-        return false;
-    }
-}
-
-// Adexium reklamlarını göstər
-function showAdexiumAds() {
-    if (!adexiumWidget) {
-        const initialized = initializeAdexium();
-        if (!initialized) {
-            console.log('❌ Adexium sistemi hazır deyil');
-            return false;
-        }
-    }
-    
-    try {
-        // Adexium reklamlarını aktiv et
-        adexiumWidget.show();
-        return true;
-    } catch (error) {
-        console.error('❌ Adexium reklam göstərmə xətası:', error);
-        return false;
-    }
-}
-
 // =================================================================
 // FIREBASE KONFİQURASİYASI
 // =================================================================
@@ -1558,7 +1523,7 @@ try {
 }
 
 // =================================================================
-// ADSGRAM REKLAM SİSTEMİ - YENİLƏNİB
+// ADSGRAM REKLAM SİSTEMİ
 // =================================================================
 
 let AdsgramController = null;
@@ -1568,7 +1533,6 @@ let adsgramRewardAvailable = true;
 function initializeAdsGram() {
     try {
         if (window.Adsgram) {
-            // Block ID-ni burada dəyişin - AdsGram panelindən aldığınız block ID
             AdsgramController = window.Adsgram.init({ blockId: "16650" });
             console.log('✅ AdsGram sistemi uğurla başladıldı');
             return true;
@@ -1603,20 +1567,14 @@ function showAdsGramRewardVideo() {
         .then((result) => {
             console.log('✅ AdsGram reward video tamamlandı!', result);
             
-            // Oyunçuya böyük bonus ver
-            const rewardAmount = 0.001; // 0.001 AZN bonus
+            const rewardAmount = 0.001;
             currentUserState.totalMoney += rewardAmount;
             
-            // Firebase-ə yaz
             saveUserState();
-            
-            // UI yenilə
             updateEnergyDisplay();
             
-            // Təbriklər mesajı
             showSuccess(`🎉 Reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
             
-            // 30 saniye sonra reward video yenidən aktiv olacaq
             setTimeout(() => {
                 adsgramRewardAvailable = true;
                 console.log('🔄 Reward video yenidən aktiv oldu');
@@ -1633,7 +1591,6 @@ function showAdsGramRewardVideo() {
             
             alert(`❌ ${errorMessage}`);
             
-            // Xəta olsa belə, 30saniye sonra reward video yenidən aktiv olacaq
             setTimeout(() => {
                 adsgramRewardAvailable = true;
                 console.log('🔄 Reward video yenidən aktiv oldu');
@@ -1644,7 +1601,7 @@ function showAdsGramRewardVideo() {
 }
 
 // =================================================================
-// ADSGRAM 30 KLİK REWARD VIDEO SİSTEMİ - YENİ
+// ADSGRAM 30 KLİK REWARD VIDEO SİSTEMİ
 // =================================================================
 
 let Adsgram30ClickController = null;
@@ -1653,7 +1610,6 @@ let Adsgram30ClickController = null;
 function initializeAdsGram30Click() {
     try {
         if (window.Adsgram) {
-            // 30 klikdən sonra gələcək reklam üçün YENİ UnitID
             Adsgram30ClickController = window.Adsgram.init({ blockId: "17053" });
             console.log('✅ AdsGram 30 Klik Reward Video sistemi uğurla başladıldı');
             return true;
@@ -1671,36 +1627,29 @@ function initializeAdsGram30Click() {
 function showAdsGram30ClickReward() {
     console.log('🔄 30 klik reklamı başladı...');
     
-    // 1. AdsGram controller tapılıb-tapılmadığını yoxla
     if (!Adsgram30ClickController) {
         console.error('❌ AdsGram controller tapılmadı! Yenidən başladılır...');
         const initialized = initializeAdsGram30Click(); 
         if (!initialized) {
-            console.error('❌ Reklam sistemi hazır deyil. İlkinləşmə uğursuz oldu.'); 
-            
+            console.error('❌ Reklam sistemi hazır deyil.');
             currentUserState.clicksUntilAd = AD_INTERVAL;
             updateEnergyDisplay();
             return false;
         }
     }
 
-    // 2. REKLAMIN HAZIR OLUB-OLMADIĞINI YOXLA
     if (typeof Adsgram30ClickController.isReady === 'function') {
         if (!Adsgram30ClickController.isReady()) {
-            console.warn('⚠️ Reklam hazır deyil, isReady() false qaytarır.');
-            
-            // Hazır deyilsə, növbəti klikdə yoxlamaq üçün return edirik.
+            console.warn('⚠️ Reklam hazır deyil');
             return false;
         }
     }
 
-    // 3. TRY-CATCH İÇƏRISINDA REKLAMI GÖSTƏR
     try {
         console.log('🎬 Reklam göstərilməyə çalışılır...');
         
         Adsgram30ClickController.show()
             .then((result) => {
-                // Uğurlu Hal
                 console.log('✅ AdsGram 30 klik reward video tamamlandı!', result);
                 
                 const rewardAmount = 0.0001; 
@@ -1711,28 +1660,17 @@ function showAdsGram30ClickReward() {
                 
                 currentUserState.clicksUntilAd = AD_INTERVAL;
                 updateEnergyDisplay();
-                console.log('✅ Reklam uğurla tamamlandı, sayğac sıfırlandı');
             })
             .catch((error) => {
-                // Reklam uğursuz olduqda (No Fill, bağlamaq və s.)
                 console.error('❌ AdsGram 30 klik reward video xətası:', error);
-                
-                // Sayğacı sıfırla ki, növbəti klikə keçsin
                 currentUserState.clicksUntilAd = AD_INTERVAL;
                 updateEnergyDisplay();
-                console.log('🔄 Xəta olsa belə sayğac sıfırlandı');
             });
 
     } catch (e) {
-        // "attempt to call show..." kimi dərhal baş verən xətalar (Əsas problem)
-        console.error("🚨 AdsGram show() çağırışında dərhal xəta (hələ yüklənib-hazır deyil):", e.message);
-        
-        // Bu xəta baş verəndə sayğacı sıfırlamaq (yenə də) 
-        // ən təhlükəsiz yoldur ki, tətbiq donmasın.
+        console.error("🚨 AdsGram show() xətası:", e.message);
         currentUserState.clicksUntilAd = AD_INTERVAL;
         updateEnergyDisplay();
-        console.log('🔄 Catch blokunda sayğac sıfırlandı');
-        
         return false;
     }
     
@@ -1753,7 +1691,6 @@ async function getNextCGId() {
     try {
         const counterRef = db.collection('counters').doc('userCounter');
         
-        // Firestore increment istifadəsi
         const result = await db.runTransaction(async (transaction) => {
             const doc = await transaction.get(counterRef);
             const currentCount = doc.exists ? doc.data().count : 0;
@@ -1765,7 +1702,6 @@ async function getNextCGId() {
         return `CG${result}`;
     } catch (error) {
         console.error('CG ID xətası:', error);
-        // Fallback üçün timestamp əsaslı ID
         return `CG${Date.now()}${Math.random().toString(36).substr(2, 5)}`.toUpperCase();
     }
 }
@@ -1902,7 +1838,6 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
     
     const encodedMessage = encodeURIComponent(message);
     
-    // TikTok üçün ən yaxşı paylaşım üsulu
     if (navigator.share) {
         navigator.share({
             title: 'Casper Game - Dost Dəvəti',
@@ -1912,11 +1847,9 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             console.log('TikTok paylaşım uğurlu');
         }).catch((error) => {
             console.log('TikTok paylaşım xətası:', error);
-            // Fallback - məlumatları kopyala
             copyInviteLink();
         });
     } else {
-        // Fallback - məlumatları kopyala
         copyInviteLink();
         alert("TikTok paylaşımı üçün məlumatlar kopyalandı! TikTok-da paylaşın.");
     }
@@ -3029,13 +2962,9 @@ function clickIcon(e) {
     if (state.clicksUntilAd <= 1) { 
         state.clicksUntilAd = 0; 
         
-        // 🟢 DÜZƏLİŞ: showAd() yerinə setTimeout ilə showAdsGram30ClickReward() çağırırıq
         console.log("30 klik tamamlandı. Reward video çağırılır...");
         
-        // 500ms gecikmə tətbiq edin
         setTimeout(() => {
-             // Əgər sizdə showAd() funksiyası showAdsGram30ClickReward() funksiyasını çağırırsa,
-             // onu buraya qoymalısınız. Əks halda, birbaşa aşağıdakı funksiyanı çağırın.
              showAdsGram30ClickReward(); 
         }, 500); 
         
@@ -3046,7 +2975,6 @@ function clickIcon(e) {
         if (state.clicksUntilAd > 0) {
             state.clicksUntilAd = 0; 
             
-            // 🟢 DÜZƏLİŞ: Enerji yoxdursa və reklam vaxtıdırsa, yenə də gecikmə tətbiq edin
             console.log("Enerji bitdi, lakin reklam vaxtıdır. Reward video çağırılır...");
             
             setTimeout(() => {
@@ -3081,16 +3009,6 @@ window.addEventListener('load', async function() {
     // CG ID sistemini initialize et
     await initializeCounter();
     console.log('✅ CG ID sistemi hazırdır');
-    
-    // ADEXIUM REKLAM SİSTEMİNİ İŞƏ SAL
-    setTimeout(() => {
-        const adexiumInitialized = initializeAdexium();
-        if (adexiumInitialized) {
-            console.log('✅ Adexium reklam sistemi uğurla başladıldı');
-        } else {
-            console.log('❌ Adexium reklam sistemi başladıla bilmədi');
-        }
-    }, 2000);
     
     // ADSGRAM BUTTON REKLAMI İŞƏ SAL
     setTimeout(() => {
