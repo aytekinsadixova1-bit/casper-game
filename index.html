@@ -1362,7 +1362,7 @@
                         </div>
 
                         <div class="withdrawal-info">
-                            <p><strong>Minimum çıxarış məbləği: 5.00 AZN</strong></p>
+                            <p><strong>Minimum çıxarış məbləği: 1.00 AZN</strong></p>
                             <p><strong>Çıxarış limiti: 10 gündə 1 dəfə</strong></p>
                             <p><strong>Maksimum çıxarış: 1000.00 AZN</strong></p>
                             <p><strong>Çıxarış məlumatları avtomatik olaraq adminə göndəriləcək</strong></p>
@@ -1382,7 +1382,7 @@
                         <form id="withdrawalForm">
                             <div class="input-group">
                                 <label for="withdrawAmount">Çıxarmaq İstədiyiniz Məbləğ (AZN)</label> 
-                                <input type="number" step="0.01" id="withdrawAmount" placeholder="Məbləği daxil edin (Məs: 5.00)" required> 
+                                <input type="number" step="0.01" id="withdrawAmount" placeholder="Məbləği daxil edin (Məs: 1.00)" required> 
                                 <div class="amount-input-hint" id="amountHint"></div>
                             </div>
                             
@@ -1943,7 +1943,8 @@ const ENERGY_REGEN_PER_SECOND = MAX_ENERGY_CAP / SECONDS_FOR_FULL_CHARGE;
 const BASE_REGEN_RATE = 1000 / 60; 
 const REFERRAL_BONUS_LIMIT = 10;
 
-const MIN_WITHDRAWAL_AMOUNT = 5.00;
+// MINIMUM ÇIXARIŞ MƏBLƏĞİ 1.00 AZN OLARAQ DƏYİŞDİRİLDİ
+const MIN_WITHDRAWAL_AMOUNT = 1.00;
 const WITHDRAWAL_COOLDOWN_DAYS = 10;
 const MAX_WITHDRAWAL_AMOUNT = 1000.00;
 const ADMIN_WHATSAPP_NUMBER = "0513248685";
@@ -2852,6 +2853,7 @@ document.getElementById('withdrawalForm').addEventListener('submit', async funct
         return;
     }
 
+    // MINIMUM ÇIXARIŞ 1.00 AZN OLARAQ YENİLƏNDİ
     if (amountAZN < MIN_WITHDRAWAL_AMOUNT) {
         alert(`Minimum çıxarış məbləği ${MIN_WITHDRAWAL_AMOUNT.toFixed(2)} AZN-dir.`);
         return;
