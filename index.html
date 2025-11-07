@@ -2637,12 +2637,27 @@ navItems.forEach(item => {
 
 function logout() {
     currentUserState = {
-        cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
-        maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP, clicksUntilAd = AD_INTERVAL, 
-        totalClicks: 0, totalMoney: 0.00, energyUsed: 0, energyRegenRate: BASE_REGEN_RATE, 
-        successfulReferrals: 0, referralBonusEarned: 0.00, 
-        scorePerClick: 1, lastEnergyUpdate: Date.now(), lastClickTime: Date.now(), 
-        lastWithdrawalDate: null, registrationDate: null
+        cgId: null, 
+        username: null, 
+        name: null, 
+        surname: null, 
+        phone: null, 
+        email: null, 
+        referralCode: null, 
+        maxEnergy: MAX_ENERGY_CAP, 
+        currentEnergy: MAX_ENERGY_CAP, 
+        clicksUntilAd: AD_INTERVAL,  // ✅ DÜZƏLDİ - : işarəsi istifadə edilməlidir
+        totalClicks: 0, 
+        totalMoney: 0.00, 
+        energyUsed: 0, 
+        energyRegenRate: BASE_REGEN_RATE, 
+        successfulReferrals: 0, 
+        referralBonusEarned: 0.00, 
+        scorePerClick: 1, 
+        lastEnergyUpdate: Date.now(), 
+        lastClickTime: Date.now(), 
+        lastWithdrawalDate: null, 
+        registrationDate: null
     };
 
     gameScreen.style.display = 'none';
