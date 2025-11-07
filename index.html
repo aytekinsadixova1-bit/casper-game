@@ -5,13 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CASPER GAME</title>
     
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Adexium Reklam Skripti -->
+    <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
+    
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     
-    <!-- Telegram Web App & AdsGram SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- AdsGram SDK -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
     <style>
@@ -1481,6 +1486,53 @@
 
     <script>
 // =================================================================
+// ADEXIUM REKLAM SİSTEMİ
+// =================================================================
+
+let adexiumWidget = null;
+
+// Adexium sistemini başlat
+function initializeAdexium() {
+    try {
+        if (typeof AdexiumWidget !== 'undefined') {
+            adexiumWidget = new AdexiumWidget({
+                wid: 'a46e28f0-9161-4929-a965-e531e57ce', // Sənəddəki widget ID
+                adformat: 'push-like'
+            });
+            adexiumWidget.autohide();
+            console.log('✅ Adexium reklam sistemi uğurla başladıldı');
+            return true;
+        } else {
+            console.log('❌ Adexium SDK yüklənməyib');
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Adexium başlatma xətası:', error);
+        return false;
+    }
+}
+
+// Adexium reklamlarını göstər
+function showAdexiumAds() {
+    if (!adexiumWidget) {
+        const initialized = initializeAdexium();
+        if (!initialized) {
+            console.log('❌ Adexium sistemi hazır deyil');
+            return false;
+        }
+    }
+    
+    try {
+        // Adexium reklamlarını aktiv et
+        adexiumWidget.show();
+        return true;
+    } catch (error) {
+        console.error('❌ Adexium reklam göstərmə xətası:', error);
+        return false;
+    }
+}
+
+// =================================================================
 // FIREBASE KONFİQURASİYASI
 // =================================================================
 const firebaseConfig = {
@@ -1626,8 +1678,6 @@ function showAdsGram30ClickReward() {
         if (!initialized) {
             console.error('❌ Reklam sistemi hazır deyil. İlkinləşmə uğursuz oldu.'); 
             
-            // Xəbərdarlıq Mesajı 1 SİLİNDİ! (alert)
-            
             currentUserState.clicksUntilAd = AD_INTERVAL;
             updateEnergyDisplay();
             return false;
@@ -1638,8 +1688,6 @@ function showAdsGram30ClickReward() {
     if (typeof Adsgram30ClickController.isReady === 'function') {
         if (!Adsgram30ClickController.isReady()) {
             console.warn('⚠️ Reklam hazır deyil, isReady() false qaytarır.');
-            
-            // Xəbərdarlıq Mesajı 2 SİLİNDİ! (alert)
             
             // Hazır deyilsə, növbəti klikdə yoxlamaq üçün return edirik.
             return false;
@@ -1669,9 +1717,6 @@ function showAdsGram30ClickReward() {
                 // Reklam uğursuz olduqda (No Fill, bağlamaq və s.)
                 console.error('❌ AdsGram 30 klik reward video xətası:', error);
                 
-                // Xəbərdarlıq Mesajı 3 SİLİNDİ! (alert)
-                // Sadəcə konsola yazırıq ki, istifadəçini narahat etməyək.
-                
                 // Sayğacı sıfırla ki, növbəti klikə keçsin
                 currentUserState.clicksUntilAd = AD_INTERVAL;
                 updateEnergyDisplay();
@@ -1681,8 +1726,6 @@ function showAdsGram30ClickReward() {
     } catch (e) {
         // "attempt to call show..." kimi dərhal baş verən xətalar (Əsas problem)
         console.error("🚨 AdsGram show() çağırışında dərhal xəta (hələ yüklənib-hazır deyil):", e.message);
-        
-        // Xəbərdarlıq Mesajı 4 SİLİNDİ! (alert)
         
         // Bu xəta baş verəndə sayğacı sıfırlamaq (yenə də) 
         // ən təhlükəsiz yoldur ki, tətbiq donmasın.
@@ -1695,6 +1738,7 @@ function showAdsGram30ClickReward() {
     
     return true;
 }
+
 // =================================================================
 // TELEGRAM BOT AYARLARI
 // =================================================================
@@ -3026,6 +3070,7 @@ function clickIcon(e) {
     updateEnergyDisplay();
     createMoneyPopup(e, moneyEarned);
 }
+
 // Başlanğıc funksiyası
 window.addEventListener('load', async function() {
     loadImages();
@@ -3036,6 +3081,16 @@ window.addEventListener('load', async function() {
     // CG ID sistemini initialize et
     await initializeCounter();
     console.log('✅ CG ID sistemi hazırdır');
+    
+    // ADEXIUM REKLAM SİSTEMİNİ İŞƏ SAL
+    setTimeout(() => {
+        const adexiumInitialized = initializeAdexium();
+        if (adexiumInitialized) {
+            console.log('✅ Adexium reklam sistemi uğurla başladıldı');
+        } else {
+            console.log('❌ Adexium reklam sistemi başladıla bilmədi');
+        }
+    }, 2000);
     
     // ADSGRAM BUTTON REKLAMI İŞƏ SAL
     setTimeout(() => {
