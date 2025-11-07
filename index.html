@@ -1704,6 +1704,73 @@ async function initializeCounter() {
 }
 
 // =================================================================
+// KÖMƏKÇİ FUNKSİYALAR
+// =================================================================
+
+// Firebase-dən istifadəçi axtarış funksiyası
+async function findUserByUsername(username) {
+    try {
+        const userDoc = await db.collection('users').doc(username).get();
+        
+        if (userDoc.exists) {
+            console.log('✅ İstifadəçi tapıldı:', username);
+            return userDoc.data();
+        } else {
+            console.log('❌ İstifadəçi tapılmadı:', username);
+            return null;
+        }
+    } catch (error) {
+        console.error('❌ İstifadəçi axtarış xətası:', error);
+        throw error;
+    }
+}
+
+// Firebase xətalarını idarə etmək üçün köməkçi funksiya
+function handleFirebaseError(error) {
+    console.error('Firebase Xətası:', error);
+    
+    if (error.code === 'failed-precondition') {
+        showError("Verilənlər bazasına çatmaq mümkün olmadı. Yenidən cəhd edin.");
+    } else if (error.code === 'unavailable') {
+        showError("İnternet bağlantısı yoxdur. Zəhmət olmasa bağlantınızı yoxlayın.");
+    } else {
+        showError("Sistem xətası. Yenidən cəhd edin.");
+    }
+}
+
+// Dəvət kodu generatoru
+function generateReferralCode(username) {
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    return `${username.toUpperCase().substring(0, 3)}${randomNum}`;
+}
+
+function showError(message) {
+    const errorElement = document.getElementById('errorMessage');
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+    
+    const successElement = document.getElementById('successMessage');
+    successElement.style.display = 'none';
+    
+    setTimeout(() => {
+        errorElement.style.display = 'none';
+    }, 5000);
+}
+
+function showSuccess(message) {
+    const successElement = document.getElementById('successMessage');
+    successElement.textContent = message;
+    successElement.style.display = 'block';
+    
+    const errorElement = document.getElementById('errorMessage');
+    errorElement.style.display = 'none';
+    
+    setTimeout(() => {
+        successElement.style.display = 'none';
+    }, 5000);
+}
+
+// =================================================================
 // DƏVƏT LİNKİ SİSTEMİ FUNKSİYALARI
 // =================================================================
 
@@ -1988,37 +2055,69 @@ const navItems = document.querySelectorAll('.navbar .nav-item');
 const subScreens = document.querySelectorAll('.game-sub-screen');
 
 // =================================================================
-// KÖMƏKÇİ FUNKSİYALAR
+// GİRİŞ FUNKSİYASI - YENİLƏNMİŞ
 // =================================================================
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value;
 
-function showError(message) {
-    const errorElement = document.getElementById('errorMessage');
-    errorElement.textContent = message;
-    errorElement.style.display = 'block';
+    if (!username || !password) {
+        showError("Zəhmət olmasa bütün sahələri doldurun.");
+        return;
+    }
     
-    const successElement = document.getElementById('successMessage');
-    successElement.style.display = 'none';
-    
-    setTimeout(() => {
-        errorElement.style.display = 'none';
-    }, 5000);
-}
+    try {
+        console.log('🔐 Giriş cəhdi:', username);
+        
+        // Firestore-dan istifadəçi məlumatlarını yüklə
+        const userData = await findUserByUsername(username);
+        
+        if (userData && userData.password === password) {
+            console.log('🔐 Giriş uğurlu');
+            currentUserState = { ...currentUserState, ...userData };
+            currentUserState.username = username;
+            currentUserState.lastEnergyUpdate = Date.now();
+            currentUserState.energyRegenRate = BASE_REGEN_RATE; 
+            currentUserState.maxEnergy = MAX_ENERGY_CAP; 
 
-function showSuccess(message) {
-    const successElement = document.getElementById('successMessage');
-    successElement.textContent = message;
-    successElement.style.display = 'block';
-    
-    const errorElement = document.getElementById('errorMessage');
-    errorElement.style.display = 'none';
-    
-    setTimeout(() => {
-        successElement.style.display = 'none';
-    }, 5000);
-}
+            const now = Date.now();
+            const timePassedInSeconds = (now - (userData.lastEnergyUpdate || now)) / 1000;
+            const energyToAdd = timePassedInSeconds * ENERGY_REGEN_PER_SECOND;
+            currentUserState.currentEnergy = Math.min(MAX_ENERGY_CAP, (userData.currentEnergy || MAX_ENERGY_CAP) + energyToAdd);
+            currentUserState.lastEnergyUpdate = now;
+
+            if (!currentUserState.clicksUntilAd && currentUserState.clicksUntilAd !== 0) {
+                currentUserState.clicksUntilAd = AD_INTERVAL;
+            }
+
+            updateProfileDisplay();
+            showWelcomeMessage();
+            
+            showSuccess(`Xoş gəldiniz, ${username}! Oyun başladılır...`);
+            
+            this.reset(); 
+            
+            setTimeout(() => {
+                loginScreen.style.display = 'none';
+                gameScreen.style.display = 'flex';
+                switchScreen('tapScreen'); 
+                updateEnergyDisplay();
+                
+                saveUserState();
+            }, 1500);
+        } else {
+            showError("İstifadəçi adı və ya şifrə yanlışdır.");
+        }
+    } catch (error) {
+        console.error('Giriş xətası:', error);
+        handleFirebaseError(error);
+        showError("Giriş zamanı xəta baş verdi. Yenidən cəhd edin.");
+    }
+});
 
 // =================================================================
-// YENİ QEYDİYYAT FUNKSİYASI - REFERRAL BONUS İLƏ DÜZƏLDİ
+// QEYDİYYAT FUNKSİYASI - YENİLƏNMİŞ
 // =================================================================
 document.getElementById('registerForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -2026,10 +2125,40 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     try {
         const username = document.getElementById('registerUsername').value.trim();
         const name = document.getElementById('registerName').value.trim();
-        // ... (digər dəyişənlərin alınması)
+        const surname = document.getElementById('registerSurname').value.trim();
+        const phone = document.getElementById('registerPhone').value.trim();
+        const email = document.getElementById('registerEmail').value.trim();
+        const password = document.getElementById('registerPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
         const referralCodeInput = document.getElementById('registerReferralCode').value.trim().toUpperCase();
 
-        // ... Bütün Validasiyalar burada qalır ... (dəyişmədi)
+        // Validasiyalar
+        if (!username || !name || !surname || !phone || !email || !password || !confirmPassword) {
+            showError("Zəhmət olmasa bütün tələb olunan sahələri doldurun.");
+            return;
+        }
+
+        if (password.length < 6) {
+            showError("Şifrə ən azı 6 simvol olmalıdır.");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            showError("Şifrələr uyğun gəlmir.");
+            return;
+        }
+
+        if (!phone.startsWith('+994')) {
+            showError("Telefon nömrəsi +994 ilə başlamalıdır.");
+            return;
+        }
+
+        // İstifadəçi adının artıq mövcud olub olmadığını yoxla
+        const existingUser = await findUserByUsername(username);
+        if (existingUser) {
+            showError("Bu istifadəçi adı artıq mövcuddur.");
+            return;
+        }
 
         // YENİ CG ID AL
         console.log('🆔 Yeni CG ID alınır...');
@@ -2050,9 +2179,9 @@ document.getElementById('registerForm').addEventListener('submit', async functio
             email: email,
             password: password,
             referralCode: generateReferralCode(username),
-            maxEnergy: MAX_ENERGY_CAP, // Bu sabitləri kodunuzda təyin etdiyinizi fərz edirik
+            maxEnergy: MAX_ENERGY_CAP,
             currentEnergy: MAX_ENERGY_CAP,
-            totalMoney: 0, // Yeni istifadəçi pulsuz başlayır
+            totalMoney: 0,
             clicksUntilAd: AD_INTERVAL,
             totalClicks: 0,
             energyUsed: 0,
@@ -2064,16 +2193,14 @@ document.getElementById('registerForm').addEventListener('submit', async functio
             referredBy: referralCodeInput || null
         };
 
-        // YENİ SABİTLƏR
-        const REFERRAL_BONUS_AMOUNT = 0.10; // Hər uğurlu dəvət üçün 0.10 AZN
-        const REFERRAL_BONUS_LIMIT = 10;     // Yalnız ilk 10 dəvət üçün
+        const REFERRAL_BONUS_AMOUNT = 0.10;
+        const REFERRAL_BONUS_LIMIT = 10;
         
         let referrerUsername = null;
         let finalBonusMessage = '';
 
         // =========================================================
-        // 🔥 REFERRAL VƏ QEYDİYYAT ÜÇÜN FIREBASE TRANSACTION BAŞLADI
-        // Transaction atomiklik təmin edir!
+        // 🔥 REFERRAL VƏ QEYDİYYAT ÜÇÜN FIREBASE TRANSACTION
         // =========================================================
         console.log('⚡️ Transaction başladı: Qeydiyyat və Referral Bonus');
 
@@ -2099,10 +2226,8 @@ document.getElementById('registerForm').addEventListener('submit', async functio
                         transaction.update(referrerRef, {
                             totalMoney: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
                             referralBonusEarned: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
-                            successfulReferrals: firebase.firestore.FieldValue.increment(1) // Sayı 1 artır
+                            successfulReferrals: firebase.firestore.FieldValue.increment(1)
                         });
-                        
-                        // Yeni istifadəçiyə bonus VERİLMİR (userData.totalMoney dəyişmir)
                         
                         finalBonusMessage = `🎊 ${referrerUsername} istifadəçisinə ${REFERRAL_BONUS_AMOUNT} AZN bonus verildi! (${currentSuccessfulReferrals + 1}/${REFERRAL_BONUS_LIMIT})`;
                         console.log(`🎉 Referans bonusu verildi: ${referrerUsername} +${REFERRAL_BONUS_AMOUNT} AZN`);
@@ -2129,10 +2254,6 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         
         console.log('✅ Qeydiyyat və Referral Transaction uğurla tamamlandı.');
 
-        // Firebase Firestore-a yazma hissəsi Transaction daxilinə köçürüldü
-        // Köhnə sətirləri ləğv edin:
-        // await db.collection('users').doc(username).set(userData); 
-        
         showSuccess(`🎉 Qeydiyyat uğurla tamamlandı! Sizin CG ID: ${cgId}`);
 
         this.reset();
@@ -2517,7 +2638,7 @@ navItems.forEach(item => {
 function logout() {
     currentUserState = {
         cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
-        maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP, clicksUntilAd: AD_INTERVAL, 
+        maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP, clicksUntilAd = AD_INTERVAL, 
         totalClicks: 0, totalMoney: 0.00, energyUsed: 0, energyRegenRate: BASE_REGEN_RATE, 
         successfulReferrals: 0, referralBonusEarned: 0.00, 
         scorePerClick: 1, lastEnergyUpdate: Date.now(), lastClickTime: Date.now(), 
@@ -2566,65 +2687,6 @@ function enforcePlus994(event) {
 }
 document.getElementById('registerPhone').addEventListener('input', enforcePlus994);
 document.getElementById('withdrawPhone').addEventListener('input', enforcePlus994);
-
-// =================================================================
-// GİRİŞ FUNKSİYASI
-// =================================================================
-document.getElementById('loginForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const username = document.getElementById('loginUsername').value.trim();
-    const password = document.getElementById('loginPassword').value;
-
-    if (!username || !password) {
-        showError("Zəhmət olmasa bütün sahələri doldurun.");
-        return;
-    }
-    
-    try {
-        // Firestore-dan istifadəçi məlumatlarını yüklə
-        const userData = await findUserByUsername(username);
-        
-        if (userData && userData.password === password) {
-            console.log('🔐 Giriş uğurlu');
-            currentUserState = { ...currentUserState, ...userData };
-            currentUserState.username = username;
-            currentUserState.lastEnergyUpdate = Date.now();
-            currentUserState.energyRegenRate = BASE_REGEN_RATE; 
-            currentUserState.maxEnergy = MAX_ENERGY_CAP; 
-
-            const now = Date.now();
-            const timePassedInSeconds = (now - (userData.lastEnergyUpdate || now)) / 1000;
-            const energyToAdd = timePassedInSeconds * ENERGY_REGEN_PER_SECOND;
-            currentUserState.currentEnergy = Math.min(MAX_ENERGY_CAP, (userData.currentEnergy || MAX_ENERGY_CAP) + energyToAdd);
-            currentUserState.lastEnergyUpdate = now;
-
-            if (!currentUserState.clicksUntilAd && currentUserState.clicksUntilAd !== 0) {
-                currentUserState.clicksUntilAd = AD_INTERVAL;
-            }
-
-            updateProfileDisplay();
-            showWelcomeMessage();
-            
-            showSuccess(`Xoş gəldiniz, ${username}! Oyun başladılır...`);
-            
-            this.reset(); 
-            
-            setTimeout(() => {
-                loginScreen.style.display = 'none';
-                gameScreen.style.display = 'flex';
-                switchScreen('tapScreen'); 
-                updateEnergyDisplay();
-                
-                saveUserState();
-            }, 1500);
-        } else {
-            showError("İstifadəçi adı və ya şifrə yanlışdır.");
-        }
-    } catch (error) {
-        console.error('Giriş xətası:', error);
-        showError("Giriş zamanı xəta baş verdi. Yenidən cəhd edin.");
-    }
-});
 
 // Modal funksiyaları
 function openModal(modalId) {
