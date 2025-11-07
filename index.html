@@ -5,20 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CASPER GAME</title>
     
-    <!-- Telegram Web App SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script> 
-    <script src='//libtl.com/sdk.js' data-zone='10135032' data-sdk='show_10135032'></script>
-    
-    <!-- Adexium Reklam Skripti -->
-    <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
-    
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     
-    <!-- AdsGram SDK -->
+    <!-- Telegram Web App & AdsGram SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
     <style>
@@ -1210,11 +1203,10 @@
                         </div>
 
                         <!-- YENİ ADSGRAM REWARD VIDEO DÜYMƏSİ -->
-                       <div class="bonus-info" style="margin: 12px 0; text-align: center;">
-    <button onclick="showLibtlRewardVideo()" class="adsgram-video-btn">
-        🎬 Video İzlə & 0.001 AZN Qazan!
-    </button>
-</div>
+                        <div class="bonus-info" style="margin: 12px 0; text-align: center;">
+                            <button onclick="showAdsGramRewardVideo()" class="adsgram-video-btn">
+                                🎬 Video İzlə & 0.001 AZN Qazan!
+                            </button>
                             <p style="font-size: 10px; color: #6c757d; margin-top: 3px;">
                                 Hər video üçün 0.001 AZN bonus! 30 saniyədən bir yenilənir!
                             </p>
@@ -1370,7 +1362,7 @@
                         </div>
 
                         <div class="withdrawal-info">
-                            <p><strong>Minimum çıxarış məbləği: 1.00 AZN</strong></p>
+                            <p><strong>Minimum çıxarış məbləği: 5.00 AZN</strong></p>
                             <p><strong>Çıxarış limiti: 10 gündə 1 dəfə</strong></p>
                             <p><strong>Maksimum çıxarış: 1000.00 AZN</strong></p>
                             <p><strong>Çıxarış məlumatları avtomatik olaraq adminə göndəriləcək</strong></p>
@@ -1390,7 +1382,7 @@
                         <form id="withdrawalForm">
                             <div class="input-group">
                                 <label for="withdrawAmount">Çıxarmaq İstədiyiniz Məbləğ (AZN)</label> 
-                                <input type="number" step="0.01" id="withdrawAmount" placeholder="Məbləği daxil edin (Məs: 1.00)" required> 
+                                <input type="number" step="0.01" id="withdrawAmount" placeholder="Məbləği daxil edin (Məs: 5.00)" required> 
                                 <div class="amount-input-hint" id="amountHint"></div>
                             </div>
                             
@@ -1489,53 +1481,6 @@
 
     <script>
 // =================================================================
-// ADEXIUM REKLAM SİSTEMİ
-// =================================================================
-
-let adexiumWidget = null;
-
-// Adexium sistemini başlat
-function initializeAdexium() {
-    try {
-        if (typeof AdexiumWidget !== 'undefined') {
-            adexiumWidget = new AdexiumWidget({
-                wid: 'a46e28f0-9161-4929-a965-e531e57ce', // Sənəddəki widget ID
-                adformat: 'push-like'
-            });
-            adexiumWidget.autohide();
-            console.log('✅ Adexium reklam sistemi uğurla başladıldı');
-            return true;
-        } else {
-            console.log('❌ Adexium SDK yüklənməyib');
-            return false;
-        }
-    } catch (error) {
-        console.error('❌ Adexium başlatma xətası:', error);
-        return false;
-    }
-}
-
-// Adexium reklamlarını göstər
-function showAdexiumAds() {
-    if (!adexiumWidget) {
-        const initialized = initializeAdexium();
-        if (!initialized) {
-            console.log('❌ Adexium sistemi hazır deyil');
-            return false;
-        }
-    }
-    
-    try {
-        // Adexium reklamlarını aktiv et
-        adexiumWidget.show();
-        return true;
-    } catch (error) {
-        console.error('❌ Adexium reklam göstərmə xətası:', error);
-        return false;
-    }
-}
-
-// =================================================================
 // FIREBASE KONFİQURASİYASI
 // =================================================================
 const firebaseConfig = {
@@ -1560,42 +1505,92 @@ try {
     console.error('❌ Firebase xətası:', error);
 }
 
-// game-logic.js (Yenilənmiş AdsGram30Click funksiyalarından sonra əlavə edin)
+// =================================================================
+// ADSGRAM REKLAM SİSTEMİ - YENİLƏNİB
+// =================================================================
 
-// -------------------------------------------------------------
-// TRAF.COM / LIBTL FUNKSİYASI (DÜYMƏ ÜÇÜN)
-// -------------------------------------------------------------
+let AdsgramController = null;
+let adsgramRewardAvailable = true;
 
-const LIBTL_REWARD_AMOUNT = 0.001; 
+// AdsGram sistemini başlat - BUTTON REKLAMI
+function initializeAdsGram() {
+    try {
+        if (window.Adsgram) {
+            // Block ID-ni burada dəyişin - AdsGram panelindən aldığınız block ID
+            AdsgramController = window.Adsgram.init({ blockId: "16650" });
+            console.log('✅ AdsGram sistemi uğurla başladıldı');
+            return true;
+        } else {
+            console.log('❌ AdsGram SDK yüklənməyib');
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ AdsGram başlatma xətası:', error);
+        return false;
+    }
+}
 
-function showLibtlRewardVideo() {
+// Reward video göstərmək üçün funksiya - BUTTON REKLAMI
+function showAdsGramRewardVideo() {
+    if (!adsgramRewardAvailable) {
+        alert('🎬 Reward video hazır deyil. Bir neçə dəqiqə gözləyin.');
+        return false;
+    }
     
-    // Libtl SDK-sı tərəfindən yaradılan funksiyanın mövcudluğunu yoxlayın
-    if (typeof show_10135032 !== 'function') {
-        alert('Reklam sistemi hələ hazır deyil. Bir neçə saniyə gözləyin.');
-        return;
+    if (!AdsgramController) {
+        const initialized = initializeAdsGram();
+        if (!initialized) {
+            alert('❌ Reklam sistemi hazır deyil. Yenidən cəhd edin.');
+            return false;
+        }
     }
 
-    console.log('Traf.com reklamı göstərilir...');
+    adsgramRewardAvailable = false;
     
-    show_10135032()
-        .then(() => {
-            // ✅ REKLAM UĞURLA İZLƏNİLDİ.
-            console.log('Libtl: İstifadəçi reklamı izlədi. Bonus verilir.');
+    AdsgramController.show()
+        .then((result) => {
+            console.log('✅ AdsGram reward video tamamlandı!', result);
             
-            // İstifadəçiyə 0.001 AZN bonus verin
-            currentUserState.totalMoney += LIBTL_REWARD_AMOUNT;
+            // Oyunçuya böyük bonus ver
+            const rewardAmount = 0.001; // 0.001 AZN bonus
+            currentUserState.totalMoney += rewardAmount;
+            
+            // Firebase-ə yaz
             saveUserState();
-            updateEnergyDisplay(); 
             
-            showSuccess(`🎉 Video tamamlandı! +${formatMoney(LIBTL_REWARD_AMOUNT)} AZN qazandınız!`);
+            // UI yenilə
+            updateEnergyDisplay();
+            
+            // Təbriklər mesajı
+            showSuccess(`🎉 Reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
+            
+            // 30 saniye sonra reward video yenidən aktiv olacaq
+            setTimeout(() => {
+                adsgramRewardAvailable = true;
+                console.log('🔄 Reward video yenidən aktiv oldu');
+            }, 30000);
         })
         .catch((error) => {
-            // ❌ UĞURSUZLUQ (atlanma, xəta, və ya mövcud deyil)
-            console.log('Libtl: Reklam uğursuz oldu və ya atlandı:', error);
-            showErrorMessage('Reklam göstərilmədi və ya atlandı. Zəhmət olmasa, tam izləyin.');
+            console.error('❌ AdsGram reward video xətası:', error);
+            
+            let errorMessage = 'Reklam göstərilərkən xəta baş verdi.';
+            
+            if (error && error.description) {
+                errorMessage = error.description;
+            }
+            
+            alert(`❌ ${errorMessage}`);
+            
+            // Xəta olsa belə, 30saniye sonra reward video yenidən aktiv olacaq
+            setTimeout(() => {
+                adsgramRewardAvailable = true;
+                console.log('🔄 Reward video yenidən aktiv oldu');
+            }, 30000);
         });
+    
+    return true;
 }
+
 // =================================================================
 // ADSGRAM 30 KLİK REWARD VIDEO SİSTEMİ - YENİ
 // =================================================================
@@ -1631,6 +1626,8 @@ function showAdsGram30ClickReward() {
         if (!initialized) {
             console.error('❌ Reklam sistemi hazır deyil. İlkinləşmə uğursuz oldu.'); 
             
+            // Xəbərdarlıq Mesajı 1 SİLİNDİ! (alert)
+            
             currentUserState.clicksUntilAd = AD_INTERVAL;
             updateEnergyDisplay();
             return false;
@@ -1641,6 +1638,8 @@ function showAdsGram30ClickReward() {
     if (typeof Adsgram30ClickController.isReady === 'function') {
         if (!Adsgram30ClickController.isReady()) {
             console.warn('⚠️ Reklam hazır deyil, isReady() false qaytarır.');
+            
+            // Xəbərdarlıq Mesajı 2 SİLİNDİ! (alert)
             
             // Hazır deyilsə, növbəti klikdə yoxlamaq üçün return edirik.
             return false;
@@ -1670,6 +1669,9 @@ function showAdsGram30ClickReward() {
                 // Reklam uğursuz olduqda (No Fill, bağlamaq və s.)
                 console.error('❌ AdsGram 30 klik reward video xətası:', error);
                 
+                // Xəbərdarlıq Mesajı 3 SİLİNDİ! (alert)
+                // Sadəcə konsola yazırıq ki, istifadəçini narahat etməyək.
+                
                 // Sayğacı sıfırla ki, növbəti klikə keçsin
                 currentUserState.clicksUntilAd = AD_INTERVAL;
                 updateEnergyDisplay();
@@ -1679,6 +1681,8 @@ function showAdsGram30ClickReward() {
     } catch (e) {
         // "attempt to call show..." kimi dərhal baş verən xətalar (Əsas problem)
         console.error("🚨 AdsGram show() çağırışında dərhal xəta (hələ yüklənib-hazır deyil):", e.message);
+        
+        // Xəbərdarlıq Mesajı 4 SİLİNDİ! (alert)
         
         // Bu xəta baş verəndə sayğacı sıfırlamaq (yenə də) 
         // ən təhlükəsiz yoldur ki, tətbiq donmasın.
@@ -1691,7 +1695,6 @@ function showAdsGram30ClickReward() {
     
     return true;
 }
-
 // =================================================================
 // TELEGRAM BOT AYARLARI
 // =================================================================
@@ -3023,7 +3026,6 @@ function clickIcon(e) {
     updateEnergyDisplay();
     createMoneyPopup(e, moneyEarned);
 }
-
 // Başlanğıc funksiyası
 window.addEventListener('load', async function() {
     loadImages();
@@ -3034,16 +3036,6 @@ window.addEventListener('load', async function() {
     // CG ID sistemini initialize et
     await initializeCounter();
     console.log('✅ CG ID sistemi hazırdır');
-    
-    // ADEXIUM REKLAM SİSTEMİNİ İŞƏ SAL
-    setTimeout(() => {
-        const adexiumInitialized = initializeAdexium();
-        if (adexiumInitialized) {
-            console.log('✅ Adexium reklam sistemi uğurla başladıldı');
-        } else {
-            console.log('❌ Adexium reklam sistemi başladıla bilmədi');
-        }
-    }, 2000);
     
     // ADSGRAM BUTTON REKLAMI İŞƏ SAL
     setTimeout(() => {
