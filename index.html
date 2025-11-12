@@ -1725,6 +1725,34 @@ async function findUserByUsername(username) {
     }
 }
 
+// =================================================================
+// YENİ: REFERRAL KODU İLƏ İSTİFADƏÇİ AXTARAN FUNKSİYA
+// =================================================================
+async function findUserByReferralCode(referralCode) {
+    try {
+        console.log(`🔍 Referral kodu ilə axtarış: "${referralCode}"`);
+        
+        const usersRef = db.collection('users');
+        const querySnapshot = await usersRef.where('referralCode', '==', referralCode).get();
+        
+        if (!querySnapshot.empty) {
+            const userDoc = querySnapshot.docs[0];
+            console.log('✅ Referral kodu tapıldı:', userDoc.id);
+            return {
+                docRef: userDoc.ref,
+                username: userDoc.id,
+                data: userDoc.data()
+            };
+        } else {
+            console.log('❌ Referral kodu tapılmadı:', referralCode);
+            return null;
+        }
+    } catch (error) {
+        console.error('❌ Referral kodu axtarış xətası:', error);
+        throw error;
+    }
+}
+
 // Firebase xətalarını idarə etmək üçün köməkçi funksiya
 function handleFirebaseError(error) {
     console.error('Firebase Xətası:', error);
@@ -2169,7 +2197,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 });
 
 // =================================================================
-// QEYDİYYAT FUNKSİYASI - REFERRAL DÜZƏLDİ
+// YENİLƏNMİŞ QEYDİYYAT FUNKSİYASI - REFERRAL KODU DÜZƏLDİ
 // =================================================================
 document.getElementById('registerForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -2245,27 +2273,13 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         let referrerUsername = null;
         let finalBonusMessage = '';
 
-        // REFERRAL KODU YOXLA VƏ REFERRER TAP
+        // YENİ: REFERRAL KODU İLƏ REFERRER TAP
         if (referralCodeInput) {
             console.log(`🔄 Dəvət kodu yoxlanılır: "${referralCodeInput}"`);
             
             try {
-                // Bütün istifadəçiləri çəkib referral kodu yoxlayaq
-                const usersSnapshot = await db.collection('users').get();
-                let referrerFound = null;
-                
-                usersSnapshot.forEach(doc => {
-                    const userData = doc.data();
-                    console.log(`📋 İstifadəçi: ${userData.username}, Referral Kodu: ${userData.referralCode}`);
-                    
-                    if (userData.referralCode === referralCodeInput) {
-                        referrerFound = {
-                            docRef: doc.ref,
-                            username: userData.username,
-                            data: userData
-                        };
-                    }
-                });
+                // YENİ FUNKSİYA İLƏ REFERRER TAP
+                const referrerFound = await findUserByReferralCode(referralCodeInput);
                 
                 if (referrerFound) {
                     referrerUsername = referrerFound.username;
@@ -2291,8 +2305,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
                         console.log(`ℹ️ Referral limiti dolub: ${referrerUsername}. Bonus verilmədi.`);
                     }
                 } else {
-                    console.log('❌ Daxil edilmiş Dəvət Kodu tapılmadı. Bütün referral kodları:', 
-                        usersSnapshot.docs.map(doc => doc.data().referralCode));
+                    console.log('❌ Daxil edilmiş Dəvət Kodu tapılmadı.');
                     showError(`"${referralCodeInput}" dəvət kodu tapılmadı. Zəhmət olmasa düzgün kodu daxil edin.`);
                     return;
                 }
