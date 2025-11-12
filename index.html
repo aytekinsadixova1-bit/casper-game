@@ -13,6 +13,9 @@
     <!-- Telegram Web App & AdsGram SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    
+    <!-- ADEXIUM WIDGET SDK -->
+    <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
 
     <style>
         * {
@@ -1057,6 +1060,21 @@
         .main-icon::after {
             display: none !important;
         }
+        
+        /* ADEXIUM AD CONTAINER */
+        .adexium-ad-container {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(15, 52, 96, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .adexium-ad-label {
+            font-size: 10px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -1200,6 +1218,12 @@
                             <div class="ad-counter-container">
                                 <span>Növbəti reklam:</span> <span id="clicksUntilAdDisplay">30</span> klik
                             </div>
+                        </div>
+
+                        <!-- ADEXIUM AD CONTAINER -->
+                        <div class="adexium-ad-container">
+                            <div class="adexium-ad-label">Reklam</div>
+                            <div id="adexium-ad-placeholder"></div>
                         </div>
 
                         <!-- YENİ ADSGRAM REWARD VIDEO DÜYMƏSİ -->
@@ -1480,6 +1504,60 @@
     </div>
 
     <script>
+// =================================================================
+// ADEXIUM WIDGET INTEGRATION
+// =================================================================
+
+let adexiumWidget = null;
+
+function initializeAdExium() {
+    try {
+        if (typeof AdexiumWidget !== 'undefined') {
+            adexiumWidget = new AdexiumWidget({
+                width: 'a4ec28f0-91d1-4929-a965-e5131e577cae',
+                adformat: 'push-like'
+            });
+            
+            if (typeof adexiumWidget.autohide === 'function') {
+                adexiumWidget.autohide();
+            }
+            
+            console.log('✅ AdExium Widget uğurla başladıldı');
+            return true;
+        } else {
+            console.log('❌ AdExium SDK yüklənməyib');
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ AdExium başlatma xətası:', error);
+        return false;
+    }
+}
+
+function showAdExiumAd() {
+    if (!adexiumWidget) {
+        const initialized = initializeAdExium();
+        if (!initialized) {
+            console.error('❌ AdExium sistemi hazır deyil');
+            return false;
+        }
+    }
+    
+    try {
+        console.log('🔄 AdExium reklamı göstərilir...');
+        
+        // AdExium reklamını göstər
+        if (typeof adexiumWidget.show === 'function') {
+            adexiumWidget.show();
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('❌ AdExium reklam göstərilmə xətası:', error);
+        return false;
+    }
+}
+
 // =================================================================
 // FIREBASE KONFİQURASİYASI
 // =================================================================
@@ -2943,6 +3021,21 @@ window.addEventListener('load', async function() {
     // CG ID sistemini initialize et
     await initializeCounter();
     console.log('✅ CG ID sistemi hazırdır');
+    
+    // ADEXIUM WIDGET İŞƏ SAL
+    setTimeout(() => {
+        const adexiumInitialized = initializeAdExium();
+        if (adexiumInitialized) {
+            console.log('✅ AdExium Widget sistemi uğurla başladıldı');
+            
+            // AdExium reklamını göstər
+            setTimeout(() => {
+                showAdExiumAd();
+            }, 2000);
+        } else {
+            console.log('❌ AdExium Widget sistemi başladıla bilmədi');
+        }
+    }, 3000);
     
     // ADSGRAM BUTTON REKLAMI İŞƏ SAL
     setTimeout(() => {
