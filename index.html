@@ -2142,13 +2142,14 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     }
 
     try {
+        // Əvvəlcə eyni istifadəçi adının olub-olmadığını yoxla
         const userDoc = await db.collection('users').doc(username).get();
         if (userDoc.exists) {
             showError("Bu istifadəçi adı artıq mövcuddur.");
             return;
         }
 
-        // İstifadəçi üçün unikal CG ID
+        // CG ID al
         const cgId = await getNextCGId();
 
         // Yeni istifadəçi məlumatı
@@ -2170,80 +2171,53 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
             lastEnergyUpdate: Date.now(),
             lastClickTime: Date.now(),
             lastWithdrawalDate: null,
+            referredBy: referralCodeInput || null, // kimdən dəvət alıb
         };
 
-        // Firestore-a yaz
+        // 🔥 1. Əvvəlcə yeni istifadəçini Firestore-a yaz
         await db.collection('users').doc(username).set(newUserData);
-        console.log('✅ Yeni istifadəçi əlavə olundu:', username);
+        console.log(`✅ Yeni istifadəçi yaradıldı: ${username}`);
 
-        // =====================================================
-        // REFERRAL BONUS HİSSƏSİ
-        // =====================================================
+        // 🔥 2. Əgər dəvət kodu varsa — referrerə bonus ver
         if (referralCodeInput) {
-            try {
-                const referrerQuery = await db.collection('users')
-                    .where('referralCode', '==', referralCodeInput)
-                    .limit(1)
-                    .get();
+            const referrerQuery = await db.collection('users')
+                .where('referralCode', '==', referralCodeInput)
+                .limit(1)
+                .get();
 
-                if (!referrerQuery.empty) {
-                    const referrerDoc = referrerQuery.docs[0];
-                    const referrerRef = db.collection('users').doc(referrerDoc.id);
-                    const REFERRAL_BONUS_AMOUNT = 0.10;
+            if (!referrerQuery.empty) {
+                const referrerDoc = referrerQuery.docs[0];
+                const referrerRef = db.collection('users').doc(referrerDoc.id);
+                const REFERRAL_BONUS_AMOUNT = 0.10;
 
-                    await db.runTransaction(async (transaction) => {
-                        const refDoc = await transaction.get(referrerRef);
-                        if (!refDoc.exists) throw "Referrer tapılmadı";
+                await db.runTransaction(async (transaction) => {
+                    const refDoc = await transaction.get(referrerRef);
+                    if (!refDoc.exists) throw "Referrer tapılmadı";
 
-                        const currentBonus = refDoc.data().referralBonusEarned || 0;
-                        const currentCount = refDoc.data().successfulReferrals || 0;
+                    transaction.set(referrerRef, {
+                        referralBonusEarned: (refDoc.data().referralBonusEarned || 0) + REFERRAL_BONUS_AMOUNT,
+                        successfulReferrals: (refDoc.data().successfulReferrals || 0) + 1,
+                        totalMoney: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
+                        invitedFriends: firebase.firestore.FieldValue.arrayUnion(username)
+                    }, { merge: true });
+                });
 
-                        transaction.set(referrerRef, {
-                            referralBonusEarned: currentBonus + REFERRAL_BONUS_AMOUNT,
-                            successfulReferrals: currentCount + 1,
-                            totalMoney: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
-                            invitedFriends: firebase.firestore.FieldValue.arrayUnion(username)
-                        }, { merge: true });
-                    });
-
-                    console.log(`🎁 Dəvət edənə +${REFERRAL_BONUS_AMOUNT} AZN bonus verildi`);
-                    showSuccess(`🎁 Dəvət edən bonus aldı (+${REFERRAL_BONUS_AMOUNT} AZN)`);
-
-                    // 🔄 Firestore-dan yenilənmiş məlumatı al
-                    const updatedRef = await db.collection('users').doc(referrerDoc.id).get();
-                    const updatedData = updatedRef.data();
-
-                    // 💾 currentUser obyektini yenilə
-                    if (typeof currentUser !== "undefined" && currentUser.username === referrerDoc.id) {
-                        currentUser = { ...currentUser, ...updatedData }; // birləşdir
-                        saveUserState(); // yaddaşa yaz
-                        updateEnergyDisplay && updateEnergyDisplay();
-                        updateProfileDisplay && updateProfileDisplay();
-                        console.log("✅ UI yeniləndi — yeni bonus görsənir!");
-                    } else {
-                        console.log("ℹ️ Dəvət edən aktiv istifadəçi deyil — növbəti girişdə yenilənəcək.");
-                    }
-                } else {
-                    console.log("⚠️ Dəvət kodu ilə uyğun istifadəçi tapılmadı.");
-                }
-            } catch (error) {
-                console.error("❌ Referral sistem xətası:", error);
-                showError("Dəvət bonusu əlavə edilərkən xəta baş verdi.");
+                console.log(`🎁 ${referrerDoc.id} üçün +${REFERRAL_BONUS_AMOUNT} AZN bonus yazıldı`);
+            } else {
+                console.warn("⚠️ Dəvət kodu ilə uyğun istifadəçi tapılmadı:", referralCodeInput);
             }
         }
 
+        // 🔥 3. Əməliyyat uğurlu – formu sıfırla
         showSuccess("Qeydiyyat uğurla tamamlandı!");
-        setTimeout(() => {
-            document.getElementById('registerForm').reset();
-            switchToLogin(); // mövcud funksiya varsa login ekranına qaytar
-        }, 1500);
+        document.getElementById('registerForm').reset();
+        switchToLogin();
 
     } catch (error) {
-        console.error("❌ Qeydiyyat xətası:", error);
-        showError("Qeydiyyat zamanı xəta baş verdi. Yenidən cəhd edin.");
+        console.error("❌ Qeydiyyat və ya referral zamanı xəta:", error);
+        showError("Qeydiyyat zamanı xəta baş verdi. Ətraflı məlumat üçün console-a bax.");
     }
 });
-
 
 // =================================================================
 // REKLAM SİSTEMİ FUNKSİYALARI
