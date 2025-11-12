@@ -1064,13 +1064,6 @@
     <!-- Firebase Status Indicator - GİZLƏ -->
     <div class="firebase-status" id="firebaseStatus" style="display: none;">Firebase: Yüklənir...</div>
 
-    <!-- Debug Panel - GİZLƏ -->
-    <div class="debug-panel" style="display: none;">
-        <button class="debug-btn" onclick="debugFirebase()">Firebase Status</button>
-        <button class="debug-btn" onclick="debugGetAllUsers()">All Users</button>
-        <button class="debug-btn" onclick="debugCheckUser(currentUserState.username || 'test')">Check User</button>
-    </div>
-
     <div class="container">
         <div class="splash-screen" id="splashScreen">
             <div class="splash-image pulse-animation">
@@ -1175,8 +1168,6 @@
             
             <div class="game-screen" id="gameScreen" style="display: none;">
                 
-                <!-- ADSGRAM BANNER REKLAM SİLİNDİ -->
-
                 <div class="header">
                     <h1>CASPER GAME</h1>
                     <p id="welcomeText">Xoş gəldiniz, İstifadəçi! 👋</p>
@@ -1190,7 +1181,6 @@
                     
                     <div class="game-sub-screen active" id="tapScreen">
                         
-                        <!-- REKLAM VƏ BONUS MƏLUMAT HİSSƏSİ -->
                         <div class="energy-container">
                             <div class="energy-bar">
                                 <div class="energy-fill" id="energyFill" style="width: 100%">
@@ -1202,7 +1192,6 @@
                             </div>
                         </div>
 
-                        <!-- YENİ ADSGRAM REWARD VIDEO DÜYMƏSİ -->
                         <div class="bonus-info" style="margin: 12px 0; text-align: center;">
                             <button onclick="showAdsGramRewardVideo()" class="adsgram-video-btn">
                                 🎬 Video İzlə & 0.001 AZN Qazan!
@@ -1436,8 +1425,6 @@
                     </div>
                 </div>
 
-                <!-- ALT BANNER SİLİNDİ -->
-
             </div>
         </div>
         
@@ -1506,160 +1493,6 @@ try {
 }
 
 // =================================================================
-// ADSGRAM REKLAM SİSTEMİ
-// =================================================================
-
-let AdsgramController = null;
-let adsgramRewardAvailable = true;
-
-function initializeAdsGram() {
-    try {
-        if (window.Adsgram) {
-            AdsgramController = window.Adsgram.init({ blockId: "16650" });
-            console.log('✅ AdsGram sistemi uğurla başladıldı');
-            return true;
-        } else {
-            console.log('❌ AdsGram SDK yüklənməyib');
-            return false;
-        }
-    } catch (error) {
-        console.error('❌ AdsGram başlatma xətası:', error);
-        return false;
-    }
-}
-
-function showAdsGramRewardVideo() {
-    if (!adsgramRewardAvailable) {
-        alert('🎬 Reward video hazır deyil. Bir neçə dəqiqə gözləyin.');
-        return false;
-    }
-    
-    if (!AdsgramController) {
-        const initialized = initializeAdsGram();
-        if (!initialized) {
-            alert('❌ Reklam sistemi hazır deyil. Yenidən cəhd edin.');
-            return false;
-        }
-    }
-
-    adsgramRewardAvailable = false;
-    
-    AdsgramController.show()
-        .then((result) => {
-            console.log('✅ AdsGram reward video tamamlandı!', result);
-            
-            const rewardAmount = 0.001;
-            currentUserState.totalMoney += rewardAmount;
-            
-            saveUserState();
-            updateEnergyDisplay();
-            
-            showSuccess(`🎉 Reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
-            
-            setTimeout(() => {
-                adsgramRewardAvailable = true;
-                console.log('🔄 Reward video yenidən aktiv oldu');
-            }, 30000);
-        })
-        .catch((error) => {
-            console.error('❌ AdsGram reward video xətası:', error);
-            
-            let errorMessage = 'Reklam göstərilərkən xəta baş verdi.';
-            
-            if (error && error.description) {
-                errorMessage = error.description;
-            }
-            
-            alert(`❌ ${errorMessage}`);
-            
-            setTimeout(() => {
-                adsgramRewardAvailable = true;
-                console.log('🔄 Reward video yenidən aktiv oldu');
-            }, 30000);
-        });
-    
-    return true;
-}
-
-// =================================================================
-// ADSGRAM 30 KLİK REWARD VIDEO SİSTEMİ
-// =================================================================
-
-let Adsgram30ClickController = null;
-
-function initializeAdsGram30Click() {
-    try {
-        if (window.Adsgram) {
-            Adsgram30ClickController = window.Adsgram.init({ blockId: "17053" });
-            console.log('✅ AdsGram 30 Klik Reward Video sistemi uğurla başladıldı');
-            return true;
-        } else {
-            console.log('❌ AdsGram SDK yüklənməyib');
-            return false;
-        }
-    } catch (error) {
-        console.error('❌ AdsGram 30 Klik Reward Video başlatma xətası:', error);
-        return false;
-    }
-}
-
-function showAdsGram30ClickReward() {
-    console.log('🔄 30 klik reklamı başladı...');
-    
-    if (!Adsgram30ClickController) {
-        console.error('❌ AdsGram controller tapılmadı! Yenidən başladılır...');
-        const initialized = initializeAdsGram30Click(); 
-        if (!initialized) {
-            console.error('❌ Reklam sistemi hazır deyil. İlkinləşmə uğursuz oldu.'); 
-            currentUserState.clicksUntilAd = AD_INTERVAL;
-            updateEnergyDisplay();
-            return false;
-        }
-    }
-
-    if (typeof Adsgram30ClickController.isReady === 'function') {
-        if (!Adsgram30ClickController.isReady()) {
-            console.warn('⚠️ Reklam hazır deyil, isReady() false qaytarır.');
-            return false;
-        }
-    }
-
-    try {
-        console.log('🎬 Reklam göstərilməyə çalışılır...');
-        
-        Adsgram30ClickController.show()
-            .then((result) => {
-                console.log('✅ AdsGram 30 klik reward video tamamlandı!', result);
-                
-                const rewardAmount = 0.0001; 
-                currentUserState.totalMoney += rewardAmount;
-                saveUserState();
-                updateEnergyDisplay();
-                showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
-                
-                currentUserState.clicksUntilAd = AD_INTERVAL;
-                updateEnergyDisplay();
-                console.log('✅ Reklam uğurla tamamlandı, sayğac sıfırlandı');
-            })
-            .catch((error) => {
-                console.error('❌ AdsGram 30 klik reward video xətası:', error);
-                currentUserState.clicksUntilAd = AD_INTERVAL;
-                updateEnergyDisplay();
-                console.log('🔄 Xəta olsa belə sayğac sıfırlandı');
-            });
-
-    } catch (e) {
-        console.error("🚨 AdsGram show() çağırışında dərhal xəta:", e.message);
-        currentUserState.clicksUntilAd = AD_INTERVAL;
-        updateEnergyDisplay();
-        console.log('🔄 Catch blokunda sayğac sıfırlandı');
-        return false;
-    }
-    
-    return true;
-}
-
-// =================================================================
 // TELEGRAM BOT AYARLARI
 // =================================================================
 const TELEGRAM_BOT_URL = "https://t.me/Casper_Game_bot/directlink";
@@ -1683,7 +1516,8 @@ async function getNextCGId() {
         return `CG${result}`;
     } catch (error) {
         console.error('CG ID xətası:', error);
-        return `CG${Date.now()}${Math.random().toString(36).substr(2, 5)}`.toUpperCase();
+        // Əgər transaction uğursuz olarsa, sadə bir ID yarad
+        return `CG${Date.now()}${Math.floor(Math.random() * 1000)}`;
     }
 }
 
@@ -1946,7 +1780,6 @@ function loadImages() {
 // OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR
 // =================================================================
 
-let users = {};
 const ENERGY_CONSUMPTION_PER_CLICK = 1;     
 const MAX_ENERGY_CAP = 100000;              
 
@@ -1972,40 +1805,6 @@ const MIN_WITHDRAWAL_AMOUNT = 1.00;
 const WITHDRAWAL_COOLDOWN_DAYS = 10;
 const MAX_WITHDRAWAL_AMOUNT = 1000.00;
 const ADMIN_WHATSAPP_NUMBER = "0513248685";
-
-const BASE_INVITE_URL = window.location.href.split('?')[0];
-
-const ads = [
-    {
-        id: 1,
-        title: "🎮 YENİ OYUN TƏKLİFİ",
-        description: "Bu mobil oyunu yükləyin və xüsusi bonus qazanın!",
-        color: "#ff6b6b",
-        duration: 10,
-        type: "premium"
-    },
-    {
-        id: 2,
-        title: "🛒 ONLAYN ALIŞ-VERİŞ",
-        description: "Xüsusi endirimlərdən yararlanın!",
-        color: "#4ecdc4",
-        duration: 10,
-        type: "special"
-    },
-    {
-        id: 3,
-        title: "📱 TƏTBİQ TƏKLİFİ",
-        description: "Bu faydalı tətbiqi yükləyin!",
-        color: "#45b7d1",
-        duration: 10,
-        type: "bonus"
-    }
-];
-
-let currentAdIndex = 0;
-let adTimerInterval;
-let adTimeLeft = 0;
-let totalAdRewardEarned = 0;
 
 let currentUserState = {
     cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
@@ -2055,7 +1854,7 @@ const navItems = document.querySelectorAll('.navbar .nav-item');
 const subScreens = document.querySelectorAll('.game-sub-screen');
 
 // =================================================================
-// GİRİŞ FUNKSİYASI - DÜZƏLDİLMİŞ
+// GİRİŞ FUNKSİYASI - SADƏLƏŞDİRİLMİŞ
 // =================================================================
 document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -2076,7 +1875,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         if (userData && userData.password === password) {
             console.log('🔐 Giriş uğurlu');
             
-            // ✅ DÜZƏLDİ - Bütün məlumatları düzgün yüklə
+            // Bütün məlumatları düzgün yüklə
             currentUserState = { 
                 ...currentUserState, 
                 ...userData,
@@ -2097,7 +1896,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
                 currentUserState.clicksUntilAd = AD_INTERVAL;
             }
 
-            // ✅ DÜZƏLDİ - Statistikaları yenilə
+            // Statistikaları yenilə
             updateProfileDisplay();
             updateReferralStats();
             showWelcomeMessage();
@@ -2125,7 +1924,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 });
 
 // =================================================================
-// QEYDİYYAT FUNKSİYASI - DÜZƏLDİLMİŞ
+// QEYDİYYAT FUNKSİYASI - SADƏLƏŞDİRİLMİŞ
 // =================================================================
 document.getElementById('registerForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -2177,8 +1976,8 @@ document.getElementById('registerForm').addEventListener('submit', async functio
             return;
         }
 
-        // İstifadəçi məlumatlarını hazırla - CG ID İLƏ
-        let userData = {
+        // İstifadəçi məlumatlarını hazırla
+        const userData = {
             cgId: cgId,
             username: username,
             name: name,
@@ -2201,66 +2000,47 @@ document.getElementById('registerForm').addEventListener('submit', async functio
             referredBy: referralCodeInput || null
         };
 
-        const REFERRAL_BONUS_AMOUNT = 0.10;
-        const REFERRAL_BONUS_LIMIT = 10;
-        
-        let referrerUsername = null;
-        let finalBonusMessage = '';
-
-        // =========================================================
-        // 🔥 REFERRAL VƏ QEYDİYYAT ÜÇÜN FIREBASE TRANSACTION
-        // =========================================================
-        console.log('⚡️ Transaction başladı: Qeydiyyat və Referral Bonus');
-
-        await db.runTransaction(async (transaction) => {
-            
-            // ƏGƏR DƏVƏT KODU VARSA
-            if (referralCodeInput) {
-                // 1. Dəvət edəni (Referrer) axtar
+        // ƏGƏR DƏVƏT KODU VARSA, REFERRER-İ YENİLƏ
+        if (referralCodeInput) {
+            try {
+                // Dəvət edəni (Referrer) axtar
                 const referrerQuery = db.collection('users').where('referralCode', '==', referralCodeInput).limit(1);
-                const referrerSnapshot = await transaction.get(referrerQuery);
+                const referrerSnapshot = await referrerQuery.get();
 
                 if (!referrerSnapshot.empty) {
                     const referrerDoc = referrerSnapshot.docs[0];
-                    const referrerRef = referrerDoc.ref;
                     const referrerData = referrerDoc.data();
-                    
-                    referrerUsername = referrerData.username;
+                    const referrerUsername = referrerData.username;
                     const currentSuccessfulReferrals = referrerData.successfulReferrals || 0;
 
-                    // 2. Yalnız ilk 10 dəvətdirsə bonus ver (0.10 AZN)
+                    // Yalnız ilk 10 dəvətdirsə bonus ver
                     if (currentSuccessfulReferrals < REFERRAL_BONUS_LIMIT) {
-                        // Referrerin məlumatlarını yenilə (Atomik Yenilənmə)
-                        transaction.update(referrerRef, {
+                        // Referrerin məlumatlarını yenilə
+                        await db.collection('users').doc(referrerUsername).update({
                             totalMoney: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
                             referralBonusEarned: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
                             successfulReferrals: firebase.firestore.FieldValue.increment(1)
                         });
                         
-                        finalBonusMessage = `🎊 ${referrerUsername} istifadəçisinə ${REFERRAL_BONUS_AMOUNT} AZN bonus verildi! (${currentSuccessfulReferrals + 1}/${REFERRAL_BONUS_LIMIT})`;
                         console.log(`🎉 Referans bonusu verildi: ${referrerUsername} +${REFERRAL_BONUS_AMOUNT} AZN`);
-
+                        showSuccess(`🎊 ${referrerUsername} istifadəçisinə ${REFERRAL_BONUS_AMOUNT} AZN bonus verildi! (${currentSuccessfulReferrals + 1}/${REFERRAL_BONUS_LIMIT})`);
                     } else {
-                        // Limit (10 dəvət) dolubsa, bonus verilmir
-                        finalBonusMessage = `ℹ️ Dəvət etdiyiniz istifadəçi (${referrerUsername}) artıq maksimum dəvət limitinə (${REFERRAL_BONUS_LIMIT}) çatıb.`;
                         console.log(`ℹ️ Referans limiti dolub: ${referrerUsername}. Bonus verilmədi.`);
+                        showSuccess(`ℹ️ Dəvət etdiyiniz istifadəçi (${referrerUsername}) artıq maksimum dəvət limitinə (${REFERRAL_BONUS_LIMIT}) çatıb.`);
                     }
                 } else {
                     console.log('❌ Daxil edilmiş Dəvət Kodu tapılmadı. Normal qeydiyyat davam edir.');
                 }
+            } catch (referralError) {
+                console.error('❌ Referral bonus xətası:', referralError);
+                // Referral xətası olsa belə qeydiyyat davam etsin
             }
-            
-            // 3. Yeni istifadəçinin məlumatlarını yaz (Transaction Set)
-            const newUserRef = db.collection('users').doc(username);
-            transaction.set(newUserRef, userData);
-            
-            // 4. Uğur mesajını göstər
-            if (finalBonusMessage) {
-                showSuccess(finalBonusMessage);
-            }
-        }); // Transaction bitdi
+        }
+
+        // YENİ İSTİFADƏÇİNİ YARAD
+        await db.collection('users').doc(username).set(userData);
         
-        console.log('✅ Qeydiyyat və Referral Transaction uğurla tamamlandı.');
+        console.log('✅ Qeydiyyat uğurla tamamlandı');
 
         showSuccess(`🎉 Qeydiyyat uğurla tamamlandı! Sizin CG ID: ${cgId}`);
 
@@ -2271,168 +2051,14 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         }, 2000);
 
     } catch (error) {
-        console.error('❌ Qeydiyyat Transaction xətası:', error);
+        console.error('❌ Qeydiyyat xətası:', error);
         handleFirebaseError(error);
         showError("Qeydiyyat zamanı gözlənilməyən xəta baş verdi. Yenidən cəhd edin.");
     }
 });
 
 // =================================================================
-// REKLAM SİSTEMİ FUNKSİYALARI
-// =================================================================
-
-function showAd() {
-    if (adScreen.style.display === 'flex') return;
-    
-    showAdsGram30ClickReward();
-}
-
-function showNextAd() {
-    showAdsGram30ClickReward();
-}
-
-function startAdTimer() {
-    setTimeout(() => {
-        completeCurrentAd();
-    }, 1000);
-}
-
-function completeCurrentAd() {
-    currentUserState.clicksUntilAd = AD_INTERVAL;
-    updateEnergyDisplay();
-}
-
-function skipAd() {
-    return;
-}
-
-function closeAd() {
-    currentUserState.clicksUntilAd = AD_INTERVAL;
-    updateEnergyDisplay();
-}
-
-// =================================================================
-// WHATSAPP GÖNDƏRMƏ FUNKSİYASI
-// =================================================================
-
-function sendWithdrawalToWhatsApp(withdrawalData) {
-    const message = `💰 YENİ ÇIXARIŞ SORĞUSU 💰
-
-👤 İstifadəçi Məlumatları:
-• CG ID: ${withdrawalData.userId}
-• İstifadəçi adı: ${withdrawalData.username}
-• Ad Soyad: ${withdrawalData.fullName}
-• Telefon: ${withdrawalData.phone}
-• E-poçt: ${withdrawalData.email}
-
-💳 Çıxarış Məlumatları:
-• Məbləğ: ${withdrawalData.amount} AZN
-• Kart nömrəsi: ${withdrawalData.cardNumber}
-• Kart sahibi: ${withdrawalData.cardHolder}
-
-📊 Oyun Statistikası:
-• Cəmi qazanc: ${withdrawalData.totalMoney} AZN
-• Uğurlu dəvətlər: ${withdrawalData.successfulReferrals}
-• Referral bonus: ${withdrawalData.referralBonus} AZN
-• Ümumi kliklər: ${withdrawalData.totalClicks}
-
-⏰ Çıxarış tarixi: ${withdrawalData.withdrawalDate}`;
-
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodedMessage}`;
-    
-    window.open(whatsappUrl, '_blank');
-    
-    return true;
-}
-
-// =================================================================
-// ÇIXARIŞ SİSTEMİ FUNKSİYALARI
-// =================================================================
-
-function checkWithdrawalAvailability() {
-    if (!currentUserState.username) return false;
-    
-    const lastWithdrawal = currentUserState.lastWithdrawalDate;
-    if (!lastWithdrawal) return true;
-    
-    const now = new Date();
-    const lastWithdrawalDate = new Date(lastWithdrawal);
-    const timeDiff = now.getTime() - lastWithdrawalDate.getTime();
-    const daysDiff = timeDiff / (1000 * 3600 * 24);
-    
-    return daysDiff >= WITHDRAWAL_COOLDOWN_DAYS;
-}
-
-function getNextWithdrawalTime() {
-    if (!currentUserState.lastWithdrawalDate) {
-        return { available: true, timeLeft: 0 };
-    }
-    
-    const lastWithdrawal = new Date(currentUserState.lastWithdrawalDate);
-    const nextWithdrawal = new Date(lastWithdrawal);
-    nextWithdrawal.setDate(nextWithdrawal.getDate() + WITHDRAWAL_COOLDOWN_DAYS);
-    
-    const now = new Date();
-    const timeLeft = nextWithdrawal.getTime() - now.getTime();
-    
-    if (timeLeft <= 0) {
-        return { available: true, timeLeft: 0 };
-    }
-    
-    return {
-        available: false,
-        timeLeft: timeLeft,
-        nextDate: nextWithdrawal
-    };
-}
-
-function formatTimeLeft(milliseconds) {
-    const days = Math.floor(milliseconds / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((milliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60));
-    
-    if (days > 0) {
-        return `${days} gün ${hours} saat`;
-    } else if (hours > 0) {
-        return `${hours} saat ${minutes} dəqiqə`;
-    } else {
-        return `${minutes} dəqiqə`;
-    }
-}
-
-function updateWithdrawalDisplay() {
-    if (!currentUserState.username) return;
-    
-    const withdrawalStatus = getNextWithdrawalTime();
-    
-    // User ID göstər
-    withdrawalUserIdDisplay.textContent = currentUserState.cgId || 'N/A';
-    
-    if (withdrawalStatus.available) {
-        nextWithdrawalTimeEl.textContent = "Hazır";
-        withdrawalTimerInfoEl.innerHTML = 'Növbəti çıxarış üçün: <strong style="color: #00b894;">Hazır</strong>';
-        withdrawSubmitBtn.disabled = false;
-        withdrawSubmitBtn.style.opacity = "1";
-        withdrawSubmitBtn.textContent = "ÇIXARIŞ ET";
-        withdrawSubmitBtn.classList.remove('withdraw-btn-disabled');
-    } else {
-        const timeLeftFormatted = formatTimeLeft(withdrawalStatus.timeLeft);
-        nextWithdrawalTimeEl.textContent = timeLeftFormatted;
-        withdrawalTimerInfoEl.innerHTML = `Növbəti çıxarış üçün: <strong style="color: #ff6b6b;">${timeLeftFormatted}</strong>`;
-        withdrawSubmitBtn.disabled = true;
-        withdrawSubmitBtn.style.opacity = "0.6";
-        withdrawSubmitBtn.textContent = `10 GÜN GÖZLƏMƏ (${timeLeftFormatted})`;
-        withdrawSubmitBtn.classList.add('withdraw-btn-disabled');
-    }
-    
-    availableMoneyEl.textContent = formatMoney(currentUserState.totalMoney);
-    
-    setTimeout(updateWithdrawalDisplay, 60000);
-}
-
-// =================================================================
-// DƏVƏT STATİSTİKASINI YENİLƏ - YENİ FUNKSİYA
+// DƏVƏT STATİSTİKASINI YENİLƏ
 // =================================================================
 function updateReferralStats() {
     const state = currentUserState;
@@ -2531,7 +2157,7 @@ function updateEnergyDisplay() {
     totalMoneyEl.textContent = formatMoney(state.totalMoney);
     clicksUntilAdDisplay.textContent = state.clicksUntilAd;
     
-    // ✅ DÜZƏLDİ - Statistikaları yenilə
+    // Statistikaları yenilə
     updateReferralStats();
     
     if (document.getElementById('friendsScreen').classList.contains('active')) {
@@ -2557,7 +2183,7 @@ function updateProfileDisplay() {
     profileMoneyEl.textContent = formatMoney(state.totalMoney);
     profileReferralCodeEl.textContent = state.referralCode || 'GENERATING...';
     
-    // ✅ DÜZƏLDİ - Dəvət statistikasını yenilə
+    // Dəvət statistikasını yenilə
     updateReferralStats();
 }
 
@@ -2634,17 +2260,17 @@ function switchScreen(screenName) {
         if (isTargetScreen) {
             screen.classList.add('active');
             
-            // ✅ DÜZƏLDİ - Hər ekran dəyişdikdə statistikaları yenilə
+            // Hər ekran dəyişdikdə statistikaları yenilə
             if (screenName === 'friendsScreen') {
                 updateInviteLinkDisplay();
-                updateReferralStats(); // Dəvət statistikasını yenilə
+                updateReferralStats();
             }
             if (screenName === 'profileScreen' || screenName === 'friendsScreen' || screenName === 'withdrawalScreen') {
                 updateProfileDisplay();
-                updateReferralStats(); // Statistikaları yenilə
+                updateReferralStats();
             }
             if (screenName === 'tapScreen') {
-                updateEnergyDisplay(); // Əsas oyun ekranında da yenilə
+                updateEnergyDisplay();
             }
         } else {
             screen.classList.remove('active');
@@ -2826,6 +2452,122 @@ document.getElementById('withdrawAmount').addEventListener('input', function(e) 
 });
 
 // =================================================================
+// ÇIXARIŞ SİSTEMİ FUNKSİYALARI
+// =================================================================
+
+function checkWithdrawalAvailability() {
+    if (!currentUserState.username) return false;
+    
+    const lastWithdrawal = currentUserState.lastWithdrawalDate;
+    if (!lastWithdrawal) return true;
+    
+    const now = new Date();
+    const lastWithdrawalDate = new Date(lastWithdrawal);
+    const timeDiff = now.getTime() - lastWithdrawalDate.getTime();
+    const daysDiff = timeDiff / (1000 * 3600 * 24);
+    
+    return daysDiff >= WITHDRAWAL_COOLDOWN_DAYS;
+}
+
+function getNextWithdrawalTime() {
+    if (!currentUserState.lastWithdrawalDate) {
+        return { available: true, timeLeft: 0 };
+    }
+    
+    const lastWithdrawal = new Date(currentUserState.lastWithdrawalDate);
+    const nextWithdrawal = new Date(lastWithdrawal);
+    nextWithdrawal.setDate(nextWithdrawal.getDate() + WITHDRAWAL_COOLDOWN_DAYS);
+    
+    const now = new Date();
+    const timeLeft = nextWithdrawal.getTime() - now.getTime();
+    
+    if (timeLeft <= 0) {
+        return { available: true, timeLeft: 0 };
+    }
+    
+    return {
+        available: false,
+        timeLeft: timeLeft,
+        nextDate: nextWithdrawal
+    };
+}
+
+function formatTimeLeft(milliseconds) {
+    const days = Math.floor(milliseconds / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((milliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (days > 0) {
+        return `${days} gün ${hours} saat`;
+    } else if (hours > 0) {
+        return `${hours} saat ${minutes} dəqiqə`;
+    } else {
+        return `${minutes} dəqiqə`;
+    }
+}
+
+function updateWithdrawalDisplay() {
+    if (!currentUserState.username) return;
+    
+    const withdrawalStatus = getNextWithdrawalTime();
+    
+    // User ID göstər
+    withdrawalUserIdDisplay.textContent = currentUserState.cgId || 'N/A';
+    
+    if (withdrawalStatus.available) {
+        nextWithdrawalTimeEl.textContent = "Hazır";
+        withdrawalTimerInfoEl.innerHTML = 'Növbəti çıxarış üçün: <strong style="color: #00b894;">Hazır</strong>';
+        withdrawSubmitBtn.disabled = false;
+        withdrawSubmitBtn.style.opacity = "1";
+        withdrawSubmitBtn.textContent = "ÇIXARIŞ ET";
+        withdrawSubmitBtn.classList.remove('withdraw-btn-disabled');
+    } else {
+        const timeLeftFormatted = formatTimeLeft(withdrawalStatus.timeLeft);
+        nextWithdrawalTimeEl.textContent = timeLeftFormatted;
+        withdrawalTimerInfoEl.innerHTML = `Növbəti çıxarış üçün: <strong style="color: #ff6b6b;">${timeLeftFormatted}</strong>`;
+        withdrawSubmitBtn.disabled = true;
+        withdrawSubmitBtn.style.opacity = "0.6";
+        withdrawSubmitBtn.textContent = `10 GÜN GÖZLƏMƏ (${timeLeftFormatted})`;
+        withdrawSubmitBtn.classList.add('withdraw-btn-disabled');
+    }
+    
+    availableMoneyEl.textContent = formatMoney(currentUserState.totalMoney);
+    
+    setTimeout(updateWithdrawalDisplay, 60000);
+}
+
+function sendWithdrawalToWhatsApp(withdrawalData) {
+    const message = `💰 YENİ ÇIXARIŞ SORĞUSU 💰
+
+👤 İstifadəçi Məlumatları:
+• CG ID: ${withdrawalData.userId}
+• İstifadəçi adı: ${withdrawalData.username}
+• Ad Soyad: ${withdrawalData.fullName}
+• Telefon: ${withdrawalData.phone}
+• E-poçt: ${withdrawalData.email}
+
+💳 Çıxarış Məlumatları:
+• Məbləğ: ${withdrawalData.amount} AZN
+• Kart nömrəsi: ${withdrawalData.cardNumber}
+• Kart sahibi: ${withdrawalData.cardHolder}
+
+📊 Oyun Statistikası:
+• Cəmi qazanc: ${withdrawalData.totalMoney} AZN
+• Uğurlu dəvətlər: ${withdrawalData.successfulReferrals}
+• Referral bonus: ${withdrawalData.referralBonus} AZN
+• Ümumi kliklər: ${withdrawalData.totalClicks}
+
+⏰ Çıxarış tarixi: ${withdrawalData.withdrawalDate}`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodedMessage}`;
+    
+    window.open(whatsappUrl, '_blank');
+    
+    return true;
+}
+
+// =================================================================
 // ÇIXARIŞ FORM FUNKSİYASI
 // =================================================================
 document.getElementById('withdrawalForm').addEventListener('submit', async function(e) {
@@ -2979,28 +2721,14 @@ function clickIcon(e) {
     
     addGhostAnimations(e);
     
-    // 30 klikdən sonra YENİ AdsGram reklamı göstər
     if (state.clicksUntilAd <= 1) { 
         state.clicksUntilAd = 0; 
-        
-        console.log("30 klik tamamlandı. Reward video çağırılır...");
-        
-        setTimeout(() => {
-             showAdsGram30ClickReward(); 
-        }, 500); 
-        
         return; 
     }
 
     if (state.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) { 
         if (state.clicksUntilAd > 0) {
             state.clicksUntilAd = 0; 
-            
-            console.log("Enerji bitdi, lakin reklam vaxtıdır. Reward video çağırılır...");
-            
-            setTimeout(() => {
-                 showAdsGram30ClickReward();
-            }, 500);
         }
         return;
     }
@@ -3030,26 +2758,6 @@ window.addEventListener('load', async function() {
     // CG ID sistemini initialize et
     await initializeCounter();
     console.log('✅ CG ID sistemi hazırdır');
-    
-    // ADSGRAM BUTTON REKLAMI İŞƏ SAL
-    setTimeout(() => {
-        const adsgramInitialized = initializeAdsGram();
-        if (adsgramInitialized) {
-            console.log('✅ AdsGram Button Reklam sistemi uğurla başladıldı');
-        } else {
-            console.log('❌ AdsGram Button Reklam sistemi başladıla bilmədi');
-        }
-    }, 3000);
-    
-    // ADSGRAM 30 KLİK REWARD VIDEO İŞƏ SAL
-    setTimeout(() => {
-        const adsgram30ClickInitialized = initializeAdsGram30Click();
-        if (adsgram30ClickInitialized) {
-            console.log('✅ AdsGram 30 Klik Reward Video sistemi uğurla başladıldı');
-        } else {
-            console.log('❌ AdsGram 30 Klik Reward Video sistemi başladıla bilmədi');
-        }
-    }, 1000);
     
     const img = document.getElementById('clickImage');
     img.classList.add('wind-animation', 'floating-ghost');
