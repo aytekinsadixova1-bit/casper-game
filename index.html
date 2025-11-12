@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>  
-    <meta charset="UTF-8"> 
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CASPER GAME</title>
     
@@ -2055,7 +2055,7 @@ const navItems = document.querySelectorAll('.navbar .nav-item');
 const subScreens = document.querySelectorAll('.game-sub-screen');
 
 // =================================================================
-// GİRİŞ FUNKSİYASI - YENİLƏNMİŞ
+// GİRİŞ FUNKSİYASI - DÜZƏLDİLMİŞ
 // =================================================================
 document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -2075,12 +2075,18 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         
         if (userData && userData.password === password) {
             console.log('🔐 Giriş uğurlu');
-            currentUserState = { ...currentUserState, ...userData };
-            currentUserState.username = username;
-            currentUserState.lastEnergyUpdate = Date.now();
-            currentUserState.energyRegenRate = BASE_REGEN_RATE; 
-            currentUserState.maxEnergy = MAX_ENERGY_CAP; 
+            
+            // ✅ DÜZƏLDİ - Bütün məlumatları düzgün yüklə
+            currentUserState = { 
+                ...currentUserState, 
+                ...userData,
+                username: username,
+                lastEnergyUpdate: Date.now(),
+                energyRegenRate: BASE_REGEN_RATE,
+                maxEnergy: MAX_ENERGY_CAP
+            };
 
+            // Enerji hesablaması
             const now = Date.now();
             const timePassedInSeconds = (now - (userData.lastEnergyUpdate || now)) / 1000;
             const energyToAdd = timePassedInSeconds * ENERGY_REGEN_PER_SECOND;
@@ -2091,7 +2097,9 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
                 currentUserState.clicksUntilAd = AD_INTERVAL;
             }
 
+            // ✅ DÜZƏLDİ - Statistikaları yenilə
             updateProfileDisplay();
+            updateReferralStats();
             showWelcomeMessage();
             
             showSuccess(`Xoş gəldiniz, ${username}! Oyun başladılır...`);
@@ -2117,7 +2125,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 });
 
 // =================================================================
-// QEYDİYYAT FUNKSİYASI - YENİLƏNMİŞ
+// QEYDİYYAT FUNKSİYASI - DÜZƏLDİLMİŞ
 // =================================================================
 document.getElementById('registerForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -2424,6 +2432,38 @@ function updateWithdrawalDisplay() {
 }
 
 // =================================================================
+// DƏVƏT STATİSTİKASINI YENİLƏ - YENİ FUNKSİYA
+// =================================================================
+function updateReferralStats() {
+    const state = currentUserState;
+    
+    // Profil ekranında
+    if (successfulReferralsEl) {
+        successfulReferralsEl.textContent = state.successfulReferrals || 0;
+    }
+    if (referralBonusTotalEl) {
+        referralBonusTotalEl.textContent = formatMoney(state.referralBonusEarned || 0);
+    }
+    if (referralLimitEl) {
+        referralLimitEl.textContent = REFERRAL_BONUS_LIMIT;
+    }
+    
+    // Balansı yenilə
+    if (availableMoneyEl) {
+        availableMoneyEl.textContent = formatMoney(state.totalMoney);
+    }
+    if (totalMoneyEl) {
+        totalMoneyEl.textContent = formatMoney(state.totalMoney);
+    }
+    
+    console.log('📊 Dəvət statistikası yeniləndi:', {
+        referrals: state.successfulReferrals,
+        bonus: state.referralBonusEarned,
+        totalMoney: state.totalMoney
+    });
+}
+
+// =================================================================
 // ƏSAS OYUN FUNKSİYALARI
 // =================================================================
 
@@ -2491,6 +2531,9 @@ function updateEnergyDisplay() {
     totalMoneyEl.textContent = formatMoney(state.totalMoney);
     clicksUntilAdDisplay.textContent = state.clicksUntilAd;
     
+    // ✅ DÜZƏLDİ - Statistikaları yenilə
+    updateReferralStats();
+    
     if (document.getElementById('friendsScreen').classList.contains('active')) {
         updateInviteLinkDisplay();
     }
@@ -2498,13 +2541,6 @@ function updateEnergyDisplay() {
     if (document.getElementById('profileScreen').classList.contains('active')) {
         updateProfileDisplay();
     }
-
-    availableMoneyEl.textContent = formatMoney(state.totalMoney);
-    
-    // DƏVƏT STATISTIKASINI YENİLƏ
-    successfulReferralsEl.textContent = state.successfulReferrals || 0;
-    referralBonusTotalEl.textContent = formatMoney(state.referralBonusEarned || 0);
-    referralLimitEl.textContent = REFERRAL_BONUS_LIMIT;
 
     saveUserState();
 }
@@ -2521,14 +2557,8 @@ function updateProfileDisplay() {
     profileMoneyEl.textContent = formatMoney(state.totalMoney);
     profileReferralCodeEl.textContent = state.referralCode || 'GENERATING...';
     
-    // DƏVƏT STATISTIKASINI YENİLƏ
-    successfulReferralsEl.textContent = state.successfulReferrals || 0;
-    referralBonusTotalEl.textContent = formatMoney(state.referralBonusEarned || 0);
-    referralLimitEl.textContent = REFERRAL_BONUS_LIMIT;
-
-    if (document.getElementById('withdrawalScreen').classList.contains('active')) {
-        updateWithdrawalDisplay();
-    }
+    // ✅ DÜZƏLDİ - Dəvət statistikasını yenilə
+    updateReferralStats();
 }
 
 function copyReferralCode() {
@@ -2603,11 +2633,18 @@ function switchScreen(screenName) {
         screen.style.display = isTargetScreen ? 'block' : 'none'; 
         if (isTargetScreen) {
             screen.classList.add('active');
+            
+            // ✅ DÜZƏLDİ - Hər ekran dəyişdikdə statistikaları yenilə
             if (screenName === 'friendsScreen') {
                 updateInviteLinkDisplay();
+                updateReferralStats(); // Dəvət statistikasını yenilə
             }
             if (screenName === 'profileScreen' || screenName === 'friendsScreen' || screenName === 'withdrawalScreen') {
                 updateProfileDisplay();
+                updateReferralStats(); // Statistikaları yenilə
+            }
+            if (screenName === 'tapScreen') {
+                updateEnergyDisplay(); // Əsas oyun ekranında da yenilə
             }
         } else {
             screen.classList.remove('active');
@@ -2646,7 +2683,7 @@ function logout() {
         referralCode: null, 
         maxEnergy: MAX_ENERGY_CAP, 
         currentEnergy: MAX_ENERGY_CAP, 
-        clicksUntilAd: AD_INTERVAL,  // ✅ DÜZƏLDİ - : işarəsi istifadə edilməlidir
+        clicksUntilAd: AD_INTERVAL,
         totalClicks: 0, 
         totalMoney: 0.00, 
         energyUsed: 0, 
