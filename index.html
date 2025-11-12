@@ -3033,51 +3033,60 @@ window.addEventListener('beforeunload', function() {
 });
     </script>
 <script>
+<script>
 window.addEventListener('load', () => {
- const loginForm = document.getElementById('loginForm');
+    const loginForm = document.getElementById('loginForm');
 
+    // 💡 TƏKMİLLƏŞDİRİLMİŞ FUNKSİYA
     function initAdexiumWidget() {
-        if (!window.Telegram?.WebApp?.initData) return; // Telegram info yoxdursa geri dön
+        if (!window.Telegram || !window.Telegram.WebApp || !Telegram.WebApp.initData) {
+            console.log("ℹ️ Adexium: Telegram WebApp məlumatları yoxdur. İşə salınmadı.");
+            return; // Telegram info yoxdursa geri dön
+        }
+        
+        // Telegram Web App-i genişləndir (geniş ekranı təmin et)
+        Telegram.WebApp.expand(); 
+        Telegram.WebApp.ready();
+
         const adexiumWidget = new AdexiumWidget({
             wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
             adFormat: 'push-like'
         });
         adexiumWidget.autoMode();
+        console.log("✅ Adexium Widget uğurla işə salındı.");
     }
-
+    
     // --- Login form və Adexium ---
- 
-  loginForm.addEventListener('submit', async (e) => {
+    loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const username = document.getElementById('loginUsername').value;
         const password = document.getElementById('loginPassword').value;
 
         try {
-            // Firebase login
-            // Qeyd: Firebase Auth istifadəçi adlarını e-poçt kimi tələb etdiyi üçün @example.com əlavə edilir.
             await firebase.auth().signInWithEmailAndPassword(username + '@example.com', password);
             console.log('✅ Login uğurlu oldu');
 
-            // Adexium widget-i uğurlu logindən sonra işə sal
-            if(window.Telegram?.WebApp?.initData) {
-                initAdexiumWidget();
-            }
+            // 💡 Uğurlu logindən sonra Adexium-u çağır
+            initAdexiumWidget(); 
 
             // Oyun ekranını göstər
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('gameScreen').style.display = 'flex';
         } catch (err) {
             console.error(err);
-            // İstifadəçiyə anlaşılmaz Firebase xətaları əvəzinə ümumi bir mesaj göstər
             const errorMessageElement = document.getElementById('errorMessage');
             if (errorMessageElement) {
                 errorMessageElement.innerText = "Daxil olarkən xəta: İstifadəçi adı və ya şifrə səhvdir.";
             } else {
-                console.error("❌ Xəta mesajı elementi (id='errorMessage') tapılmadı.");
+                console.error("❌ Xəta mesajı elementi tapılmadı.");
             }
         }
     });
+
+    // Qeyd: Əgər istifadəçi birbaşa daxil olubsa (məsələn, yaddaşda saxlanılıbsa), 
+    // səhifə yüklənəndə də Adexium-u işə salmağı düşünün. Hazırda bu, yalnız logindən sonra işləyir.
+
 });
 
 </script>
