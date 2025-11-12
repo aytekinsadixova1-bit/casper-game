@@ -2117,7 +2117,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 });
 
 // =================================================================
-// QEYDİYYAT FUNKSİYASI - FİNAL DÜZƏLİŞ (TƏHLÜKƏSİZ INCREMENT İLƏ)
+// QEYDİYYAT FUNKSİYASI - REFERRAL DÜZƏLDİ
 // =================================================================
 document.getElementById('registerForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -2166,7 +2166,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
             return;
         }
 
-        // İstifadəçi məlumatlarını hazırla - totalMoney: 0
+        // İstifadəçi məlumatlarını hazırla
         let userData = {
             cgId: cgId,
             username: username,
@@ -2174,11 +2174,11 @@ document.getElementById('registerForm').addEventListener('submit', async functio
             surname: surname,
             phone: phone,
             email: email,
-            password: password, 
+            password: password,
             referralCode: generateReferralCode(username),
             maxEnergy: MAX_ENERGY_CAP,
             currentEnergy: MAX_ENERGY_CAP,
-            totalMoney: 0, 
+            totalMoney: 0,
             clicksUntilAd: AD_INTERVAL,
             totalClicks: 0,
             energyUsed: 0,
@@ -2190,84 +2190,47 @@ document.getElementById('registerForm').addEventListener('submit', async functio
             referredBy: referralCodeInput || null
         };
 
-        const REFERRAL_BONUS_AMOUNT = 0.10;
-        const REFERRAL_BONUS_LIMIT = 10;
-        
-        let referrerRef = null;
         let referrerUsername = null;
         let finalBonusMessage = '';
 
-        // =========================================================
-        // 1. REFERRAL YOXLAMASI TRANSACTION XARİCİNDƏ (Lazımi Düzəliş)
-        // =========================================================
-        
+        // REFERRAL KODU YOXLA VƏ REFERRER TAP
         if (referralCodeInput) {
             console.log(`🔄 Dəvət kodu yoxlanılır: ${referralCodeInput}`);
             const referrerQuery = db.collection('users').where('referralCode', '==', referralCodeInput).limit(1);
-            const referrerSnapshot = await referrerQuery.get(); 
+            const referrerSnapshot = await referrerQuery.get();
 
             if (!referrerSnapshot.empty) {
                 const referrerDoc = referrerSnapshot.docs[0];
-                referrerRef = referrerDoc.ref; // DocumentReference əldə edilir
                 referrerUsername = referrerDoc.data().username;
                 console.log(`✅ Dəvət edən tapıldı: ${referrerUsername}`);
+                
+                // REFERRER-İN MƏLUMATLARINI YENİLƏ
+                const referrerData = referrerDoc.data();
+                const currentSuccessfulReferrals = referrerData.successfulReferrals || 0;
+                
+                if (currentSuccessfulReferrals < REFERRAL_BONUS_LIMIT) {
+                    // REFERRER-Ə BONUS VER
+                    await db.collection('users').doc(referrerUsername).update({
+                        totalMoney: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
+                        referralBonusEarned: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
+                        successfulReferrals: firebase.firestore.FieldValue.increment(1)
+                    });
+                    
+                    finalBonusMessage = `🎊 ${referrerUsername} istifadəçisinə ${REFERRAL_BONUS_AMOUNT} AZN bonus verildi!`;
+                    console.log(`🎉 Referral bonus verildi: ${referrerUsername} +${REFERRAL_BONUS_AMOUNT} AZN`);
+                } else {
+                    finalBonusMessage = `ℹ️ Dəvət etdiyiniz istifadəçi (${referrerUsername}) artıq maksimum dəvət limitinə çatıb.`;
+                    console.log(`ℹ️ Referral limiti dolub: ${referrerUsername}. Bonus verilmədi.`);
+                }
             } else {
                 console.log('❌ Daxil edilmiş Dəvət Kodu tapılmadı. Normal qeydiyyat davam edir.');
             }
         }
 
-        // =========================================================
-        // 2. REFERRAL VƏ QEYDİYYAT ÜÇÜN FIREBASE TRANSACTION
-        // =========================================================
-        console.log('⚡️ Transaction başladı: Qeydiyyat və Referral Bonus');
+        // YENİ İSTİFADƏÇİNİ YARAD
+        await db.collection('users').doc(username).set(userData);
         
-        const newUserRef = db.collection('users').doc(username);
-
-        await db.runTransaction(async (transaction) => {
-            
-            // DƏVƏT EDƏN TAPILIBSSA
-            if (referrerRef) {
-                // Sənədi Transaction daxilində oxu
-                const referrerDoc = await transaction.get(referrerRef);
-                
-                // Məntiqi olaraq yoxla
-                if (!referrerDoc.exists) {
-                    // Bu hal nadir olsa da, tranzaksiyadan çıxmaq üçün atılır
-                    throw new Error("Referans sənədi tapılmadı (Transaction error)"); 
-                }
-
-                const referrerData = referrerDoc.data();
-                const currentSuccessfulReferrals = referrerData.successfulReferrals || 0;
-
-                // DƏVƏT EDƏNƏ BONUS VER (Limit yoxlanılır)
-                if (currentSuccessfulReferrals < REFERRAL_BONUS_LIMIT) {
-                    
-                    // FieldValue.increment istifadəsi atomik artımı təmin edir
-                    const incrementAmount = firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT);
-                    const incrementOne = firebase.firestore.FieldValue.increment(1);
-
-                    // Dəvət edəni yenilə
-                    transaction.update(referrerRef, {
-                        totalMoney: incrementAmount, // BALANS ARTIRILIR
-                        referralBonusEarned: incrementAmount, 
-                        successfulReferrals: incrementOne // SAY ARTIRILIR
-                    });
-                    
-                    finalBonusMessage = `🎊 ${referrerUsername} istifadəçisinə ${REFERRAL_BONUS_AMOUNT} AZN bonus verildi!`;
-                    console.log(`🎉 Referans bonusu verildi: ${referrerUsername} +${REFERRAL_BONUS_AMOUNT} AZN`);
-
-                } else {
-                    finalBonusMessage = `ℹ️ Dəvət etdiyiniz istifadəçi (${referrerUsername}) artıq maksimum dəvət limitinə çatıb.`;
-                    console.log(`ℹ️ Referans limiti dolub: ${referrerUsername}. Bonus verilmədi.`);
-                }
-            }
-            
-            // YENİ İSTİFADƏÇİNİN MƏLUMATLARINI YAZ
-            transaction.set(newUserRef, userData);
-            
-        }); // Transaction bitdi
-        
-        console.log('✅ Qeydiyyat və Referral Transaction uğurla tamamlandı.');
+        console.log('✅ Qeydiyyat uğurla tamamlandı');
 
         if (finalBonusMessage) {
             showSuccess(finalBonusMessage);
@@ -2281,9 +2244,8 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         }, 2000);
 
     } catch (error) {
-        console.error('❌ Qeydiyyat Transaction xətası:', error);
-        // handleFirebaseError-in xətanı istifadəçiyə göstərdiyinə əmin olun
-        handleFirebaseError(error); 
+        console.error('❌ Qeydiyyat xətası:', error);
+        handleFirebaseError(error);
         showError("Qeydiyyat zamanı gözlənilməyən xəta baş verdi. Yenidən cəhd edin.");
     }
 });
