@@ -14,6 +14,18 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
+      <!-- Adexium push-like reklam SDK -->
+    <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            const adexiumWidget = new AdexiumWidget({
+                wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
+                adFormat: 'push-like'
+            });
+            adexiumWidget.autoMode();
+        });
+    </script>
+
     <style>
         * {
             margin: 0;
@@ -1095,81 +1107,100 @@
             </div>
         </div>
         
-        <div class="main-content" id="mainContent" style="height: 100%; flex-grow: 1; display: none; flex-direction: column; justify-content: space-between;">
-            
-            <div class="login-screen" id="loginScreen" style="height: 100%; display: none;">
-                <div class="header">
-                    <h1>CASPER GAME</h1>
-                    <p>Xoş gəlmisiniz!</p>
+     <div class="main-content" id="mainContent" style="height: 100%; flex-grow: 1; display: none; flex-direction: column; justify-content: flex-start;">
+
+    <!-- LOGIN SCREEN -->
+    <div class="login-screen" id="loginScreen" style="height: 100%; display: none;">
+
+        <!-- Adexium Push-Like Reklam Divi -->
+        <div class="adexium-container" style="width: 100%; display: flex; justify-content: center; margin-bottom: 12px;">
+            <div id="adexiumWidgetContainer"></div>
+        </div>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', () => {
+                const adexiumWidget = new AdexiumWidget({
+                    wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
+                    adFormat: 'push-like',
+                    containerId: 'adexiumWidgetContainer'
+                });
+                adexiumWidget.autoMode();
+            });
+        </script>
+
+        <div class="header">
+            <h1>CASPER GAME</h1>
+            <p>Xoş gəlmisiniz!</p>
+        </div>
+
+        <div class="content">
+            <div class="tabs">
+                <div class="tab active" id="loginTab">GİRİŞ</div>
+                <div class="tab" id="registerTab">QEYDİYYAT</div>
+            </div>
+
+            <div class="message error" id="errorMessage"></div>
+            <div class="message success" id="successMessage"></div>
+
+            <!-- LOGIN FORM -->
+            <form class="form active" id="loginForm">
+                <div class="input-group">
+                    <label for="loginUsername">İstifadəçi adı (Login)</label>
+                    <input type="text" id="loginUsername" placeholder="İstifadəçi adınızı daxil edin" required>
                 </div>
-                
-                <div class="content">
-                    <div class="tabs">
-                        <div class="tab active" id="loginTab">GİRİŞ</div>
-                        <div class="tab" id="registerTab">QEYDİYYAT</div>
-                    </div>
-                    
-                    <div class="message error" id="errorMessage"></div>
-                    <div class="message success" id="successMessage"></div>
-                    
-                    <form class="form active" id="loginForm">
-                        <div class="input-group">
-                            <label for="loginUsername">İstifadəçi adı (Login)</label>
-                            <input type="text" id="loginUsername" placeholder="İstifadəçi adınızı daxil edin" required>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="loginPassword">Şifrə</label>
-                            <input type="password" id="loginPassword" placeholder="Şifrənizi daxil edin" required>
-                        </div>
-                        
-                        <button type="submit" class="btn">DAXİL OL</button>
-                    </form>
-                    
-                    <form class="form" id="registerForm">
-                        <div class="input-group">
-                            <label for="registerUsername">İstifadəçi adı (Login) *</label>
-                            <input type="text" id="registerUsername" placeholder="Yeni istifadəçi adı" required>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="registerName">Ad *</label>
-                            <input type="text" id="registerName" placeholder="Adınızı daxil edin" required>
-                        </div>
 
-                         <div class="input-group">
-                            <label for="registerSurname">Soyad *</label>
-                            <input type="text" id="registerSurname" placeholder="Soyadınızı daxil edin" required>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="registerPhone">Telefon Nömrəsi *</label>
-                            <input type="tel" id="registerPhone" value="+994" placeholder="xx xxx xx xx" required>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="registerEmail">E-poçt (Mail) *</label>
-                            <input type="email" id="registerEmail" placeholder="E-poçtunuzu daxil edin" required>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="registerPassword">Şifrə *</label>
-                            <input type="password" id="registerPassword" placeholder="Ən azı 6 simvol" required>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="confirmPassword">Şifrəni təsdiqlə *</label>
-                            <input type="password" id="confirmPassword" placeholder="Şifrənizi təkrar daxil edin" required>
-                        </div>
+                <div class="input-group">
+                    <label for="loginPassword">Şifrə</label>
+                    <input type="password" id="loginPassword" placeholder="Şifrənizi daxil edin" required>
+                </div>
 
-                        <div class="input-group">
-                            <label for="registerReferralCode">Dəvət Kodu</label>
-                            <input type="text" id="registerReferralCode" placeholder="Dəvət kodunuzu daxil edin">
-                            <small style="color: #6c757d; font-size: 10px;">İstəyə bağlı - dostunuzun dəvət kodunu daxil edin</small>
-                        </div>
-                        
-                        <button type="submit" class="btn">QEYDİYYATDAN KEÇ</button>
-                    </form>
+                <button type="submit" class="btn">DAXİL OL</button>
+            </form>
+
+            <!-- REGISTER FORM -->
+            <form class="form" id="registerForm">
+                <div class="input-group">
+                    <label for="registerUsername">İstifadəçi adı (Login) *</label>
+                    <input type="text" id="registerUsername" placeholder="Yeni istifadəçi adı" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="registerName">Ad *</label>
+                    <input type="text" id="registerName" placeholder="Adınızı daxil edin" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="registerSurname">Soyad *</label>
+                    <input type="text" id="registerSurname" placeholder="Soyadınızı daxil edin" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="registerPhone">Telefon Nömrəsi *</label>
+                    <input type="tel" id="registerPhone" value="+994" placeholder="xx xxx xx xx" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="registerEmail">E-poçt (Mail) *</label>
+                    <input type="email" id="registerEmail" placeholder="E-poçtunuzu daxil edin" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="registerPassword">Şifrə *</label>
+                    <input type="password" id="registerPassword" placeholder="Ən azı 6 simvol" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="confirmPassword">Şifrəni təsdiqlə *</label>
+                    <input type="password" id="confirmPassword" placeholder="Şifrənizi təkrar daxil edin" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="registerReferralCode">Dəvət Kodu</label>
+                    <input type="text" id="registerReferralCode" placeholder="Dəvət kodunuzu daxil edin">
+                    <small style="color: #6c757d; font-size: 10px;">İstəyə bağlı - dostunuzun dəvət kodunu daxil edin</small>
+                </div>
+
+                <button type="submit" class="btn">QEYDİYYATDAN KEÇ</button>
+            </form>
                 </div>
             </div>
             
