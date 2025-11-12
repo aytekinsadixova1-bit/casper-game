@@ -2135,6 +2135,51 @@ async function debugAllUsers() {
 window.debugAllUsers = debugAllUsers;
 
 // =================================================================
+// YENİ: REFERRAL KODU AVTOMATİK BÖYÜK HƏRFƏ ÇEVİR
+// =================================================================
+document.getElementById('registerReferralCode').addEventListener('input', function(e) {
+    this.value = this.value.toUpperCase();
+});
+
+// =================================================================
+// YENİ: KONKRET REFERRAL KODUNU YOXLA
+// =================================================================
+async function checkSpecificReferralCode(code) {
+    try {
+        console.log(`🔍 Konkret referral kodu yoxlanılır: "${code}"`);
+        
+        const usersRef = db.collection('users');
+        const querySnapshot = await usersRef.where('referralCode', '==', code).get();
+        
+        if (!querySnapshot.empty) {
+            const userDoc = querySnapshot.docs[0];
+            const userData = userDoc.data();
+            console.log('✅ Referral kodu TAPILDI:', {
+                username: userDoc.id,
+                referralCode: userData.referralCode,
+                cgId: userData.cgId,
+                name: userData.name
+            });
+            return userDoc;
+        } else {
+            console.log('❌ Referral kodu TAPILMADI:', code);
+            
+            // Bütün referral kodlarını göstər
+            const allUsers = await db.collection('users').get();
+            console.log('📋 Mövcud bütün referral kodları:');
+            allUsers.forEach(doc => {
+                const user = doc.data();
+                console.log(`   👤 ${user.username}: "${user.referralCode}"`);
+            });
+            return null;
+        }
+    } catch (error) {
+        console.error('❌ Referral kodu yoxlama xətası:', error);
+        return null;
+    }
+}
+
+// =================================================================
 // GİRİŞ FUNKSİYASI
 // =================================================================
 document.getElementById('loginForm').addEventListener('submit', async function(e) {
@@ -2210,7 +2255,12 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         const email = document.getElementById('registerEmail').value.trim();
         const password = document.getElementById('registerPassword').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
-        const referralCodeInput = document.getElementById('registerReferralCode').value.trim().toUpperCase();
+        
+        // REFERRAL KODUNU AVTOMATİK BÖYÜK HƏRFƏ ÇEVİR
+        let referralCodeInput = document.getElementById('registerReferralCode').value.trim();
+        referralCodeInput = referralCodeInput.toUpperCase();
+        
+        console.log('📝 Referral kodu işlənir:', referralCodeInput);
 
         // Validasiyalar
         if (!username || !name || !surname || !phone || !email || !password || !confirmPassword) {
