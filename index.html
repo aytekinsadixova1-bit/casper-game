@@ -2186,59 +2186,51 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
                     .limit(1)
                     .get();
 
-         // Referral bonus hissəsi
-if (referralCodeInput) {
-    try {
-        const referrerQuery = await db.collection('users')
-            .where('referralCode', '==', referralCodeInput)
-            .limit(1)
-            .get();
+                if (!referrerQuery.empty) {
+                    const referrerDoc = referrerQuery.docs[0];
+                    const referrerRef = db.collection('users').doc(referrerDoc.id);
+                    const REFERRAL_BONUS_AMOUNT = 0.10;
 
-        if (!referrerQuery.empty) {
-            const referrerDoc = referrerQuery.docs[0];
-            const referrerRef = db.collection('users').doc(referrerDoc.id);
-            const REFERRAL_BONUS_AMOUNT = 0.10;
+                    await db.runTransaction(async (transaction) => {
+                        const refDoc = await transaction.get(referrerRef);
+                        if (!refDoc.exists) throw "Referrer tapılmadı";
 
-            await db.runTransaction(async (transaction) => {
-                const refDoc = await transaction.get(referrerRef);
-                if (!refDoc.exists) throw "Referrer tapılmadı";
+                        const currentBonus = refDoc.data().referralBonusEarned || 0;
+                        const currentCount = refDoc.data().successfulReferrals || 0;
 
-                const currentBonus = refDoc.data().referralBonusEarned || 0;
-                const currentCount = refDoc.data().successfulReferrals || 0;
+                        transaction.set(referrerRef, {
+                            referralBonusEarned: currentBonus + REFERRAL_BONUS_AMOUNT,
+                            successfulReferrals: currentCount + 1,
+                            totalMoney: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
+                            invitedFriends: firebase.firestore.FieldValue.arrayUnion(username)
+                        }, { merge: true });
+                    });
 
-                transaction.set(referrerRef, {
-                    referralBonusEarned: currentBonus + REFERRAL_BONUS_AMOUNT,
-                    successfulReferrals: currentCount + 1,
-                    totalMoney: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
-                    invitedFriends: firebase.firestore.FieldValue.arrayUnion(username)
-                }, { merge: true });
-            });
+                    console.log(`🎁 Dəvət edənə +${REFERRAL_BONUS_AMOUNT} AZN bonus verildi`);
+                    showSuccess(`🎁 Dəvət edən bonus aldı (+${REFERRAL_BONUS_AMOUNT} AZN)`);
 
-            console.log(`🎁 Dəvət edənə +${REFERRAL_BONUS_AMOUNT} AZN bonus verildi`);
-            showSuccess(`🎁 Dəvət edən bonus aldı (+${REFERRAL_BONUS_AMOUNT} AZN)`);
+                    // 🔄 Firestore-dan yenilənmiş məlumatı al
+                    const updatedRef = await db.collection('users').doc(referrerDoc.id).get();
+                    const updatedData = updatedRef.data();
 
-            // 🔄 Firestore-dan yenilənmiş məlumatı al
-            const updatedRef = await db.collection('users').doc(referrerDoc.id).get();
-            const updatedData = updatedRef.data();
-
-            // 💾 currentUser obyektini yenilə
-            if (typeof currentUser !== "undefined" && currentUser.username === referrerDoc.id) {
-                currentUser = { ...currentUser, ...updatedData }; // birləşdir
-                saveUserState(); // yaddaşa yaz
-                updateEnergyDisplay && updateEnergyDisplay();
-                updateProfileDisplay && updateProfileDisplay();
-                console.log("✅ UI yeniləndi — yeni bonus görsənir!");
-            } else {
-                console.log("ℹ️ Dəvət edən aktiv istifadəçi deyil — növbəti girişdə yenilənəcək.");
+                    // 💾 currentUser obyektini yenilə
+                    if (typeof currentUser !== "undefined" && currentUser.username === referrerDoc.id) {
+                        currentUser = { ...currentUser, ...updatedData }; // birləşdir
+                        saveUserState(); // yaddaşa yaz
+                        updateEnergyDisplay && updateEnergyDisplay();
+                        updateProfileDisplay && updateProfileDisplay();
+                        console.log("✅ UI yeniləndi — yeni bonus görsənir!");
+                    } else {
+                        console.log("ℹ️ Dəvət edən aktiv istifadəçi deyil — növbəti girişdə yenilənəcək.");
+                    }
+                } else {
+                    console.log("⚠️ Dəvət kodu ilə uyğun istifadəçi tapılmadı.");
+                }
+            } catch (error) {
+                console.error("❌ Referral sistem xətası:", error);
+                showError("Dəvət bonusu əlavə edilərkən xəta baş verdi.");
             }
-        } else {
-            console.log("⚠️ Dəvət kodu ilə uyğun istifadəçi tapılmadı.");
         }
-    } catch (error) {
-        console.error("❌ Referral sistem xətası:", error);
-        showError("Dəvət bonusu əlavə edilərkən xəta baş verdi.");
-    }
-}
 
         showSuccess("Qeydiyyat uğurla tamamlandı!");
         setTimeout(() => {
@@ -2250,7 +2242,8 @@ if (referralCodeInput) {
         console.error("❌ Qeydiyyat xətası:", error);
         showError("Qeydiyyat zamanı xəta baş verdi. Yenidən cəhd edin.");
     }
-}
+});
+
 
 // =================================================================
 // REKLAM SİSTEMİ FUNKSİYALARI
