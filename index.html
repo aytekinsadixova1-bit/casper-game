@@ -2349,8 +2349,8 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 });
 
 // =================================================================
-// QEYDİYYAT FUNKSİYASI - YENİLƏNMİŞ (REFERRAL XƏTASI DÜZƏLDİLMİŞ)
-// =================================================================
+// QEYDİYYAT FUNKSİYASI - YENİLƏNMİŞ (YALNIZ DƏVƏT EDƏNƏ BONUS VERƏN)
+// =---------------------------------------------------------------
 document.getElementById('registerForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -2398,7 +2398,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
             return;
         }
 
-        // İstifadəçi məlumatlarını hazırla - CG ID İLƏ
+        // İstifadəçi məlumatlarını hazırla - totalMoney: 0
         let userData = {
             cgId: cgId,
             username: username,
@@ -2406,11 +2406,11 @@ document.getElementById('registerForm').addEventListener('submit', async functio
             surname: surname,
             phone: phone,
             email: email,
-            password: password, // Mövcud kodunuz şifrəni açıq saxlayır
+            password: password, 
             referralCode: generateReferralCode(username),
             maxEnergy: MAX_ENERGY_CAP,
             currentEnergy: MAX_ENERGY_CAP,
-            totalMoney: 0,
+            totalMoney: 0, // Yeni istifadəçi 0 ilə başlayır
             clicksUntilAd: AD_INTERVAL,
             totalClicks: 0,
             energyUsed: 0,
@@ -2430,19 +2430,16 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         let finalBonusMessage = '';
 
         // =========================================================
-        // 🔥 DÜZƏLİŞ: REFERRAL YOXLAMASI TRANSACTION XARİCİNDƏ
+        // 🔥 REFERRAL YOXLAMASI TRANSACTION XARİCİNDƏ
         // =========================================================
         
         if (referralCodeInput) {
             console.log(`🔄 Dəvət kodu yoxlanılır: ${referralCodeInput}`);
-            // 1. Dəvət edəni (Referrer) transaction xaricində axtar
             const referrerQuery = db.collection('users').where('referralCode', '==', referralCodeInput).limit(1);
-            // Burada normal ".get()" istifadə olunur
             const referrerSnapshot = await referrerQuery.get(); 
 
             if (!referrerSnapshot.empty) {
                 const referrerDoc = referrerSnapshot.docs[0];
-                // Sənəd referansını (DocumentReference) əldə edirik
                 referrerRef = referrerDoc.ref; 
                 referrerUsername = referrerDoc.data().username;
                 console.log(`✅ Dəvət edən tapıldı: ${referrerUsername}`);
@@ -2457,15 +2454,12 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         // =========================================================
         console.log('⚡️ Transaction başladı: Qeydiyyat və Referral Bonus');
         
-        // Yeni istifadəçinin referansını da əvvəldən təyin edirik
         const newUserRef = db.collection('users').doc(username);
 
         await db.runTransaction(async (transaction) => {
             
-            // ƏGƏR DƏVƏT EDƏN TAPILIBSSA (YUXARIDAKI YOXLAMADAN)
+            // ƏGƏR DƏVƏT EDƏN TAPILIBSSA
             if (referrerRef) {
-                // 1. Dəvət edənin sənədini transaction daxilində oxu
-                // DÜZƏLİŞ: Artıq "referrerRef" (sənəd referansı) istifadə olunur
                 const referrerDoc = await transaction.get(referrerRef);
                 if (!referrerDoc.exists) {
                     throw new Error("Dəvət edən istifadəçi sənədi tapılmadı.");
@@ -2474,40 +2468,36 @@ document.getElementById('registerForm').addEventListener('submit', async functio
                 const referrerData = referrerDoc.data();
                 const currentSuccessfulReferrals = referrerData.successfulReferrals || 0;
 
-                // 2. Yalnız ilk 10 dəvətdirsə bonus ver (0.10 AZN)
+                // 1. Dəvət edənə bonus ver (Limit yoxlanılır)
                 if (currentSuccessfulReferrals < REFERRAL_BONUS_LIMIT) {
                     
-                    // Dəyərləri əl ilə hesabla (daha etibarlı)
                     const newTotalMoney = (referrerData.totalMoney || 0) + REFERRAL_BONUS_AMOUNT;
                     const newReferralBonusEarned = (referrerData.referralBonusEarned || 0) + REFERRAL_BONUS_AMOUNT;
                     const newSuccessfulReferrals = currentSuccessfulReferrals + 1;
 
-                    // 3. Dəvət edənin məlumatlarını yenilə
+                    // Dəvət edəni yenilə
                     transaction.update(referrerRef, {
                         totalMoney: newTotalMoney,
                         referralBonusEarned: newReferralBonusEarned,
                         successfulReferrals: newSuccessfulReferrals
                     });
                     
-                    finalBonusMessage = `🎊 ${referrerUsername} istifadəçisinə ${REFERRAL_BONUS_AMOUNT} AZN bonus verildi! (${newSuccessfulReferrals}/${REFERRAL_BONUS_LIMIT})`;
+                    finalBonusMessage = `🎊 ${referrerUsername} istifadəçisinə ${REFERRAL_BONUS_AMOUNT} AZN bonus verildi!`;
                     console.log(`🎉 Referans bonusu verildi: ${referrerUsername} +${REFERRAL_BONUS_AMOUNT} AZN`);
 
                 } else {
-                    // Limit (10 dəvət) dolubsa, bonus verilmir
-                    finalBonusMessage = `ℹ️ Dəvət etdiyiniz istifadəçi (${referrerUsername}) artıq maksimum dəvət limitinə (${REFERRAL_BONUS_LIMIT}) çatıb.`;
+                    finalBonusMessage = `ℹ️ Dəvət etdiyiniz istifadəçi (${referrerUsername}) artıq maksimum dəvət limitinə çatıb.`;
                     console.log(`ℹ️ Referans limiti dolub: ${referrerUsername}. Bonus verilmədi.`);
                 }
             }
             
-            // 4. Yeni istifadəçinin məlumatlarını yaz (Transaction Set)
+            // 2. Yeni istifadəçinin məlumatlarını yaz (bonus olmadan, userData-da totalMoney: 0 olaraq)
             transaction.set(newUserRef, userData);
             
-            // 5. Uğur mesajını göstər (Transaction daxilində deyil, çöldə)
         }); // Transaction bitdi
         
         console.log('✅ Qeydiyyat və Referral Transaction uğurla tamamlandı.');
 
-        // Uğur mesajlarını transaction bitdikdən sonra göstər
         if (finalBonusMessage) {
             showSuccess(finalBonusMessage);
         }
