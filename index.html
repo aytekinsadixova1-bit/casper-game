@@ -1535,8 +1535,8 @@ function initializeAdExium() {
                     colorScheme: 'light',
                     themeParams: {},
                     isExpanded: true,
-                    viewportHeight: 600,
-                    viewportStableHeight: 600,
+                    viewportHeight: 400,
+                    viewportStableHeight: 400,
                     isClosingConfirmationEnabled: false,
                     headerColor: '#000000',
                     backgroundColor: '#ffffff',
@@ -3082,17 +3082,17 @@ window.addEventListener('load', async function() {
     await initializeCounter();
     console.log('✅ CG ID sistemi hazırdır');
 
-    
 // ADEXIUM WIDGET İŞƏ SAL (yalnız push-like reklamlar üçün)
 setTimeout(() => {
     const adexiumInitialized = initializeAdExiumPushLike();
     if (adexiumInitialized) {
         console.log('✅ AdExium Push-like sistemi uğurla başladıldı');
         
-        // Push-like reklamı 2 saniyə sonra göstər
-        setTimeout(() => {
+        // Push-like reklamı hər 30 saniyədən bir göstər (30000 ms = 30 saniyə)
+        setInterval(() => {
             showAdExiumPushLike();
-        }, 2000);
+        }, 30000); // <-- ƏSAS DƏYİŞİKLİK BURADADIR!
+        
     } else {
         console.log('❌ AdExium Push-like sistemi başladıla bilmədi');
     }
