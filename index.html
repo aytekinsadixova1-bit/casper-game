@@ -15,8 +15,15 @@
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     
     <!-- ADEXIUM WIDGET SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
     <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
-
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+        const adexiumWidget = new AdexiumWidget({wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae', adFormat: 'push-like'});
+        adexiumWidget.autoMode();
+    });
+</script>
+    
     <style>
         * {
             margin: 0;
@@ -1061,11 +1068,22 @@
             display: none !important;
         }
         
-        /* ADEXIUM AD CONTAINER - SİLİNDİ */
+        /* ADEXIUM AD CONTAINER */
         .adexium-ad-container {
-            display: none !important;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(15, 52, 96, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .adexium-ad-label {
+            font-size: 10px;
+            color: #6c757d;
+            margin-bottom: 5px;
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
     <!-- Firebase Status Indicator - GİZLƏ -->
@@ -1182,6 +1200,8 @@
             
             <div class="game-screen" id="gameScreen" style="display: none;">
                 
+                <!-- ADSGRAM BANNER REKLAM SİLİNDİ -->
+
                 <div class="header">
                     <h1>CASPER GAME</h1>
                     <p id="welcomeText">Xoş gəldiniz, İstifadəçi! 👋</p>
@@ -1205,6 +1225,12 @@
                             <div class="ad-counter-container">
                                 <span>Növbəti reklam:</span> <span id="clicksUntilAdDisplay">30</span> klik
                             </div>
+                        </div>
+
+                        <!-- ADEXIUM AD CONTAINER -->
+                        <div class="adexium-ad-container">
+                            <div class="adexium-ad-label">Reklam</div>
+                            <div id="adexium-ad-placeholder"></div>
                         </div>
 
                         <!-- YENİ ADSGRAM REWARD VIDEO DÜYMƏSİ -->
@@ -1237,7 +1263,184 @@
                         </div>
                     </div>
                     
-                    <!-- ... digər ekranlar eyni qalır ... -->
+                    <div class="game-sub-screen" id="profileScreen" style="display: none;">
+                        <h3 class="sub-header">👤 Profil Məlumatları</h3>
+                        
+                        <div class="profile-item">
+                            <div class="profile-info">
+                                <h4>CG ID:</h4>
+                                <div class="cg-id-badge" id="profileCGID">CG1</div>
+                            </div>
+                        </div>
+
+                        <div class="profile-item">
+                            <div class="profile-info">
+                                <h4>İstifadəçi Adı (Login):</h4>
+                                <p id="profileUsername">N/A</p>
+                            </div>
+                        </div>
+
+                        <div class="profile-item">
+                            <div class="profile-info">
+                                <h4>Ad Soyad:</h4>
+                                <p id="profileFullName">N/A</p>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-item">
+                            <div class="profile-info">
+                                <h4>Telefon Nömrəsi:</h4>
+                                <p id="profilePhone">N/A</p>
+                            </div>
+                        </div>
+
+                        <div class="profile-item">
+                            <div class="profile-info">
+                                <h4>E-poçt (Mail):</h4>
+                                <p id="profileEmail">N/A</p>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-item">
+                            <div class="profile-info">
+                                <h4>Qazanılmış Cəmi AZN:</h4> <p id="profileMoney">0.000000 AZN</p> </div>
+                        </div>
+
+                        <div class="referral-container">
+                            <h4>Dəvət Kodu (Dostlarınızla Paylaşın)</h4>
+                            <div class="referral-code" id="profileReferralCode">LOADING...</div>
+                            <button class="copy-btn" onclick="copyReferralCode()">Kodu Kopyala</button>
+                        </div>
+
+                        <h3 class="sub-header" style="margin-top: 15px;">⚙️ Tənzimləmələr</h3>
+                        
+                        <div class="settings-btn-group">
+                            <button class="settings-btn" onclick="openModal('editProfileModal')">
+                                <i class="fa-solid fa-pen-to-square"></i> <span>Adı / Məlumatları Dəyişdir</span>
+                            </button>
+                            <button class="settings-btn delete-btn" onclick="openModal('deleteProfileModal')">
+                                <i class="fa-solid fa-trash-can"></i> <span>Hesabı Sil</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="game-sub-screen" id="friendsScreen" style="display: none;">
+                        <h3 class="sub-header">🤝 Dostlarınızı Dəvət Edin</h3>
+                        
+                        <div class="bonus-info">
+                            <strong>Hər dəvət üçün 0.10 AZN bonus qazanın!</strong>
+                        </div>
+
+                        <div class="invite-link-container">
+                            <h4 style="text-align: center; margin-bottom: 12px;">🎁 Dəvət Məlumatlarınız</h4>
+                            <div class="invite-link" id="inviteLinkDisplay">
+                                Məlumatlar yüklənir...
+                            </div>
+                            <button class="copy-btn" onclick="copyInviteLink()" style="width: 100%;">
+                                <i class="fa-solid fa-copy"></i> Məlumatları Kopyala
+                            </button>
+                            <p style="text-align: center; margin-top: 8px; font-size: 10px; color: #6c757d;">
+                                Dostunuz qeydiyyat zamanı sizin dəvət kodunuzu daxil etməlidir!
+                            </p>
+                        </div>
+                        
+                        <div class="social-share-container">
+                            <div class="social-icon-btn whatsapp" onclick="shareOnWhatsApp()">
+                                <i class="fa-brands fa-whatsapp"></i>
+                            </div>
+                            <div class="social-icon-btn telegram" onclick="shareOnTelegram()">
+                                <i class="fa-brands fa-telegram"></i>
+                            </div>
+                            <div class="social-icon-btn tiktok" onclick="shareOnTikTok()">
+                                <i class="fa-brands fa-tiktok"></i>
+                            </div>
+                            <div class="social-icon-btn" style="background: #252525;" onclick="copyInviteLink()">
+                                <i class="fa-solid fa-link"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="referral-stats">
+                            <div class="stat-item">
+                                <div class="stat-value" id="successfulReferrals">0</div>
+                                <div class="stat-label">Uğurlu Dəvət</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="referralBonusTotal">0.00 AZN</div>
+                                <div class="stat-label">Cəmi Bonus</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="referralLimit">10</div>
+                                <div class="stat-label">Maksimum Limit</div>
+                            </div>
+                        </div>
+                        
+                        <div class="referral-container" style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba;">
+                            <h4 style="color: #856404;">Dəvət Bonus Qaydası</h4>
+                            <p style="font-size: 12px; margin-top: 3px;">
+                                Hər qeydiyyatdan keçən dostunuz üçün sizə **0.10 AZN** bonus verilir. Bonus yalnız ilk **10 uğurlu dəvət** üçün nəzərdə tutulub. </p>
+                        </div>
+                    </div>
+
+                    <div class="game-sub-screen" id="withdrawalScreen" style="display: none;">
+                        <h3 class="sub-header">💸 AZN Çıxarışı</h3> 
+                        
+                        <div class="user-id-container">
+                            <h4 style="margin-bottom: 8px; color: white;">🆔 Sizin User ID</h4>
+                            <div class="user-id-badge" id="withdrawalUserIdDisplay">Yüklənir...</div>
+                            <p style="color: #e0e0e0; font-size: 10px; margin-top: 6px;">
+                                Bu ID çıxarış sorğunuzda avtomatik olaraq adminə göndəriləcək
+                            </p>
+                        </div>
+
+                        <div class="withdrawal-info">
+                            <p><strong>Minimum çıxarış məbləği: 1.00 AZN</strong></p>
+                            <p><strong>Çıxarış limiti: 10 gündə 1 dəfə</strong></p>
+                            <p><strong>Maksimum çıxarış: 1000.00 AZN</strong></p>
+                            <p><strong>Çıxarış məlumatları avtomatik olaraq adminə göndəriləcək</strong></p>
+                        </div>
+
+                        <div class="withdrawal-warning">
+                            <p id="withdrawalTimerInfo">Növbəti çıxarış üçün: <strong id="nextWithdrawalTime">Hazır</strong></p>
+                        </div>
+                        
+                        <div class="friend-item">
+                            <div class="boost-info">
+                                <h4>Mövcud Balans:</h4>
+                                <p id="availableMoney">0.000000 AZN</p> 
+                            </div>
+                        </div>
+
+                        <form id="withdrawalForm">
+                            <div class="input-group">
+                                <label for="withdrawAmount">Çıxarmaq İstədiyiniz Məbləğ (AZN)</label> 
+                                <input type="number" step="0.01" id="withdrawAmount" placeholder="Məbləği daxil edin (Məs: 1.00)" required> 
+                                <div class="amount-input-hint" id="amountHint"></div>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="withdrawName">Ad</label>
+                                <input type="text" id="withdrawName" placeholder="Adınızı daxil edin" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="withdrawSurname">Soyad</label>
+                                <input type="text" id="withdrawSurname" placeholder="Soyadınızı daxil edin" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="withdrawPhone">Telefon Nömrəsi</label>
+                                <input type="tel" id="withdrawPhone" value="+994" placeholder="xx xxx xx xx" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="withdrawCardNumber">Kart Nömrəsi (16 Rəqəm)</label>
+                                <input type="text" id="withdrawCardNumber" placeholder="Kart Nömrəsini daxil edin" required pattern="\d{16}" maxlength="16">
+                            </div>
+                            <div class="input-group">
+                                <label for="withdrawCardHolder">Kart Sahibinin Adı Soyadı</label>
+                                <input type="text" id="withdrawCardHolder" placeholder="Kartın sahibinin ad/soyadı" required>
+                            </div>
+
+                            <button type="submit" class="btn" id="withdrawSubmitBtn">ÇIXARIŞ ET</button>
+                        </form>
+                    </div>
 
                 </div>
                 
@@ -1264,105 +1467,157 @@
                     </div>
                 </div>
 
+                <!-- ALT BANNER SİLİNDİ -->
+
             </div>
         </div>
         
-        <!-- ... modal-lar eyni qalır ... -->
-        
+        <div id="editProfileModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal('editProfileModal')">&times;</span>
+                <h2>Məlumatları Dəyişdir</h2>
+                <form id="editProfileForm">
+                    <div class="input-group">
+                        <label for="editName">Ad</label>
+                        <input type="text" id="editName" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="editSurname">Soyad</label>
+                        <input type="text" id="editSurname" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="editEmail">E-poçt (Mail)</label>
+                        <input type="email" id="editEmail" required>
+                    </div>
+                    <button type="submit" class="btn" style="margin-top: 12px;">Yadda Saxla</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="deleteProfileModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal('deleteProfileModal')">&times;</span>
+                <h2>Hesabı Silmə</h2>
+                <div class="message error" style="display: block;">
+                    Hesabınızı silməkdə əminsiniz? Bu əməliyyat geri qaytarılmayacaq!
+                </div>
+                <div class="input-group">
+                    <label for="deleteConfirm">Təsdiq üçün "SİL" yazın</label>
+                    <input type="text" id="deleteConfirm" placeholder="SİL" required>
+                </div>
+                <button class="btn delete-btn" onclick="deleteProfile()">Hesabımı Sil</button>
+            </div>
+        </div>
     </div>
 
     <script>
 // =================================================================
-// ADEXIUM PUSH-LIKE REKLAM SİSTEMİ - YENİLƏNMİŞ
+// ADEXIUM WIDGET INTEGRATION - YENİLƏNMİŞ VERSİYA
 // =================================================================
 
 let adexiumWidget = null;
 let adexiumInitialized = false;
-let adexiumTimer = null;
-let lastAdClosedTime = 0;
 
 function initializeAdExium() {
     try {
-        console.log('🔄 AdExium Push-like başladılır...');
+        // Telegram WebView kontekstində olub-olmadığımızı yoxla
+        const isTelegramWebView = window.Telegram && Telegram.WebApp;
         
-        if (typeof AdexiumWidget === 'undefined') {
+        if (!isTelegramWebView) {
+            console.log('ℹ️ AdExium: Telegram kontekstində deyilik, test rejimində işləyirik');
+            if (!window.Telegram) window.Telegram = {};
+            if (!Telegram.WebApp) {
+                Telegram.WebApp = {
+                    initData: '',
+                    initDataUnsafe: {},
+                    version: '6.0',
+                    platform: 'web',
+                    colorScheme: 'light',
+                    themeParams: {},
+                    isExpanded: true,
+                    viewportHeight: 600,
+                    viewportStableHeight: 600,
+                    isClosingConfirmationEnabled: false,
+                    headerColor: '#000000',
+                    backgroundColor: '#ffffff',
+                    BackButton: { isVisible: false, show(){}, hide(){}, onClick(cb){} },
+                    MainButton: { text:'', isVisible:false, show(){}, hide(){}, enable(){}, disable(){}, onClick(cb){} },
+                    ready(){ console.log('Telegram WebApp ready (mock)'); },
+                    expand(){ console.log('Telegram WebApp expand (mock)'); },
+                    close(){ console.log('Telegram WebApp close (mock)'); }
+                };
+            }
+        }
+
+        if (typeof AdexiumWidget !== 'undefined') {
+            console.log('🔄 AdExium Widget başladılır...');
+            adexiumWidget = new AdexiumWidget({
+                width: 'a4ec28f0-91d1-4929-a965-e5131e577cae',
+                adformat: 'push-like'
+            });
+
+            if (typeof adexiumWidget.autohide === 'function') adexiumWidget.autohide();
+            
+            adexiumInitialized = true;
+            console.log('✅ AdExium Widget uğurla başladıldı');
+            return true;
+        } else {
             console.log('❌ AdExium SDK yüklənməyib');
             return false;
         }
-
-        // Push-like reklamı başlat
-        adexiumWidget = new AdexiumWidget({
-            wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
-            adFormat: 'push-like'
-        });
-        
-        // Reklam bağlandıqda zamanı qeyd et
-        if (typeof adexiumWidget.onClose === 'function') {
-            adexiumWidget.onClose(() => {
-                console.log('✅ AdExium reklamı bağlandı');
-                lastAdClosedTime = Date.now();
-                startAdExiumTimer(); // 15 saniyə sonra yenidən aktiv et
-            });
-        }
-        
-        adexiumInitialized = true;
-        console.log('✅ AdExium Push-like uğurla başladıldı');
-        return true;
     } catch (error) {
-        console.error('❌ AdExium xətası:', error);
+        console.error('❌ AdExium başlatma xətası:', error);
+        showFallbackAd();
         return false;
     }
-}
-
-function startAdExiumTimer() {
-    // Köhnə timerı təmizlə
-    if (adexiumTimer) {
-        clearTimeout(adexiumTimer);
-    }
-    
-    // 15 saniyə sonra reklamı aktiv et
-    adexiumTimer = setTimeout(() => {
-        console.log('🔄 15 saniyə bitdi, AdExium aktiv edilir...');
-        showAdExiumAd();
-    }, 15000); // 15 saniyə
 }
 
 function showAdExiumAd() {
     if (!adexiumInitialized) {
-        console.log('❌ AdExium hazır deyil');
-        return false;
+        if (!initializeAdExium()) {
+            console.error('❌ AdExium sistemi hazır deyil');
+            showFallbackAd();
+            return false;
+        }
     }
 
     try {
-        // Reklamı göstər
+        console.log('🔄 AdExium reklamı göstərilir...');
         if (typeof adexiumWidget.show === 'function') {
             adexiumWidget.show();
             console.log('✅ AdExium reklamı göstərildi');
             return true;
+        } else {
+            console.warn('⚠️ AdExium show metodu tapılmadı');
+            showFallbackAd();
+            return false;
         }
     } catch (error) {
         console.error('❌ AdExium reklam göstərilmə xətası:', error);
+        showFallbackAd();
         return false;
     }
 }
 
-// Oyunçu giriş etdikdə AdExium başlat
-function initializeAdExiumAfterLogin() {
-    console.log('🔄 Oyunçu giriş etdi, AdExium başladılır...');
-    
-    // İlk dəfə AdExium başlat
-    setTimeout(() => {
-        initializeAdExium();
-        
-        // İlk reklamı 10 saniyə sonra göstər (oyuna mane olmamaq üçün)
-        setTimeout(() => {
-            if (adexiumInitialized) {
-                showAdExiumAd();
-            }
-        }, 10000);
-    }, 2000);
+function showFallbackAd() {
+    console.log('🔄 Alternativ reklam göstərilir...');
+    const adContainer = document.getElementById('adexium-ad-placeholder');
+    if (adContainer) {
+        adContainer.innerHTML = `
+            <div style="padding: 10px; background: linear-gradient(135deg, #0f3460, #1a1a2e); color: white; border-radius: 8px; text-align: center;">
+                <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">🎮 CASPER GAME</div>
+                <div style="font-size: 10px; opacity: 0.8;">Daha çox qazanmaq üçün klikləməyə davam edin!</div>
+                <div style="font-size: 8px; margin-top: 5px; color: #00b894;">Reklam sistemi hazırlanır...</div>
+            </div>
+        `;
+    }
 }
 
+function checkAdExiumStatus() {
+    if (typeof AdexiumWidget === 'undefined') return 'sdk_not_loaded';
+    if (!adexiumInitialized) return 'not_initialized';
+    return 'active';
+}
 // =================================================================
 // FIREBASE KONFİQURASİYASI
 // =================================================================
@@ -1654,7 +1909,291 @@ function showSuccess(message) {
 }
 
 // =================================================================
-// GİRİŞ FUNKSİYASI - YENİLƏNMİŞ (ADEXIUM ƏLAVƏ EDİLDİ)
+// DƏVƏT LİNKİ SİSTEMİ FUNKSİYALARI
+// =================================================================
+
+function generateInviteLink() {
+    return TELEGRAM_BOT_URL;
+}
+
+function updateInviteLinkDisplay() {
+    const inviteLink = generateInviteLink();
+    if (inviteLink && currentUserState.referralCode) {
+        inviteLinkDisplay.innerHTML = `
+            <div style="margin-bottom: 12px; text-align: center;">
+                <strong style="color: #0f3460;">📱 Telegram Bot Linki:</strong><br>
+                <div style="background: white; padding: 8px; border-radius: 6px; margin: 6px 0; border: 1px solid #e9ecef; word-break: break-all;">
+                    ${inviteLink}
+                </div>
+            </div>
+            <div style="margin-bottom: 12px; text-align: center;">
+                <strong style="color: #0f3460;">🎯 Dəvət Kodunuz:</strong><br>
+                <div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 6px; margin: 6px 0; font-weight: bold; font-size: 14px; border: 1px dashed #00b894;">
+                    ${currentUserState.referralCode}
+                </div>
+            </div>
+            <div style="margin-top: 8px; padding: 10px; background: #fff3cd; border-radius: 6px; font-size: 10px; color: #856404; border: 1px solid #ffeeba;">
+                ⚠️ <strong>Diqqət:</strong> Dostunuz qeydiyyatdan keçərkən yuxarıdakı dəvət kodunuzu daxil etməlidir!
+            </div>
+        `;
+    } else {
+        inviteLinkDisplay.textContent = "Məlumatlar yüklənir...";
+    }
+}
+
+function copyInviteLink() {
+    const inviteLink = generateInviteLink();
+    const referralCode = currentUserState.referralCode;
+    
+    if (!inviteLink || !referralCode) {
+        alert("Dəvət məlumatları hazır deyil.");
+        return;
+    }
+
+    const fullInfo = `🎮 Casper Game - Dost Dəvət Məlumatları:
+
+📱 Telegram Bot: ${inviteLink}
+🎯 Dəvət Kodum: ${referralCode}
+
+💡 Qeydiyyat zamanı dəvət kodumu daxil et!`;
+    
+    navigator.clipboard.writeText(fullInfo).then(() => {
+        alert("✅ Dəvət məlumatları uğurla kopyalandı!\n\nTelegram Bot Linki və Dəvət Kodunuz kopyalandı.");
+    }).catch(() => {
+        const tempInput = document.createElement('textarea');
+        tempInput.value = fullInfo;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        alert("✅ Dəvət məlumatları uğurla kopyalandı!");
+    });
+}
+
+function shareOnWhatsApp() {
+    const inviteLink = generateInviteLink();
+    const referralCode = currentUserState.referralCode;
+    if (!inviteLink || !referralCode) return;
+    
+    const message = `🎮 Casper Game - Dost Dəvəti
+
+Salam! Casper Game-də mənə qoşul və pul qazan! 
+
+📱 Telegram Bot: ${inviteLink}
+🎯 Dəvət Kodum: ${referralCode}
+
+💡 Qeydiyyat zamanı yuxarıdakı dəvət kodumu daxil et! 🚀`;
+    
+    const encodedMessage = encodeURIComponent(message);
+    const url = `https://wa.me/?text=${encodedMessage}`;
+    window.open(url, '_blank');
+}
+
+function shareOnTelegram() {
+    const inviteLink = generateInviteLink();
+    const referralCode = currentUserState.referralCode;
+    if (!inviteLink || !referralCode) return;
+    
+    const message = `🎮 Casper Game - Dost Dəvəti
+
+Salam! Casper Game-də mənə qoşul və pul qazan! 
+
+📱 Telegram Bot: ${inviteLink}
+🎯 Dəvət Kodum: ${referralCode}
+
+💡 Qeydiyyat zamanı yuxarıdakı dəvət kodumu daxil et! 🚀`;
+    
+    const encodedMessage = encodeURIComponent(message);
+    const url = `https://t.me/share/url?url=${encodeURIComponent(inviteLink)}&text=${encodedMessage}`;
+    window.open(url, '_blank');
+}
+
+function shareOnTikTok() {
+    const inviteLink = generateInviteLink();
+    const referralCode = currentUserState.referralCode;
+    if (!inviteLink || !referralCode) return;
+    
+    const message = `🎮 Casper Game - Dost Dəvəti
+
+Salam! Casper Game-də mənə qoşul və pul qazan! 
+
+Dəvət Kodum: ${referralCode}
+
+Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
+    
+    const encodedMessage = encodeURIComponent(message);
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'Casper Game - Dost Dəvəti',
+            text: message,
+            url: inviteLink
+        }).then(() => {
+            console.log('TikTok paylaşım uğurlu');
+        }).catch((error) => {
+            console.log('TikTok paylaşım xətası:', error);
+            copyInviteLink();
+        });
+    } else {
+        copyInviteLink();
+        alert("TikTok paylaşımı üçün məlumatlar kopyalandı! TikTok-da paylaşın.");
+    }
+}
+
+function checkUrlForReferralCode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    
+    if (refCode) {
+        document.getElementById('registerReferralCode').value = refCode;
+        showSuccess(`Dəvət kodu avtomatik dolduruldu: ${refCode}`);
+    }
+}
+
+// =================================================================
+// ŞƏKİL AYARLARI VƏ YÜKLƏNMƏSİ
+// =================================================================
+
+const IMAGE_CONFIG = {
+    splashImage: "https://i.ibb.co/JFndRdvY/casper.jpg",
+    gameIcon: "https://i.ibb.co/hp0mdt1/2025-10-31-T103543-300-removebg-preview.png",
+    fallbackText: "👻"
+};
+
+function loadImages() {
+    const splashImg = document.querySelector('.splash-image img');
+    const gameIcon = document.getElementById('clickImage');
+    
+    splashImg.src = IMAGE_CONFIG.splashImage;
+    splashImg.alt = "Casper Game Logo";
+    
+    gameIcon.src = IMAGE_CONFIG.gameIcon;
+    gameIcon.alt = "Casper";
+    
+    const handleImageError = (img, fallback) => {
+        img.onerror = null;
+        img.style.display = 'none';
+        img.parentElement.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:60px;color:white;">${fallback}</div>`;
+    };
+    
+    splashImg.onerror = () => handleImageError(splashImg, IMAGE_CONFIG.fallbackText);
+    gameIcon.onerror = () => handleImageError(gameIcon, IMAGE_CONFIG.fallbackText);
+}
+
+// =================================================================
+// OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR
+// =================================================================
+
+let users = {};
+const ENERGY_CONSUMPTION_PER_CLICK = 1;     
+const MAX_ENERGY_CAP = 100000;              
+
+const AD_INTERVAL = 30;
+const AD_COUNT = 3;
+const AD_DURATION = 10;
+const AD_REWARD_PER_AD = 0.0001;
+
+const ENERGY_REGEN_INTERVAL = 1000;         
+const MONEY_PER_CLICK = 0.000003;
+const MONEY_DECIMAL_PLACES = 6;         
+const REFERRAL_BONUS_AMOUNT = 0.10;
+
+const HOURS_FOR_FULL_CHARGE = 24;
+const SECONDS_FOR_FULL_CHARGE = HOURS_FOR_FULL_CHARGE * 60 * 60;
+const ENERGY_REGEN_PER_SECOND = MAX_ENERGY_CAP / SECONDS_FOR_FULL_CHARGE;
+
+const BASE_REGEN_RATE = 1000 / 60; 
+const REFERRAL_BONUS_LIMIT = 10;
+
+// MINIMUM ÇIXARIŞ MƏBLƏĞİ 1.00 AZN
+const MIN_WITHDRAWAL_AMOUNT = 1.00;
+const WITHDRAWAL_COOLDOWN_DAYS = 10;
+const MAX_WITHDRAWAL_AMOUNT = 1000.00;
+const ADMIN_WHATSAPP_NUMBER = "0513248685";
+
+const BASE_INVITE_URL = window.location.href.split('?')[0];
+
+const ads = [
+    {
+        id: 1,
+        title: "🎮 YENİ OYUN TƏKLİFİ",
+        description: "Bu mobil oyunu yükləyin və xüsusi bonus qazanın!",
+        color: "#ff6b6b",
+        duration: 10,
+        type: "premium"
+    },
+    {
+        id: 2,
+        title: "🛒 ONLAYN ALIŞ-VERİŞ",
+        description: "Xüsusi endirimlərdən yararlanın!",
+        color: "#4ecdc4",
+        duration: 10,
+        type: "special"
+    },
+    {
+        id: 3,
+        title: "📱 TƏTBİQ TƏKLİFİ",
+        description: "Bu faydalı tətbiqi yükləyin!",
+        color: "#45b7d1",
+        duration: 10,
+        type: "bonus"
+    }
+];
+
+let currentAdIndex = 0;
+let adTimerInterval;
+let adTimeLeft = 0;
+let totalAdRewardEarned = 0;
+
+let currentUserState = {
+    cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
+    maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP,
+    clicksUntilAd: AD_INTERVAL, totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
+    energyRegenRate: BASE_REGEN_RATE, scorePerClick: 1, lastEnergyUpdate: Date.now(), 
+    lastClickTime: Date.now(), successfulReferrals: 0, referralBonusEarned: 0.00, 
+    lastWithdrawalDate: null, registrationDate: null
+};
+
+// DOM Elementləri
+const splashScreen = document.getElementById('splashScreen');
+const mainContent = document.getElementById('mainContent');
+const loginScreen = document.getElementById('loginScreen');
+const gameScreen = document.getElementById('gameScreen');
+const adScreen = document.getElementById('adScreen');
+const adContent = document.getElementById('adContent');
+const mainIcon = document.getElementById('mainIcon');
+const welcomeText = document.getElementById('welcomeText');
+const welcomeMessage = document.getElementById('welcomeMessage');
+const personalWelcomeText = document.getElementById('personalWelcomeText');
+const inviteLinkDisplay = document.getElementById('inviteLinkDisplay');
+const withdrawalUserIdDisplay = document.getElementById('withdrawalUserIdDisplay');
+
+const energyFillEl = document.getElementById('energyFill');
+const energyTextEl = document.getElementById('energyText');
+const totalMoneyEl = document.getElementById('totalMoney'); 
+const clicksUntilAdDisplay = document.getElementById('clicksUntilAdDisplay');
+
+const profileCGIDEl = document.getElementById('profileCGID');
+const profileUsernameEl = document.getElementById('profileUsername');
+const profileFullNameEl = document.getElementById('profileFullName');
+const profilePhoneEl = document.getElementById('profilePhone');
+const profileEmailEl = document.getElementById('profileEmail');
+const profileMoneyEl = document.getElementById('profileMoney');
+const profileReferralCodeEl = document.getElementById('profileReferralCode');
+
+const availableMoneyEl = document.getElementById('availableMoney');
+const successfulReferralsEl = document.getElementById('successfulReferrals');
+const referralBonusTotalEl = document.getElementById('referralBonusTotal');
+const referralLimitEl = document.getElementById('referralLimit');
+const nextWithdrawalTimeEl = document.getElementById('nextWithdrawalTime');
+const withdrawalTimerInfoEl = document.getElementById('withdrawalTimerInfo');
+const withdrawSubmitBtn = document.getElementById('withdrawSubmitBtn');
+
+const navItems = document.querySelectorAll('.navbar .nav-item');
+const subScreens = document.querySelectorAll('.game-sub-screen');
+
+// =================================================================
+// GİRİŞ FUNKSİYASI - YENİLƏNMİŞ
 // =================================================================
 document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -1702,9 +2241,6 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
                 gameScreen.style.display = 'flex';
                 switchScreen('tapScreen'); 
                 updateEnergyDisplay();
-                
-                // ✅ OYUNÇU GİRİŞ ETDİKDƏN SONRA ADEXIUM BAŞLAT
-                initializeAdExiumAfterLogin();
                 
                 saveUserState();
             }, 1500);
@@ -1773,7 +2309,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
             lastEnergyUpdate: Date.now(),
             lastClickTime: Date.now(),
             lastWithdrawalDate: null,
-            referredBy: referralCodeInput || null,
+            referredBy: referralCodeInput || null, // kimdən dəvət alıb
         };
 
         // 🔥 1. Əvvəlcə yeni istifadəçini Firestore-a yaz
@@ -1822,63 +2358,158 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
 });
 
 // =================================================================
-// OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR
+// REKLAM SİSTEMİ FUNKSİYALARI
 // =================================================================
 
-let users = {};
-const ENERGY_CONSUMPTION_PER_CLICK = 1;     
-const MAX_ENERGY_CAP = 100000;              
+function showAd() {
+    if (adScreen.style.display === 'flex') return;
+    
+    showAdsGram30ClickReward();
+}
 
-const AD_INTERVAL = 30;
-const AD_COUNT = 3;
-const AD_DURATION = 10;
-const AD_REWARD_PER_AD = 0.0001;
+function showNextAd() {
+    showAdsGram30ClickReward();
+}
 
-const ENERGY_REGEN_INTERVAL = 1000;         
-const MONEY_PER_CLICK = 0.000003;
-const MONEY_DECIMAL_PLACES = 6;         
-const REFERRAL_BONUS_AMOUNT = 0.10;
+function startAdTimer() {
+    setTimeout(() => {
+        completeCurrentAd();
+    }, 1000);
+}
 
-const HOURS_FOR_FULL_CHARGE = 24;
-const SECONDS_FOR_FULL_CHARGE = HOURS_FOR_FULL_CHARGE * 60 * 60;
-const ENERGY_REGEN_PER_SECOND = MAX_ENERGY_CAP / SECONDS_FOR_FULL_CHARGE;
+function completeCurrentAd() {
+    currentUserState.clicksUntilAd = AD_INTERVAL;
+    updateEnergyDisplay();
+}
 
-const BASE_REGEN_RATE = 1000 / 60; 
-const REFERRAL_BONUS_LIMIT = 10;
+function skipAd() {
+    return;
+}
 
-// MINIMUM ÇIXARIŞ MƏBLƏĞİ 1.00 AZN
-const MIN_WITHDRAWAL_AMOUNT = 1.00;
-const WITHDRAWAL_COOLDOWN_DAYS = 10;
-const MAX_WITHDRAWAL_AMOUNT = 1000.00;
-const ADMIN_WHATSAPP_NUMBER = "0513248685";
+function closeAd() {
+    currentUserState.clicksUntilAd = AD_INTERVAL;
+    updateEnergyDisplay();
+}
 
-const BASE_INVITE_URL = window.location.href.split('?')[0];
+// =================================================================
+// WHATSAPP GÖNDƏRMƏ FUNKSİYASI
+// =================================================================
 
-let currentUserState = {
-    cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
-    maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP,
-    clicksUntilAd: AD_INTERVAL, totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
-    energyRegenRate: BASE_REGEN_RATE, scorePerClick: 1, lastEnergyUpdate: Date.now(), 
-    lastClickTime: Date.now(), successfulReferrals: 0, referralBonusEarned: 0.00, 
-    lastWithdrawalDate: null, registrationDate: null
-};
+function sendWithdrawalToWhatsApp(withdrawalData) {
+    const message = `💰 YENİ ÇIXARIŞ SORĞUSU 💰
 
-// DOM Elementləri
-const splashScreen = document.getElementById('splashScreen');
-const mainContent = document.getElementById('mainContent');
-const loginScreen = document.getElementById('loginScreen');
-const gameScreen = document.getElementById('gameScreen');
-const welcomeText = document.getElementById('welcomeText');
-const welcomeMessage = document.getElementById('welcomeMessage');
-const personalWelcomeText = document.getElementById('personalWelcomeText');
+👤 İstifadəçi Məlumatları:
+• CG ID: ${withdrawalData.userId}
+• İstifadəçi adı: ${withdrawalData.username}
+• Ad Soyad: ${withdrawalData.fullName}
+• Telefon: ${withdrawalData.phone}
+• E-poçt: ${withdrawalData.email}
 
-const energyFillEl = document.getElementById('energyFill');
-const energyTextEl = document.getElementById('energyText');
-const totalMoneyEl = document.getElementById('totalMoney'); 
-const clicksUntilAdDisplay = document.getElementById('clicksUntilAdDisplay');
+💳 Çıxarış Məlumatları:
+• Məbləğ: ${withdrawalData.amount} AZN
+• Kart nömrəsi: ${withdrawalData.cardNumber}
+• Kart sahibi: ${withdrawalData.cardHolder}
 
-const navItems = document.querySelectorAll('.navbar .nav-item');
-const subScreens = document.querySelectorAll('.game-sub-screen');
+📊 Oyun Statistikası:
+• Cəmi qazanc: ${withdrawalData.totalMoney} AZN
+• Uğurlu dəvətlər: ${withdrawalData.successfulReferrals}
+• Referral bonus: ${withdrawalData.referralBonus} AZN
+• Ümumi kliklər: ${withdrawalData.totalClicks}
+
+⏰ Çıxarış tarixi: ${withdrawalData.withdrawalDate}`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodedMessage}`;
+    
+    window.open(whatsappUrl, '_blank');
+    
+    return true;
+}
+
+// =================================================================
+// ÇIXARIŞ SİSTEMİ FUNKSİYALARI
+// =================================================================
+
+function checkWithdrawalAvailability() {
+    if (!currentUserState.username) return false;
+    
+    const lastWithdrawal = currentUserState.lastWithdrawalDate;
+    if (!lastWithdrawal) return true;
+    
+    const now = new Date();
+    const lastWithdrawalDate = new Date(lastWithdrawal);
+    const timeDiff = now.getTime() - lastWithdrawalDate.getTime();
+    const daysDiff = timeDiff / (1000 * 3600 * 24);
+    
+    return daysDiff >= WITHDRAWAL_COOLDOWN_DAYS;
+}
+
+function getNextWithdrawalTime() {
+    if (!currentUserState.lastWithdrawalDate) {
+        return { available: true, timeLeft: 0 };
+    }
+    
+    const lastWithdrawal = new Date(currentUserState.lastWithdrawalDate);
+    const nextWithdrawal = new Date(lastWithdrawal);
+    nextWithdrawal.setDate(nextWithdrawal.getDate() + WITHDRAWAL_COOLDOWN_DAYS);
+    
+    const now = new Date();
+    const timeLeft = nextWithdrawal.getTime() - now.getTime();
+    
+    if (timeLeft <= 0) {
+        return { available: true, timeLeft: 0 };
+    }
+    
+    return {
+        available: false,
+        timeLeft: timeLeft,
+        nextDate: nextWithdrawal
+    };
+}
+
+function formatTimeLeft(milliseconds) {
+    const days = Math.floor(milliseconds / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((milliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (days > 0) {
+        return `${days} gün ${hours} saat`;
+    } else if (hours > 0) {
+        return `${hours} saat ${minutes} dəqiqə`;
+    } else {
+        return `${minutes} dəqiqə`;
+    }
+}
+
+function updateWithdrawalDisplay() {
+    if (!currentUserState.username) return;
+    
+    const withdrawalStatus = getNextWithdrawalTime();
+    
+    // User ID göstər
+    withdrawalUserIdDisplay.textContent = currentUserState.cgId || 'N/A';
+    
+    if (withdrawalStatus.available) {
+        nextWithdrawalTimeEl.textContent = "Hazır";
+        withdrawalTimerInfoEl.innerHTML = 'Növbəti çıxarış üçün: <strong style="color: #00b894;">Hazır</strong>';
+        withdrawSubmitBtn.disabled = false;
+        withdrawSubmitBtn.style.opacity = "1";
+        withdrawSubmitBtn.textContent = "ÇIXARIŞ ET";
+        withdrawSubmitBtn.classList.remove('withdraw-btn-disabled');
+    } else {
+        const timeLeftFormatted = formatTimeLeft(withdrawalStatus.timeLeft);
+        nextWithdrawalTimeEl.textContent = timeLeftFormatted;
+        withdrawalTimerInfoEl.innerHTML = `Növbəti çıxarış üçün: <strong style="color: #ff6b6b;">${timeLeftFormatted}</strong>`;
+        withdrawSubmitBtn.disabled = true;
+        withdrawSubmitBtn.style.opacity = "0.6";
+        withdrawSubmitBtn.textContent = `10 GÜN GÖZLƏMƏ (${timeLeftFormatted})`;
+        withdrawSubmitBtn.classList.add('withdraw-btn-disabled');
+    }
+    
+    availableMoneyEl.textContent = formatMoney(currentUserState.totalMoney);
+    
+    setTimeout(updateWithdrawalDisplay, 60000);
+}
 
 // =================================================================
 // ƏSAS OYUN FUNKSİYALARI
@@ -1947,13 +2578,58 @@ function updateEnergyDisplay() {
     
     totalMoneyEl.textContent = formatMoney(state.totalMoney);
     clicksUntilAdDisplay.textContent = state.clicksUntilAd;
+    
+    if (document.getElementById('friendsScreen').classList.contains('active')) {
+        updateInviteLinkDisplay();
+    }
+
+    if (document.getElementById('profileScreen').classList.contains('active')) {
+        updateProfileDisplay();
+    }
+
+    availableMoneyEl.textContent = formatMoney(state.totalMoney);
+    
+    // DƏVƏT STATISTIKASINI YENİLƏ
+    successfulReferralsEl.textContent = state.successfulReferrals || 0;
+    referralBonusTotalEl.textContent = formatMoney(state.referralBonusEarned || 0);
+    referralLimitEl.textContent = REFERRAL_BONUS_LIMIT;
 
     saveUserState();
 }
 
 function updateProfileDisplay() {
     const state = currentUserState;
-    // ... profil yeniləmə kodu
+
+    // CG ID GÖSTƏR
+    profileCGIDEl.textContent = state.cgId || 'N/A';
+    profileUsernameEl.textContent = state.username || 'N/A';
+    profileFullNameEl.textContent = (state.name && state.surname) ? `${state.name} ${state.surname}` : 'N/A';
+    profilePhoneEl.textContent = state.phone || 'N/A';
+    profileEmailEl.textContent = state.email || 'N/A';
+    profileMoneyEl.textContent = formatMoney(state.totalMoney);
+    profileReferralCodeEl.textContent = state.referralCode || 'GENERATING...';
+    
+    // DƏVƏT STATISTIKASINI YENİLƏ
+    successfulReferralsEl.textContent = state.successfulReferrals || 0;
+    referralBonusTotalEl.textContent = formatMoney(state.referralBonusEarned || 0);
+    referralLimitEl.textContent = REFERRAL_BONUS_LIMIT;
+
+    if (document.getElementById('withdrawalScreen').classList.contains('active')) {
+        updateWithdrawalDisplay();
+    }
+}
+
+function copyReferralCode() {
+    const code = currentUserState.referralCode;
+    if (code) {
+        navigator.clipboard.writeText(code).then(() => {
+            alert(`Dəvət Kodu: ${code} uğurla kopyalandı!`);
+        }).catch(() => {
+            alert(`Dəvət Kodu: ${code} uğurla kopyalandı!`);
+        });
+    } else {
+        alert("Dəvət kodu hələ mövcud deyil.");
+    }
 }
 
 function simulateEnergyRegen() {
@@ -2015,6 +2691,12 @@ function switchScreen(screenName) {
         screen.style.display = isTargetScreen ? 'block' : 'none'; 
         if (isTargetScreen) {
             screen.classList.add('active');
+            if (screenName === 'friendsScreen') {
+                updateInviteLinkDisplay();
+            }
+            if (screenName === 'profileScreen' || screenName === 'friendsScreen' || screenName === 'withdrawalScreen') {
+                updateProfileDisplay();
+            }
         } else {
             screen.classList.remove('active');
         }
@@ -2043,12 +2725,27 @@ navItems.forEach(item => {
 
 function logout() {
     currentUserState = {
-        cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
-        maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP,
-        clicksUntilAd: AD_INTERVAL, totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
-        energyRegenRate: BASE_REGEN_RATE, scorePerClick: 1, lastEnergyUpdate: Date.now(), 
-        lastClickTime: Date.now(), successfulReferrals: 0, referralBonusEarned: 0.00, 
-        lastWithdrawalDate: null, registrationDate: null
+        cgId: null, 
+        username: null, 
+        name: null, 
+        surname: null, 
+        phone: null, 
+        email: null, 
+        referralCode: null, 
+        maxEnergy: MAX_ENERGY_CAP, 
+        currentEnergy: MAX_ENERGY_CAP, 
+        clicksUntilAd: AD_INTERVAL,  // ✅ DÜZƏLDİ - : işarəsi istifadə edilməlidir
+        totalClicks: 0, 
+        totalMoney: 0.00, 
+        energyUsed: 0, 
+        energyRegenRate: BASE_REGEN_RATE, 
+        successfulReferrals: 0, 
+        referralBonusEarned: 0.00, 
+        scorePerClick: 1, 
+        lastEnergyUpdate: Date.now(), 
+        lastClickTime: Date.now(), 
+        lastWithdrawalDate: null, 
+        registrationDate: null
     };
 
     gameScreen.style.display = 'none';
@@ -2067,6 +2764,7 @@ function switchToLogin() {
     document.getElementById('registerForm').style.display = 'none'; 
     hideMessages();
     document.getElementById('registerPhone').value = '+994';
+    document.getElementById('withdrawPhone').value = '+994';
 }
 
 function switchToRegister() {
@@ -2078,10 +2776,244 @@ function switchToRegister() {
     document.getElementById('loginForm').style.display = 'none'; 
     hideMessages();
     document.getElementById('registerPhone').value = '+994';
+    document.getElementById('withdrawPhone').value = '+994';
 }
 
 document.getElementById('loginTab').addEventListener('click', switchToLogin);
 document.getElementById('registerTab').addEventListener('click', switchToRegister);
+
+function enforcePlus994(event) {
+    const input = event.target;
+    if (!input.value.startsWith('+994')) {
+        input.value = '+994';
+    }
+}
+document.getElementById('registerPhone').addEventListener('input', enforcePlus994);
+document.getElementById('withdrawPhone').addEventListener('input', enforcePlus994);
+
+// Modal funksiyaları
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex';
+        
+        if (modalId === 'editProfileModal') {
+            document.getElementById('editName').value = currentUserState.name || '';
+            document.getElementById('editSurname').value = currentUserState.surname || '';
+            document.getElementById('editEmail').value = currentUserState.email || '';
+        }
+    }
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = "none";
+    }
+}
+
+document.getElementById('editProfileForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const newName = document.getElementById('editName').value.trim();
+    const newSurname = document.getElementById('editSurname').value.trim();
+    const newEmail = document.getElementById('editEmail').value.trim();
+
+    if (newName && newSurname && newEmail) {
+        currentUserState.name = newName;
+        currentUserState.surname = newSurname;
+        currentUserState.email = newEmail;
+        
+        await saveUserState();
+        updateProfileDisplay();
+        closeModal('editProfileModal');
+        alert("Profil məlumatlarınız uğurla yeniləndi!");
+    } else {
+        alert("Zəhmət olmasa bütün sahələri doldurun.");
+    }
+});
+
+async function deleteProfile() {
+    const confirmText = document.getElementById('deleteConfirm').value.trim();
+
+    if (confirmText !== 'SİL') {
+        alert("Hesabınızı silmək üçün zəhmət olmasa \"SİL\" sözünü böyük hərflərlə daxil edin.");
+        return;
+    }
+    
+    if (currentUserState.username) {
+        try {
+            await db.collection('users').doc(currentUserState.username).delete();
+            alert("Hesabınız uğurla silindi.");
+            closeModal('deleteProfileModal');
+            logout(); 
+        } catch (error) {
+            console.error('Hesab silmə xətası:', error);
+            alert("Hesab silinərkən xəta baş verdi.");
+        }
+    }
+}
+
+// Çıxarış məbləği real-time validasiyası
+document.getElementById('withdrawAmount').addEventListener('input', function(e) {
+    const amount = parseFloat(e.target.value) || 0;
+    const hint = document.getElementById('amountHint');
+    
+    if (amount < MIN_WITHDRAWAL_AMOUNT) {
+        hint.innerHTML = `<span style="color: #dc3545;">⚠️ Minimum ${MIN_WITHDRAWAL_AMOUNT.toFixed(2)} AZN</span>`;
+    } else if (amount > currentUserState.totalMoney) {
+        hint.innerHTML = `<span style="color: #dc3545;">⚠️ Balansınız kifayət deyil</span>`;
+    } else if (amount > MAX_WITHDRAWAL_AMOUNT) {
+        hint.innerHTML = `<span style="color: #dc3545;">⚠️ Maksimum ${MAX_WITHDRAWAL_AMOUNT.toFixed(2)} AZN</span>`;
+    } else {
+        hint.innerHTML = `<span style="color: #28a745;">✓ Məbləğ uyğundur</span>`;
+    }
+});
+
+// =================================================================
+// ÇIXARIŞ FORM FUNKSİYASI
+// =================================================================
+document.getElementById('withdrawalForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const amountAZN = parseFloat(document.getElementById('withdrawAmount').value);
+    
+    const name = document.getElementById('withdrawName').value.trim();
+    const surname = document.getElementById('withdrawSurname').value.trim();
+    const phone = document.getElementById('withdrawPhone').value.trim();
+    const cardNumber = document.getElementById('withdrawCardNumber').value.trim();
+    const cardHolder = document.getElementById('withdrawCardHolder').value.trim();
+    
+    if (!amountAZN || !name || !surname || !phone || !cardNumber || !cardHolder) {
+         alert("Zəhmət olmasa bütün sahələri doldurun.");
+         return;
+    }
+    
+    if (cardNumber.length !== 16 || !/^\d{16}$/.test(cardNumber)) {
+        alert("Kart nömrəsi 16 rəqəmdən ibarət olmalıdır.");
+        return;
+    }
+
+    // MINIMUM ÇIXARIŞ 1.00 AZN
+    if (amountAZN < MIN_WITHDRAWAL_AMOUNT) {
+        alert(`Minimum çıxarış məbləği ${MIN_WITHDRAWAL_AMOUNT.toFixed(2)} AZN-dir.`);
+        return;
+    }
+    
+    if (amountAZN > MAX_WITHDRAWAL_AMOUNT) {
+        alert(`Maksimum çıxarış məbləği ${MAX_WITHDRAWAL_AMOUNT.toFixed(2)} AZN-dir.`);
+        return;
+    }
+    
+    if (amountAZN > currentUserState.totalMoney) {
+        alert("Balansınızda kifayət qədər pul yoxdur.");
+        return;
+    }
+
+    if (!checkWithdrawalAvailability()) {
+        const withdrawalStatus = getNextWithdrawalTime();
+        const timeLeftFormatted = formatTimeLeft(withdrawalStatus.timeLeft);
+        alert(`Çıxarış etmək üçün ${timeLeftFormatted} gözləməlisiniz.`);
+        return;
+    }
+
+    const withdrawalData = {
+        userId: currentUserState.cgId,
+        username: currentUserState.username,
+        fullName: `${name} ${surname}`,
+        phone: phone,
+        email: currentUserState.email,
+        amount: amountAZN.toFixed(2),
+        cardNumber: cardNumber,
+        cardHolder: cardHolder,
+        totalMoney: formatMoney(currentUserState.totalMoney),
+        successfulReferrals: currentUserState.successfulReferrals,
+        referralBonus: formatMoney(currentUserState.referralBonusEarned),
+        totalClicks: currentUserState.totalClicks,
+        withdrawalDate: new Date().toLocaleString('az-AZ')
+    };
+
+    const whatsappSent = sendWithdrawalToWhatsApp(withdrawalData);
+
+    if (whatsappSent) {
+        currentUserState.totalMoney -= amountAZN;
+        currentUserState.lastWithdrawalDate = new Date().toISOString();
+        
+        // Formu təmizlə
+        document.getElementById('withdrawAmount').value = '';
+        document.getElementById('withdrawName').value = '';
+        document.getElementById('withdrawSurname').value = '';
+        document.getElementById('withdrawPhone').value = '+994';
+        document.getElementById('withdrawCardNumber').value = '';
+        document.getElementById('withdrawCardHolder').value = '';
+
+        await saveUserState();
+        updateEnergyDisplay();
+        updateWithdrawalDisplay();
+        
+        alert(`✅ ${amountAZN.toFixed(2)} AZN çıxarış sorğusu uğurla göndərildi! Admin sizinlə əlaqə saxlayacaq.\n\nNövbəti çıxarışı ${WITHDRAWAL_COOLDOWN_DAYS} gündən sonra edə bilərsiniz.`);
+    } else {
+        alert("❌ Çıxarış sorğusu göndərilə bilmədi. Zəhmət olmasa yenidən cəhd edin.");
+    }
+});
+
+// Ruq animasiya funksiyaları
+function addGhostAnimations(event) {
+    const icon = document.getElementById('mainIcon');
+    const img = document.getElementById('clickImage');
+    
+    img.classList.remove('ghost-hit-animation', 'ghost-stab-animation', 'ghost-explosion', 'ghost-scared-animation');
+    
+    const animations = ['ghost-hit-animation', 'ghost-stab-animation', 'ghost-explosion', 'ghost-scared-animation'];
+    const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
+    
+    img.classList.add(randomAnimation);
+    
+    createGhostStabEffect(event);
+    
+    setTimeout(() => {
+        img.classList.remove(randomAnimation);
+    }, 800);
+}
+
+function createGhostStabEffect(event) {
+    const stabEffect = document.createElement('div');
+    stabEffect.style.cssText = `
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 90;
+        animation: stabExpand 0.6s ease-out;
+    `;
+    
+    let x, y;
+    if (event.touches && event.touches.length > 0) {
+        x = event.touches[0].clientX;
+        y = event.touches[0].clientY;
+    } else {
+        x = event.clientX;
+        y = event.clientY;
+    }
+    
+    const rect = document.querySelector('.click-area').getBoundingClientRect();
+    stabEffect.style.left = (x - rect.left - 40) + 'px';
+    stabEffect.style.top = (y - rect.top - 40) + 'px';
+    
+    document.querySelector('.click-area').appendChild(stabEffect);
+    
+    setTimeout(() => {
+        stabEffect.remove();
+    }, 600);
+}
 
 // İkon klik funksiyası
 function clickIcon(e) {
@@ -2141,11 +3073,31 @@ function clickIcon(e) {
 
 // Başlanğıc funksiyası
 window.addEventListener('load', async function() {
+    loadImages();
+    
     console.log('🚀 Oyun başladılır...');
+    checkUrlForReferralCode();
     
     // CG ID sistemini initialize et
     await initializeCounter();
     console.log('✅ CG ID sistemi hazırdır');
+
+    
+// ADEXIUM WIDGET İŞƏ SAL (yalnız push-like reklamlar üçün)
+setTimeout(() => {
+    const adexiumInitialized = initializeAdExiumPushLike();
+    if (adexiumInitialized) {
+        console.log('✅ AdExium Push-like sistemi uğurla başladıldı');
+        
+        // Push-like reklamı 2 saniyə sonra göstər
+        setTimeout(() => {
+            showAdExiumPushLike();
+        }, 2000);
+    } else {
+        console.log('❌ AdExium Push-like sistemi başladıla bilmədi');
+    }
+}, 3000);
+
     
     // ADSGRAM BUTTON REKLAMI İŞƏ SAL
     setTimeout(() => {
@@ -2179,7 +3131,6 @@ window.addEventListener('load', async function() {
 
     }, 5000); 
 
-    const mainIcon = document.getElementById('mainIcon');
     mainIcon.addEventListener('click', clickIcon);
     mainIcon.addEventListener('touchstart', function(e) {
         e.preventDefault();
@@ -2187,6 +3138,7 @@ window.addEventListener('load', async function() {
     });
     
     setInterval(simulateEnergyRegen, ENERGY_REGEN_INTERVAL);
+    setInterval(updateWithdrawalDisplay, 60000);
     
     setInterval(async () => {
         if (currentUserState.username) {
@@ -2200,60 +3152,34 @@ window.addEventListener('load', async function() {
     }
 });
 
-// Animasiya funksiyaları
-function addGhostAnimations(event) {
-    const img = document.getElementById('clickImage');
-    
-    img.classList.remove('ghost-hit-animation', 'ghost-stab-animation', 'ghost-explosion', 'ghost-scared-animation');
-    
-    const animations = ['ghost-hit-animation', 'ghost-stab-animation', 'ghost-explosion', 'ghost-scared-animation'];
-    const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
-    
-    img.classList.add(randomAnimation);
-    
-    createGhostStabEffect(event);
-    
-    setTimeout(() => {
-        img.classList.remove(randomAnimation);
-    }, 800);
-}
-
-function createGhostStabEffect(event) {
-    const stabEffect = document.createElement('div');
-    stabEffect.style.cssText = `
-        position: absolute;
-        width: 80px;
-        height: 80px;
-        background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 90;
-        animation: stabExpand 0.6s ease-out;
-    `;
-    
-    let x, y;
-    if (event.touches && event.touches.length > 0) {
-        x = event.touches[0].clientX;
-        y = event.touches[0].clientY;
-    } else {
-        x = event.clientX;
-        y = event.clientY;
-    }
-    
-    const rect = document.querySelector('.click-area').getBoundingClientRect();
-    stabEffect.style.left = (x - rect.left - 40) + 'px';
-    stabEffect.style.top = (y - rect.top - 40) + 'px';
-    
-    document.querySelector('.click-area').appendChild(stabEffect);
-    
-    setTimeout(() => {
-        stabEffect.remove();
-    }, 600);
-}
-
 window.addEventListener('beforeunload', function() {
     saveUserState();
 });
+    // AdExium Push-like reklamlarını initialize edən funksiya
+function initializeAdExiumPushLike() {
+    try {
+        const script = document.createElement("script");
+    script.src = "https://cdn.tgads.space/assets/js/adexium-widget.min.js"; // Push-like SDK
+        script.async = true;
+        document.head.appendChild(script);
+        return true;
+    } catch (e) {
+        console.error("AdExium Push-like initialize xətası:", e);
+        return false;
+    }
+}
+
+// Push-like reklamı göstərən funksiya
+function showAdExiumPushLike() {
+    if (window.AdexiumPushLike && typeof window.AdexiumPushLike.show === "function") {
+        window.AdexiumPushLike.show();
+        console.log("📢 AdExium Push-like reklam göstərildi");
+    } else {
+        console.log("⚠️ AdExium Push-like sistemi hazır deyil, bir az sonra yenə cəhd ediləcək...");
+        setTimeout(showAdExiumPushLike, 3000);
+    }
+}
+
     </script>
 </body>
 </html>
