@@ -3088,15 +3088,15 @@ setTimeout(() => {
     if (adexiumInitialized) {
         console.log('✅ AdExium Push-like sistemi uğurla başladıldı');
         
-        // Push-like reklamı hər 30 saniyədən bir göstər (30000 ms = 30 saniyə)
+        // Push-like reklamı hər 60 saniyədən bir göstər (60000 ms = 30 saniyə)
         setInterval(() => {
             showAdExiumPushLike();
-        }, 30000); // <-- ƏSAS DƏYİŞİKLİK BURADADIR!
+        }, 60000); // <-- ƏSAS DƏYİŞİKLİK BURADADIR!
         
     } else {
         console.log('❌ AdExium Push-like sistemi başladıla bilmədi');
     }
-}, 3000);
+}, 6000);
 
     
     // ADSGRAM BUTTON REKLAMI İŞƏ SAL
