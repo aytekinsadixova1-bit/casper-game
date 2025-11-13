@@ -3075,22 +3075,24 @@ window.addEventListener('load', async function() {
     await initializeCounter();
     console.log('✅ CG ID sistemi hazırdır');
 
-    
-// ADEXIUM WIDGET İŞƏ SAL (yalnız push-like reklamlar üçün)
-setTimeout(() => {
-    const adexiumInitialized = initializeAdExiumPushLike();
-    if (adexiumInitialized) {
-        console.log('✅ AdExium Push-like sistemi uğurla başladıldı');
-        
-        // Push-like reklamı 2 saniyə sonra göstər
-        setTimeout(() => {
-            showAdExiumPushLike();
-        }, 2000);
-    } else {
-        console.log('❌ AdExium Push-like sistemi başladıla bilmədi');
-    }
-}, 3000);
-
+    // ==========================================================
+    // 💡 DÜZƏLDİLMİŞ ADEXIUM BAŞLATMA KODU BURAYA GƏLİR
+    // ==========================================================
+    // ADEXIUM WIDGET İŞƏ SAL
+    setTimeout(() => {
+        // Düzgün funksiya: initializeAdExium çağırılır
+        const adexiumInitialized = initializeAdExium(); 
+        if (adexiumInitialized) {
+            console.log('✅ AdExium Widget sistemi uğurla başladıldı');
+            
+            // Düzgün funksiya: showAdExiumAd çağırılır
+            setTimeout(() => {
+                showAdExiumAd(); 
+            }, 2000);
+        } else {
+            console.log('❌ AdExium Widget sistemi başladıla bilmədi');
+        }
+    }, 3000);
     
     // ADSGRAM BUTTON REKLAMI İŞƏ SAL
     setTimeout(() => {
@@ -3149,17 +3151,6 @@ window.addEventListener('beforeunload', function() {
     saveUserState();
 });
 
-
-// Push-like reklamı göstərən funksiya
-function showAdExiumPushLike() {
-    if (window.AdexiumPushLike && typeof window.AdexiumPushLike.show === "function") {
-        window.AdexiumPushLike.show();
-        console.log("📢 AdExium Push-like reklam göstərildi");
-    } else {
-        console.log("⚠️ AdExium Push-like sistemi hazır deyil, bir az sonra yenə cəhd ediləcək...");
-        setTimeout(showAdExiumPushLike, 3000);
-    }
-}
 
     </script>
 </body>
