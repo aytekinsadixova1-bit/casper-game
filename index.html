@@ -1618,6 +1618,27 @@ function checkAdExiumStatus() {
     if (!adexiumInitialized) return 'not_initialized';
     return 'active';
 }
+        // ======================================================
+// 15 saniyəyə bir AdExium reklamı göstərmək
+// ======================================================
+
+let lastAdTime = 0; // Son reklam vaxtı (timestamp)
+
+function showAdExiumWithCooldown() {
+    const now = Date.now();
+    if (now - lastAdTime >= 15000) { // 15000 ms = 15 saniyə
+        const shown = showAdExiumAd();
+        if (shown) lastAdTime = now;
+    } else {
+        // Hələ 15 saniyə tamam olmayıb
+        console.log('⏱ 15 saniyə cooldown, reklam gözləyir...');
+    }
+}
+
+// Load zamanı interval ilə davamlı yoxlama
+window.addEventListener('load', () => {
+    setInterval(showAdExiumWithCooldown, 1000); // hər 1 saniyədə yoxlayır, cooldown ilə
+});
 // =================================================================
 // FIREBASE KONFİQURASİYASI
 // =================================================================
