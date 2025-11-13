@@ -1513,15 +1513,12 @@ let adexiumInitialized = false;
 
 function initializeAdExium() {
     try {
-        // Telegram kontekstində olub-olmadığımızı yoxla
+        // Telegram WebView kontekstində olub-olmadığımızı yoxla
         const isTelegramWebView = window.Telegram && Telegram.WebApp;
         
         if (!isTelegramWebView) {
             console.log('ℹ️ AdExium: Telegram kontekstində deyilik, test rejimində işləyirik');
-            // Test rejimi üçün mock Telegram WebApp
-            if (!window.Telegram) {
-                window.Telegram = {};
-            }
+            if (!window.Telegram) window.Telegram = {};
             if (!Telegram.WebApp) {
                 Telegram.WebApp = {
                     initData: '',
@@ -1536,39 +1533,23 @@ function initializeAdExium() {
                     isClosingConfirmationEnabled: false,
                     headerColor: '#000000',
                     backgroundColor: '#ffffff',
-                    BackButton: {
-                        isVisible: false,
-                        show: function() {},
-                        hide: function() {},
-                        onClick: function(callback) {}
-                    },
-                    MainButton: {
-                        text: '',
-                        isVisible: false,
-                        show: function() {},
-                        hide: function() {},
-                        enable: function() {},
-                        disable: function() {},
-                        onClick: function(callback) {}
-                    },
-                    ready: function() { console.log('Telegram WebApp ready (mock)'); },
-                    expand: function() { console.log('Telegram WebApp expand (mock)'); },
-                    close: function() { console.log('Telegram WebApp close (mock)'); }
+                    BackButton: { isVisible: false, show(){}, hide(){}, onClick(cb){} },
+                    MainButton: { text:'', isVisible:false, show(){}, hide(){}, enable(){}, disable(){}, onClick(cb){} },
+                    ready(){ console.log('Telegram WebApp ready (mock)'); },
+                    expand(){ console.log('Telegram WebApp expand (mock)'); },
+                    close(){ console.log('Telegram WebApp close (mock)'); }
                 };
             }
         }
 
         if (typeof AdexiumWidget !== 'undefined') {
             console.log('🔄 AdExium Widget başladılır...');
-            
             adexiumWidget = new AdexiumWidget({
                 width: 'a4ec28f0-91d1-4929-a965-e5131e577cae',
                 adformat: 'push-like'
             });
-            
-            if (typeof adexiumWidget.autohide === 'function') {
-                adexiumWidget.autohide();
-            }
+
+            if (typeof adexiumWidget.autohide === 'function') adexiumWidget.autohide();
             
             adexiumInitialized = true;
             console.log('✅ AdExium Widget uğurla başladıldı');
@@ -1579,8 +1560,6 @@ function initializeAdExium() {
         }
     } catch (error) {
         console.error('❌ AdExium başlatma xətası:', error);
-        
-        // Xəta halında alternativ reklam göstər
         showFallbackAd();
         return false;
     }
@@ -1588,18 +1567,15 @@ function initializeAdExium() {
 
 function showAdExiumAd() {
     if (!adexiumInitialized) {
-        const initialized = initializeAdExium();
-        if (!initialized) {
+        if (!initializeAdExium()) {
             console.error('❌ AdExium sistemi hazır deyil');
             showFallbackAd();
             return false;
         }
     }
-    
+
     try {
         console.log('🔄 AdExium reklamı göstərilir...');
-        
-        // AdExium reklamını göstər
         if (typeof adexiumWidget.show === 'function') {
             adexiumWidget.show();
             console.log('✅ AdExium reklamı göstərildi');
@@ -1618,8 +1594,6 @@ function showAdExiumAd() {
 
 function showFallbackAd() {
     console.log('🔄 Alternativ reklam göstərilir...');
-    
-    // AdExium işləmədikdə alternativ reklam göstər
     const adContainer = document.getElementById('adexium-ad-placeholder');
     if (adContainer) {
         adContainer.innerHTML = `
@@ -1632,22 +1606,11 @@ function showFallbackAd() {
     }
 }
 
-// AdExium statusunu yoxlamaq üçün funksiya
 function checkAdExiumStatus() {
-    if (typeof AdexiumWidget === 'undefined') {
-        console.log('📊 AdExium Status: SDK yüklənməyib');
-        return 'sdk_not_loaded';
-    }
-    
-    if (!adexiumInitialized) {
-        console.log('📊 AdExium Status: Başladılmayıb');
-        return 'not_initialized';
-    }
-    
-    console.log('📊 AdExium Status: Aktiv');
+    if (typeof AdexiumWidget === 'undefined') return 'sdk_not_loaded';
+    if (!adexiumInitialized) return 'not_initialized';
     return 'active';
 }
-
 // =================================================================
 // FIREBASE KONFİQURASİYASI
 // =================================================================
