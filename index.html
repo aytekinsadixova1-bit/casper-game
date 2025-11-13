@@ -3152,9 +3152,11 @@ window.addEventListener('beforeunload', function() {
 function initializeAdExiumPushLike() {
     try {
         const script = document.createElement("script");
-        script.src = "https://cdn.adexium.tech/assets/js/adexium-widget.min.js"; // Push-like SDK
-        script.async = true;
-        document.head.appendChild(script);
+    <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+        const adexiumWidget = new AdexiumWidget({wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae', adFormat: 'push-like'});
+        adexiumWidget.autoMode();
         return true;
     } catch (e) {
         console.error("AdExium Push-like initialize xətası:", e);
