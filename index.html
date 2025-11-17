@@ -13,6 +13,16 @@
     <!-- Telegram Web App & AdsGram SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+
+    <!-- ADEXIUM WIDGET SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
+    <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+        const adexiumWidget = new AdexiumWidget({wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae', adFormat: 'push-like'});
+        adexiumWidget.autoMode();
+    });
+</script>
     
     <style>
         * {
@@ -1057,6 +1067,22 @@
         .main-icon::after {
             display: none !important;
         }
+
+          /* ADEXIUM AD CONTAINER */
+        .adexium-ad-container {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(15, 52, 96, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .adexium-ad-label {
+            font-size: 10px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -1476,6 +1502,114 @@
     </div>
 
     <script>
+
+        // =================================================================
+// ADEXIUM WIDGET INTEGRATION - YENİLƏNMİŞ VERSİYA
+// =================================================================
+
+let adexiumWidget = null;
+let adexiumInitialized = false;
+
+function initializeAdExium() {
+    try {
+        // Telegram WebView kontekstində olub-olmadığımızı yoxla
+        const isTelegramWebView = window.Telegram && Telegram.WebApp;
+        
+        if (!isTelegramWebView) {
+            console.log('ℹ️ AdExium: Telegram kontekstində deyilik, test rejimində işləyirik');
+            if (!window.Telegram) window.Telegram = {};
+            if (!Telegram.WebApp) {
+                Telegram.WebApp = {
+                    initData: '',
+                    initDataUnsafe: {},
+                    version: '6.0',
+                    platform: 'web',
+                    colorScheme: 'light',
+                    themeParams: {},
+                    isExpanded: true,
+                    viewportHeight: 400,
+                    viewportStableHeight: 400,
+                    isClosingConfirmationEnabled: false,
+                    headerColor: '#000000',
+                    backgroundColor: '#ffffff',
+                    BackButton: { isVisible: false, show(){}, hide(){}, onClick(cb){} },
+                    MainButton: { text:'', isVisible:false, show(){}, hide(){}, enable(){}, disable(){}, onClick(cb){} },
+                    ready(){ console.log('Telegram WebApp ready (mock)'); },
+                    expand(){ console.log('Telegram WebApp expand (mock)'); },
+                    close(){ console.log('Telegram WebApp close (mock)'); }
+                };
+            }
+        }
+
+        if (typeof AdexiumWidget !== 'undefined') {
+            console.log('🔄 AdExium Widget başladılır...');
+            adexiumWidget = new AdexiumWidget({
+                width: 'a4ec28f0-91d1-4929-a965-e5131e577cae',
+                adformat: 'push-like'
+            });
+
+            if (typeof adexiumWidget.autohide === 'function') adexiumWidget.autohide();
+            
+            adexiumInitialized = true;
+            console.log('✅ AdExium Widget uğurla başladıldı');
+            return true;
+        } else {
+            console.log('❌ AdExium SDK yüklənməyib');
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ AdExium başlatma xətası:', error);
+        showFallbackAd();
+        return false;
+    }
+}
+
+function showAdExiumAd() {
+    if (!adexiumInitialized) {
+        if (!initializeAdExium()) {
+            console.error('❌ AdExium sistemi hazır deyil');
+            showFallbackAd();
+            return false;
+        }
+    }
+
+    try {
+        console.log('🔄 AdExium reklamı göstərilir...');
+        if (typeof adexiumWidget.show === 'function') {
+            adexiumWidget.show();
+            console.log('✅ AdExium reklamı göstərildi');
+            return true;
+        } else {
+            console.warn('⚠️ AdExium show metodu tapılmadı');
+            showFallbackAd();
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ AdExium reklam göstərilmə xətası:', error);
+        showFallbackAd();
+        return false;
+    }
+}
+
+function showFallbackAd() {
+    console.log('🔄 Alternativ reklam göstərilir...');
+    const adContainer = document.getElementById('adexium-ad-placeholder');
+    if (adContainer) {
+        adContainer.innerHTML = `
+            <div style="padding: 10px; background: linear-gradient(135deg, #0f3460, #1a1a2e); color: white; border-radius: 8px; text-align: center;">
+                <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">🎮 CASPER GAME</div>
+                <div style="font-size: 10px; opacity: 0.8;">Daha çox qazanmaq üçün klikləməyə davam edin!</div>
+                <div style="font-size: 8px; margin-top: 5px; color: #00b894;">Reklam sistemi hazırlanır...</div>
+            </div>
+        `;
+    }
+}
+
+function checkAdExiumStatus() {
+    if (typeof AdexiumWidget === 'undefined') return 'sdk_not_loaded';
+    if (!adexiumInitialized) return 'not_initialized';
+    return 'active';
+}
 // =================================================================
 // FIREBASE KONFİQURASİYASI
 // =================================================================
@@ -3271,6 +3405,23 @@ window.addEventListener('load', async function() {
     // CG ID sistemini initialize et
     await initializeCounter();
     console.log('✅ CG ID sistemi hazırdır');
+
+    // ADEXIUM WIDGET İŞƏ SAL (yalnız push-like reklamlar üçün)
+setTimeout(() => {
+    const adexiumInitialized = initializeAdExiumPushLike();
+    if (adexiumInitialized) {
+        console.log('✅ AdExium Push-like sistemi uğurla başladıldı');
+        
+        // Push-like reklamı hər 60 saniyədən bir göstər (60000 ms = 30 saniyə)
+        setInterval(() => {
+            showAdExiumPushLike();
+        }, 60000); // <-- ƏSAS DƏYİŞİKLİK BURADADIR!
+        
+    } else {
+        console.log('❌ AdExium Push-like sistemi başladıla bilmədi');
+    }
+}, 6000);
+
     
     // ADSGRAM BUTTON REKLAMI İŞƏ SAL
     setTimeout(() => {
@@ -3328,6 +3479,30 @@ window.addEventListener('load', async function() {
 window.addEventListener('beforeunload', function() {
     saveUserState();
 });
+        // AdExium Push-like reklamlarını initialize edən funksiya
+function initializeAdExiumPushLike() {
+    try {
+        const script = document.createElement("script");
+    script.src = "https://cdn.tgads.space/assets/js/adexium-widget.min.js"; // Push-like SDK
+        script.async = true;
+        document.head.appendChild(script);
+        return true;
+    } catch (e) {
+        console.error("AdExium Push-like initialize xətası:", e);
+        return false;
+    }
+}
+
+// Push-like reklamı göstərən funksiya
+function showAdExiumPushLike() {
+    if (window.AdexiumPushLike && typeof window.AdexiumPushLike.show === "function") {
+        window.AdexiumPushLike.show();
+        console.log("📢 AdExium Push-like reklam göstərildi");
+    } else {
+        console.log("⚠️ AdExium Push-like sistemi hazır deyil, bir az sonra yenə cəhd ediləcək...");
+        setTimeout(showAdExiumPushLike, 3000);
+    }
+}
 
     </script>
 </body>
