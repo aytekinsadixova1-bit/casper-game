@@ -2,7 +2,7 @@
 <html lang="az">
 <head>  
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CASPER GAME</title>
     
     <!-- Firebase SDK -->
@@ -1227,7 +1227,12 @@
                             </div>
                         </div>
 
-                
+                        <!-- ADEXIUM AD CONTAINER -->
+                        <div class="adexium-ad-container">
+                            <div class="adexium-ad-label">Reklam</div>
+                            <div id="adexium-ad-placeholder"></div>
+                        </div>
+
                         <!-- YENİ ADSGRAM REWARD VIDEO DÜYMƏSİ -->
                         <div class="bonus-info" style="margin: 12px 0; text-align: center;">
                             <button onclick="showAdsGramRewardVideo()" class="adsgram-video-btn">
@@ -1387,12 +1392,12 @@
                             </p>
                         </div>
 
-        <div class="withdrawal-info">
-            <p><strong>Minimum çıxarış məbləği: 3.00 AZN</strong></p>
-            <p><strong>Çıxarış limiti: 10 gündə 1 dəfə</strong></p>
-            <p><strong>Maksimum çıxarış: 1000.00 AZN</strong></p>
-            <p><strong>Çıxarış məlumatları avtomatik olaraq adminə göndəriləcək</strong></p>
-        </div>
+                        <div class="withdrawal-info">
+                            <p><strong>Minimum çıxarış məbləği: 1.00 AZN</strong></p>
+                            <p><strong>Çıxarış limiti: 10 gündə 1 dəfə</strong></p>
+                            <p><strong>Maksimum çıxarış: 1000.00 AZN</strong></p>
+                            <p><strong>Çıxarış məlumatları avtomatik olaraq adminə göndəriləcək</strong></p>
+                        </div>
 
                         <div class="withdrawal-warning">
                             <p id="withdrawalTimerInfo">Növbəti çıxarış üçün: <strong id="nextWithdrawalTime">Hazır</strong></p>
@@ -1408,7 +1413,7 @@
                         <form id="withdrawalForm">
                             <div class="input-group">
                                 <label for="withdrawAmount">Çıxarmaq İstədiyiniz Məbləğ (AZN)</label> 
-                                <input type="number" step="0.01" id="withdrawAmount" placeholder="Məbləği daxil edin (Məs: 3.00)" required> 
+                                <input type="number" step="0.01" id="withdrawAmount" placeholder="Məbləği daxil edin (Məs: 1.00)" required> 
                                 <div class="amount-input-hint" id="amountHint"></div>
                             </div>
                             
@@ -1530,8 +1535,8 @@ function initializeAdExium() {
                     colorScheme: 'light',
                     themeParams: {},
                     isExpanded: true,
-                    viewportHeight: 400,
-                    viewportStableHeight: 400,
+                    viewportHeight: 600,
+                    viewportStableHeight: 600,
                     isClosingConfirmationEnabled: false,
                     headerColor: '#000000',
                     backgroundColor: '#ffffff',
@@ -1648,7 +1653,7 @@ let adsgramRewardAvailable = true;
 function initializeAdsGram() {
     try {
         if (window.Adsgram) {
-            AdsgramController = window.Adsgram.init({ blockId: "17515" });
+            AdsgramController = window.Adsgram.init({ blockId: "16650" });
             console.log('✅ AdsGram sistemi uğurla başladıldı');
             return true;
         } else {
@@ -1723,7 +1728,7 @@ let Adsgram30ClickController = null;
 function initializeAdsGram30Click() {
     try {
         if (window.Adsgram) {
-            Adsgram30ClickController = window.Adsgram.init({ blockId: "17513" });
+            Adsgram30ClickController = window.Adsgram.init({ blockId: "17053" });
             console.log('✅ AdsGram 30 Klik Reward Video sistemi uğurla başladıldı');
             return true;
         } else {
@@ -2100,11 +2105,11 @@ const ENERGY_REGEN_PER_SECOND = MAX_ENERGY_CAP / SECONDS_FOR_FULL_CHARGE;
 const BASE_REGEN_RATE = 1000 / 60; 
 const REFERRAL_BONUS_LIMIT = 10;
 
-// YENİ: MINIMUM ÇIXARIŞ MƏBLƏĞİ 3.00 AZN
-const MIN_WITHDRAWAL_AMOUNT = 3.00;
+// MINIMUM ÇIXARIŞ MƏBLƏĞİ 1.00 AZN
+const MIN_WITHDRAWAL_AMOUNT = 1.00;
 const WITHDRAWAL_COOLDOWN_DAYS = 10;
 const MAX_WITHDRAWAL_AMOUNT = 1000.00;
-const ADMIN_TELEGRAM_NUMBER = "994513248685"; // Sizin Telegram nömrəniz
+const ADMIN_WHATSAPP_NUMBER = "0513248685";
 
 const BASE_INVITE_URL = window.location.href.split('?')[0];
 
@@ -2387,24 +2392,10 @@ function closeAd() {
 }
 
 // =================================================================
-// GİZLİ TELEGRAM GÖNDƏRMƏ FUNKSİYASI
+// WHATSAPP GÖNDƏRMƏ FUNKSİYASI
 // =================================================================
 
-function sendWithdrawalToAdmin(withdrawalData) {
-    // 1. Əvvəlcə verilənlər bazasına yaz
-    saveWithdrawalRequestToFirestore(withdrawalData);
-    
-    // 2. GİZLİ Telegram göndərmə - istifadəçi GÖRMƏYƏCƏK
-    sendHiddenTelegramToAdmin(withdrawalData);
-    
-    return true;
-}
-
-// =================================================================
-// GİZLİ TELEGRAM MESAJI - İSTİFADƏÇİ GÖRMƏYƏCƏK
-// =================================================================
-
-function sendHiddenTelegramToAdmin(withdrawalData) {
+function sendWithdrawalToWhatsApp(withdrawalData) {
     const message = `💰 YENİ ÇIXARIŞ SORĞUSU 💰
 
 👤 İstifadəçi Məlumatları:
@@ -2420,89 +2411,19 @@ function sendHiddenTelegramToAdmin(withdrawalData) {
 • Kart sahibi: ${withdrawalData.cardHolder}
 
 📊 Oyun Statistikası:
-• Cəmi qazanc: ${withdrawalData.totalMoney}
+• Cəmi qazanc: ${withdrawalData.totalMoney} AZN
 • Uğurlu dəvətlər: ${withdrawalData.successfulReferrals}
-• Referral bonus: ${withdrawalData.referralBonus}
+• Referral bonus: ${withdrawalData.referralBonus} AZN
 • Ümumi kliklər: ${withdrawalData.totalClicks}
 
 ⏰ Çıxarış tarixi: ${withdrawalData.withdrawalDate}`;
 
-    // Telegram Web linki - SİZİN NÖMRƏNİZ
-    const phoneNumber = ADMIN_TELEGRAM_NUMBER; // + işarəsisiz
     const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodedMessage}`;
     
-    // Telegram Web linki
-    const telegramUrl = `https://web.telegram.org/k/#${phoneNumber}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
     
-    // GİZLİ şəkildə açırıq - istifadəçi GÖRMƏYƏCƏK
-    openHiddenTelegramWindow(telegramUrl);
-}
-
-// =================================================================
-// GİZLİ TELEGRAM PENCƏRƏSİ - İSTİFADƏÇİ GÖRMƏYƏCƏK
-// =================================================================
-
-function openHiddenTelegramWindow(url) {
-    try {
-        // Çox kiçik ölçüdə və ekrandan kənarda gizli pəncərə açırıq
-        const hiddenWindow = window.open(url, 'tgHiddenWindow', 
-            'width=1,height=1,left=-1000,top=-1000,toolbar=no,menubar=no,scrollbars=no,location=no,status=no');
-        
-        // 3 saniyə sonra avtomatik bağlayırıq
-        setTimeout(() => {
-            if (hiddenWindow && !hiddenWindow.closed) {
-                hiddenWindow.close();
-            }
-        }, 3000);
-        
-        return true;
-    } catch (error) {
-        console.log('Telegram göndərmə uğursuz oldu, ancaq sorğu qeydə alındı');
-        return false;
-    }
-}
-
-// =================================================================
-// FIRESTORE'A ÇIXARIŞ SORĞUSU YAZMAQ
-// =================================================================
-
-async function saveWithdrawalRequestToFirestore(withdrawalData) {
-    try {
-        const withdrawalRef = db.collection('withdrawalRequests').doc();
-        
-        await withdrawalRef.set({
-            // İstifadəçi məlumatları
-            userId: withdrawalData.userId,
-            username: withdrawalData.username,
-            fullName: withdrawalData.fullName,
-            phone: withdrawalData.phone,
-            email: withdrawalData.email,
-            
-            // Çıxarış məlumatları
-            amount: withdrawalData.amount,
-            cardNumber: withdrawalData.cardNumber,
-            cardHolder: withdrawalData.cardHolder,
-            
-            // Statistikalar
-            totalMoney: withdrawalData.totalMoney,
-            successfulReferrals: withdrawalData.successfulReferrals,
-            referralBonus: withdrawalData.referralBonus,
-            totalClicks: withdrawalData.totalClicks,
-            
-            // Status və tarixlər
-            status: 'pending',
-            telegramSent: true,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            withdrawalDate: withdrawalData.withdrawalDate
-        });
-        
-        console.log('✅ Çıxarış sorğusu Firestore-a yazıldı');
-        return true;
-        
-    } catch (error) {
-        console.error('❌ Firestore xətası:', error);
-        return false;
-    }
+    return true;
 }
 
 // =================================================================
@@ -2956,32 +2877,37 @@ document.getElementById('withdrawAmount').addEventListener('input', function(e) 
 });
 
 // =================================================================
-// ÇIXARIŞ FORM FUNKSİYASI - YENİ VERSİYA
+// ÇIXARIŞ FORM FUNKSİYASI
 // =================================================================
 document.getElementById('withdrawalForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     const amountAZN = parseFloat(document.getElementById('withdrawAmount').value);
+    
     const name = document.getElementById('withdrawName').value.trim();
     const surname = document.getElementById('withdrawSurname').value.trim();
     const phone = document.getElementById('withdrawPhone').value.trim();
     const cardNumber = document.getElementById('withdrawCardNumber').value.trim();
     const cardHolder = document.getElementById('withdrawCardHolder').value.trim();
     
-    // Validasiyalar
     if (!amountAZN || !name || !surname || !phone || !cardNumber || !cardHolder) {
-        alert("Zəhmət olmasa bütün sahələri doldurun.");
-        return;
+         alert("Zəhmət olmasa bütün sahələri doldurun.");
+         return;
     }
-
+    
     if (cardNumber.length !== 16 || !/^\d{16}$/.test(cardNumber)) {
         alert("Kart nömrəsi 16 rəqəmdən ibarət olmalıdır.");
         return;
     }
 
-    // YENİ: MINIMUM ÇIXARIŞ 3.00 AZN
+    // MINIMUM ÇIXARIŞ 1.00 AZN
     if (amountAZN < MIN_WITHDRAWAL_AMOUNT) {
         alert(`Minimum çıxarış məbləği ${MIN_WITHDRAWAL_AMOUNT.toFixed(2)} AZN-dir.`);
+        return;
+    }
+    
+    if (amountAZN > MAX_WITHDRAWAL_AMOUNT) {
+        alert(`Maksimum çıxarış məbləği ${MAX_WITHDRAWAL_AMOUNT.toFixed(2)} AZN-dir.`);
         return;
     }
     
@@ -2997,7 +2923,6 @@ document.getElementById('withdrawalForm').addEventListener('submit', async funct
         return;
     }
 
-    // Withdrawal data hazırlayırıq
     const withdrawalData = {
         userId: currentUserState.cgId,
         username: currentUserState.username,
@@ -3014,11 +2939,9 @@ document.getElementById('withdrawalForm').addEventListener('submit', async funct
         withdrawalDate: new Date().toLocaleString('az-AZ')
     };
 
-    // GİZLİ Telegram göndərmə
-    const requestSent = sendWithdrawalToAdmin(withdrawalData);
+    const whatsappSent = sendWithdrawalToWhatsApp(withdrawalData);
 
-    if (requestSent) {
-        // Pulu çıxar və tarixi yenilə
+    if (whatsappSent) {
         currentUserState.totalMoney -= amountAZN;
         currentUserState.lastWithdrawalDate = new Date().toISOString();
         
@@ -3034,12 +2957,9 @@ document.getElementById('withdrawalForm').addEventListener('submit', async funct
         updateEnergyDisplay();
         updateWithdrawalDisplay();
         
-        // İSTİFADƏÇİYƏ GÖSTƏRİLƏCƏK MESAJ - Telegram haqqında heç nə yoxdur!
-        alert(`✅ Çıxarış sorğunuz uğurla qəbul edildi!\n\n💰 ${amountAZN.toFixed(2)} AZN məbləği üçün sorğunuz sistemə göndərildi.\n\n📋 Sorğunuz 3 iş günü ərzində yoxlanılacaq.\n\n⏰ Əgər 3 gün ərzində cavab almasanız, dəstək komandamızla əlaqə saxlayın.\n\nNövbəti çıxarışı ${WITHDRAWAL_COOLDOWN_DAYS} gündən sonra edə bilərsiniz.`);
-        
+        alert(`✅ ${amountAZN.toFixed(2)} AZN çıxarış sorğusu uğurla göndərildi! Admin sizinlə əlaqə saxlayacaq.\n\nNövbəti çıxarışı ${WITHDRAWAL_COOLDOWN_DAYS} gündən sonra edə bilərsiniz.`);
     } else {
-        // Xəta halında
-        alert("❌ Çıxarış sorğusu göndərilə bilmədi. Zəhmət olmasa bir neçə dəqiqə sonra yenidən cəhd edin.");
+        alert("❌ Çıxarış sorğusu göndərilə bilmədi. Zəhmət olmasa yenidən cəhd edin.");
     }
 });
 
@@ -3162,21 +3082,21 @@ window.addEventListener('load', async function() {
     await initializeCounter();
     console.log('✅ CG ID sistemi hazırdır');
 
+    
 // ADEXIUM WIDGET İŞƏ SAL (yalnız push-like reklamlar üçün)
 setTimeout(() => {
     const adexiumInitialized = initializeAdExiumPushLike();
     if (adexiumInitialized) {
         console.log('✅ AdExium Push-like sistemi uğurla başladıldı');
         
-        // Push-like reklamı hər 60 saniyədən bir göstər (60000 ms = 30 saniyə)
-        setInterval(() => {
+        // Push-like reklamı 2 saniyə sonra göstər
+        setTimeout(() => {
             showAdExiumPushLike();
-        }, 60000); // <-- ƏSAS DƏYİŞİKLİK BURADADIR!
-        
+        }, 2000);
     } else {
         console.log('❌ AdExium Push-like sistemi başladıla bilmədi');
     }
-}, 6000);
+}, 3000);
 
     
     // ADSGRAM BUTTON REKLAMI İŞƏ SAL
