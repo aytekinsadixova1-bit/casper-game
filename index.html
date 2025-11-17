@@ -2155,9 +2155,8 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 });
 
 // =====================================================
-// QEYDİYYAT FORMUNUN TAM YENİ VERSİYASI - 100% DÜZƏLDİLMİŞ
+// QEYDİYYAT FORMUNUN TAM YENİ VERSİYASI - REAL-TIME REFERRAL DƏSTƏKLİ
 // =====================================================
-
 
 document.getElementById('registerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -2235,7 +2234,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         console.log(`✅ Yeni istifadəçi yaradıldı: ${username}`);
 
         // =====================================================
-        // 6. REFERRAL PROSESSI (100% DÜZƏLDİLMİŞ)
+        // 6. REFERRAL PROSESSI
         // =====================================================
         if (referralCodeInput) {
             console.log(`🔍 Dəvət kodu axtarılır: ${referralCodeInput}`);
@@ -2253,14 +2252,13 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
 
                     console.log(`✅ Referrer tapıldı: ${referrerUsername}`);
 
-                    // 🔥 11-dən sonra da invitedFriends-ə əlavə et → LİMİTSİZ
+                    // 🔥 invitedFriends-ə əlavə et → Limitsiz
                     await db.collection('users').doc(referrerUsername).update({
                         invitedFriends: firebase.firestore.FieldValue.arrayUnion(username)
                     });
 
                     // 🔥 BONUS YOXLAMASI (yalnız 10 nəfərə qədər)
                     if ((referrerData.successfulReferrals || 0) < REFERRAL_BONUS_LIMIT) {
-
                         await db.collection('users').doc(referrerUsername).update({
                             successfulReferrals: firebase.firestore.FieldValue.increment(1),
                             referralBonusEarned: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
@@ -2269,14 +2267,13 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
 
                         console.log(`🎁 Bonus verildi: +${REFERRAL_BONUS_AMOUNT} AZN`);
 
-                        // Əgər referral istifadəçi aktivdirsə
+                        // Əgər referral istifadəçi aktivdirsə, local state update et
                         if (currentUserState && currentUserState.username === referrerUsername) {
                             currentUserState.successfulReferrals += 1;
                             currentUserState.referralBonusEarned += REFERRAL_BONUS_AMOUNT;
                             currentUserState.totalMoney += REFERRAL_BONUS_AMOUNT;
                             updateEnergyDisplay();
                         }
-
                     } else {
                         console.log(`ℹ️ Limit dolub (${REFERRAL_BONUS_LIMIT}). Bonus verilmir.`);
                     }
@@ -2295,11 +2292,42 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         document.getElementById('registerForm').reset();
         switchToLogin();
 
+        // =====================================================
+        // 8. REAL-TIME REFERRAL MONITOR (OYUN EKRANINDA)
+        // =====================================================
+        listenToReferralCount(username);
+
     } catch (error) {
         console.error("❌ Qeydiyyat zamanı xəta:", error);
         showError("Xəta baş verdi. Yenidən cəhd edin.");
     }
 });
+
+// =====================================================
+// REAL-TIME REFERRAL SAYI FUNKSİYASI
+// =====================================================
+function listenToReferralCount(username) {
+    const userRef = db.collection('users').doc(username);
+
+    userRef.onSnapshot((doc) => {
+        if (doc.exists) {
+            const data = doc.data();
+            const referralCount = data.successfulReferrals || 0;
+            const referralBonus = Math.min(referralCount, REFERRAL_BONUS_LIMIT) * REFERRAL_BONUS_AMOUNT;
+
+            // HTML elementlərinə yaz
+            document.getElementById('successfulReferrals').textContent = referralCount;
+            document.getElementById('referralBonusTotal').textContent = referralBonus.toFixed(2) + " AZN";
+
+            // Local currentUserState update
+            if (currentUserState && currentUserState.username === username) {
+                currentUserState.successfulReferrals = referralCount;
+                currentUserState.referralBonusEarned = referralBonus;
+            }
+        }
+    });
+}
+
 
 // =================================================================
 // REKLAM SİSTEMİ FUNKSİYALARI
