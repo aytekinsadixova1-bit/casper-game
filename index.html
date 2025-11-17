@@ -14,16 +14,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     
-    <!-- ADEXIUM WIDGET SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
-    <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
-<script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', () => {
-        const adexiumWidget = new AdexiumWidget({wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae', adFormat: 'push-like'});
-        adexiumWidget.autoMode();
-    });
-</script>
-    
     <style>
         * {
             margin: 0;
@@ -1067,21 +1057,6 @@
         .main-icon::after {
             display: none !important;
         }
-        
-        /* ADEXIUM AD CONTAINER */
-        .adexium-ad-container {
-            margin: 10px 0;
-            padding: 10px;
-            background: rgba(15, 52, 96, 0.1);
-            border-radius: 8px;
-            text-align: center;
-        }
-        
-        .adexium-ad-label {
-            font-size: 10px;
-            color: #6c757d;
-            margin-bottom: 5px;
-        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -1200,8 +1175,6 @@
             
             <div class="game-screen" id="gameScreen" style="display: none;">
                 
-                <!-- ADSGRAM BANNER REKLAM SİLİNDİ -->
-
                 <div class="header">
                     <h1>CASPER GAME</h1>
                     <p id="welcomeText">Xoş gəldiniz, İstifadəçi! 👋</p>
@@ -1227,7 +1200,6 @@
                             </div>
                         </div>
 
-                
                         <!-- YENİ ADSGRAM REWARD VIDEO DÜYMƏSİ -->
                         <div class="bonus-info" style="margin: 12px 0; text-align: center;">
                             <button onclick="showAdsGramRewardVideo()" class="adsgram-video-btn">
@@ -1462,8 +1434,6 @@
                     </div>
                 </div>
 
-                <!-- ALT BANNER SİLİNDİ -->
-
             </div>
         </div>
         
@@ -1506,113 +1476,6 @@
     </div>
 
     <script>
-// =================================================================
-// ADEXIUM WIDGET INTEGRATION - YENİLƏNMİŞ VERSİYA
-// =================================================================
-
-let adexiumWidget = null;
-let adexiumInitialized = false;
-
-function initializeAdExium() {
-    try {
-        // Telegram WebView kontekstində olub-olmadığımızı yoxla
-        const isTelegramWebView = window.Telegram && Telegram.WebApp;
-        
-        if (!isTelegramWebView) {
-            console.log('ℹ️ AdExium: Telegram kontekstində deyilik, test rejimində işləyirik');
-            if (!window.Telegram) window.Telegram = {};
-            if (!Telegram.WebApp) {
-                Telegram.WebApp = {
-                    initData: '',
-                    initDataUnsafe: {},
-                    version: '6.0',
-                    platform: 'web',
-                    colorScheme: 'light',
-                    themeParams: {},
-                    isExpanded: true,
-                    viewportHeight: 400,
-                    viewportStableHeight: 400,
-                    isClosingConfirmationEnabled: false,
-                    headerColor: '#000000',
-                    backgroundColor: '#ffffff',
-                    BackButton: { isVisible: false, show(){}, hide(){}, onClick(cb){} },
-                    MainButton: { text:'', isVisible:false, show(){}, hide(){}, enable(){}, disable(){}, onClick(cb){} },
-                    ready(){ console.log('Telegram WebApp ready (mock)'); },
-                    expand(){ console.log('Telegram WebApp expand (mock)'); },
-                    close(){ console.log('Telegram WebApp close (mock)'); }
-                };
-            }
-        }
-
-        if (typeof AdexiumWidget !== 'undefined') {
-            console.log('🔄 AdExium Widget başladılır...');
-            adexiumWidget = new AdexiumWidget({
-                width: 'a4ec28f0-91d1-4929-a965-e5131e577cae',
-                adformat: 'push-like'
-            });
-
-            if (typeof adexiumWidget.autohide === 'function') adexiumWidget.autohide();
-            
-            adexiumInitialized = true;
-            console.log('✅ AdExium Widget uğurla başladıldı');
-            return true;
-        } else {
-            console.log('❌ AdExium SDK yüklənməyib');
-            return false;
-        }
-    } catch (error) {
-        console.error('❌ AdExium başlatma xətası:', error);
-        showFallbackAd();
-        return false;
-    }
-}
-
-function showAdExiumAd() {
-    if (!adexiumInitialized) {
-        if (!initializeAdExium()) {
-            console.error('❌ AdExium sistemi hazır deyil');
-            showFallbackAd();
-            return false;
-        }
-    }
-
-    try {
-        console.log('🔄 AdExium reklamı göstərilir...');
-        if (typeof adexiumWidget.show === 'function') {
-            adexiumWidget.show();
-            console.log('✅ AdExium reklamı göstərildi');
-            return true;
-        } else {
-            console.warn('⚠️ AdExium show metodu tapılmadı');
-            showFallbackAd();
-            return false;
-        }
-    } catch (error) {
-        console.error('❌ AdExium reklam göstərilmə xətası:', error);
-        showFallbackAd();
-        return false;
-    }
-}
-
-function showFallbackAd() {
-    console.log('🔄 Alternativ reklam göstərilir...');
-    const adContainer = document.getElementById('adexium-ad-placeholder');
-    if (adContainer) {
-        adContainer.innerHTML = `
-            <div style="padding: 10px; background: linear-gradient(135deg, #0f3460, #1a1a2e); color: white; border-radius: 8px; text-align: center;">
-                <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">🎮 CASPER GAME</div>
-                <div style="font-size: 10px; opacity: 0.8;">Daha çox qazanmaq üçün klikləməyə davam edin!</div>
-                <div style="font-size: 8px; margin-top: 5px; color: #00b894;">Reklam sistemi hazırlanır...</div>
-            </div>
-        `;
-    }
-}
-
-function checkAdExiumStatus() {
-    if (typeof AdexiumWidget === 'undefined') return 'sdk_not_loaded';
-    if (!adexiumInitialized) return 'not_initialized';
-    return 'active';
-}
 // =================================================================
 // FIREBASE KONFİQURASİYASI
 // =================================================================
@@ -2362,45 +2225,62 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         await db.collection('users').doc(username).set(newUserData);
         console.log(`✅ Yeni istifadəçi yaradıldı: ${username}`);
 
-        // 6. Əgər dəvət kodu varsa — referrerə bonus ver (YALNIZ 10 DƏVƏTƏ QƏDƏR)
+        // 6. ƏGƏR DƏVƏT KODU VARSA - YENİ SADƏ ÜSULLA BONUS VER
         if (referralCodeInput) {
-            const referrerQuery = await db.collection('users')
-                .where('referralCode', '==', referralCodeInput)
-                .limit(1)
-                .get();
+            console.log(`🔍 Dəvət kodu axtarılır: ${referralCodeInput}`);
+            
+            try {
+                // Referrer-i tap
+                const referrerQuery = await db.collection('users')
+                    .where('referralCode', '==', referralCodeInput)
+                    .limit(1)
+                    .get();
 
-            if (!referrerQuery.empty) {
-                const referrerDoc = referrerQuery.docs[0];
-                const referrerData = referrerDoc.data();
-                const referrerRef = db.collection('users').doc(referrerDoc.id);
-                
-                // YALNIZ 10 DƏVƏTƏ QƏDƏR BONUS VER
-                if ((referrerData.successfulReferrals || 0) < REFERRAL_BONUS_LIMIT) {
-                    await db.runTransaction(async (transaction) => {
-                        const refDoc = await transaction.get(referrerRef);
-                        if (!refDoc.exists) throw "Referrer tapılmadı";
+                if (!referrerQuery.empty) {
+                    const referrerDoc = referrerQuery.docs[0];
+                    const referrerData = referrerDoc.data();
+                    const referrerUsername = referrerDoc.id;
+                    
+                    console.log(`✅ Referrer tapıldı: ${referrerUsername}`);
+                    console.log(`📊 Referrerin cari dəvət sayı: ${referrerData.successfulReferrals || 0}`);
+
+                    // YALNIZ 10 DƏVƏTƏ QƏDƏR BONUS VER
+                    if ((referrerData.successfulReferrals || 0) < REFERRAL_BONUS_LIMIT) {
                         
-                        const currentReferrals = refDoc.data().successfulReferrals || 0;
+                        // YENİ SADƏ ÜSULLA UPDATE ET
+                        const newReferralCount = (referrerData.successfulReferrals || 0) + 1;
+                        const newBonusAmount = (referrerData.referralBonusEarned || 0) + REFERRAL_BONUS_AMOUNT;
+                        const newTotalMoney = (referrerData.totalMoney || 0) + REFERRAL_BONUS_AMOUNT;
                         
-                        // Yalnız 10 dəvətə qədər bonus ver
-                        if (currentReferrals < REFERRAL_BONUS_LIMIT) {
-                            transaction.set(referrerRef, {
-                                referralBonusEarned: (refDoc.data().referralBonusEarned || 0) + REFERRAL_BONUS_AMOUNT,
-                                successfulReferrals: currentReferrals + 1,
-                                totalMoney: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
-                                invitedFriends: firebase.firestore.FieldValue.arrayUnion(username)
-                            }, { merge: true });
-                            
-                            console.log(`🎁 ${referrerDoc.id} üçün +${REFERRAL_BONUS_AMOUNT} AZN bonus yazıldı. Cari dəvət sayı: ${currentReferrals + 1}`);
-                        } else {
-                            console.log(`ℹ️ ${referrerDoc.id} artıq maksimum ${REFERRAL_BONUS_LIMIT} dəvət limitinə çatıb. Bonus verilmir.`);
+                        await db.collection('users').doc(referrerUsername).update({
+                            successfulReferrals: newReferralCount,
+                            referralBonusEarned: newBonusAmount,
+                            totalMoney: newTotalMoney,
+                            invitedFriends: firebase.firestore.FieldValue.arrayUnion(username)
+                        });
+                        
+                        console.log(`🎁 ${referrerUsername} üçün +${REFERRAL_BONUS_AMOUNT} AZN bonus yazıldı`);
+                        console.log(`📈 Yeni dəvət sayı: ${newReferralCount}`);
+                        console.log(`💰 Yeni bonus məbləği: ${newBonusAmount} AZN`);
+                        
+                        // ƏGƏR REFERRER HAL-HAZIRDA GİRİŞ EDİBSƏ, ONUN MƏLUMATLARINI YENİLƏ
+                        if (currentUserState.username === referrerUsername) {
+                            currentUserState.successfulReferrals = newReferralCount;
+                            currentUserState.referralBonusEarned = newBonusAmount;
+                            currentUserState.totalMoney = newTotalMoney;
+                            updateEnergyDisplay();
+                            console.log(`🔄 Cari istifadəçinin məlumatları yeniləndi`);
                         }
-                    });
+                        
+                    } else {
+                        console.log(`ℹ️ ${referrerUsername} artıq maksimum ${REFERRAL_BONUS_LIMIT} dəvət limitinə çatıb. Bonus verilmir.`);
+                    }
                 } else {
-                    console.log(`ℹ️ ${referrerDoc.id} artıq maksimum ${REFERRAL_BONUS_LIMIT} dəvət limitinə çatıb. Bonus verilmir.`);
+                    console.warn("⚠️ Dəvət kodu ilə uyğun istifadəçi tapılmadı:", referralCodeInput);
                 }
-            } else {
-                console.warn("⚠️ Dəvət kodu ilə uyğun istifadəçi tapılmadı:", referralCodeInput);
+            } catch (referralError) {
+                console.error("❌ Referral bonus xətası:", referralError);
+                // Referral xətası əsas qeydiyyata təsir etməməlidir
             }
         }
 
@@ -2410,7 +2290,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         switchToLogin();
 
     } catch (error) {
-        console.error("❌ Qeydiyyat və ya referral zamanı xəta:", error);
+        console.error("❌ Qeydiyyat zamanı xəta:", error);
         showError("Qeydiyyat zamanı xəta baş verdi. Yenidən cəhd edin.");
     }
 });
@@ -3224,23 +3104,6 @@ window.addEventListener('load', async function() {
     // CG ID sistemini initialize et
     await initializeCounter();
     console.log('✅ CG ID sistemi hazırdır');
-
-// ADEXIUM WIDGET İŞƏ SAL (yalnız push-like reklamlar üçün)
-setTimeout(() => {
-    const adexiumInitialized = initializeAdExiumPushLike();
-    if (adexiumInitialized) {
-        console.log('✅ AdExium Push-like sistemi uğurla başladıldı');
-        
-        // Push-like reklamı hər 60 saniyədən bir göstər (60000 ms = 30 saniyə)
-        setInterval(() => {
-            showAdExiumPushLike();
-        }, 60000);
-        
-    } else {
-        console.log('❌ AdExium Push-like sistemi başladıla bilmədi');
-    }
-}, 6000);
-
     
     // ADSGRAM BUTTON REKLAMI İŞƏ SAL
     setTimeout(() => {
@@ -3298,30 +3161,6 @@ setTimeout(() => {
 window.addEventListener('beforeunload', function() {
     saveUserState();
 });
-    // AdExium Push-like reklamlarını initialize edən funksiya
-function initializeAdExiumPushLike() {
-    try {
-        const script = document.createElement("script");
-    script.src = "https://cdn.tgads.space/assets/js/adexium-widget.min.js"; // Push-like SDK
-        script.async = true;
-        document.head.appendChild(script);
-        return true;
-    } catch (e) {
-        console.error("AdExium Push-like initialize xətası:", e);
-        return false;
-    }
-}
-
-// Push-like reklamı göstərən funksiya
-function showAdExiumPushLike() {
-    if (window.AdexiumPushLike && typeof window.AdexiumPushLike.show === "function") {
-        window.AdexiumPushLike.show();
-        console.log("📢 AdExium Push-like reklam göstərildi");
-    } else {
-        console.log("⚠️ AdExium Push-like sistemi hazır deyil, bir az sonra yenə cəhd ediləcək...");
-        setTimeout(showAdExiumPushLike, 3000);
-    }
-}
 
     </script>
 </body>
