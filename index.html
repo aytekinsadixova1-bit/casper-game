@@ -1975,6 +1975,15 @@ document.getElementById('forgotPasswordForm2').addEventListener('submit', async 
             return true;
         }
 
+        <!DOCTYPE html>
+<html lang="az">
+<head>  
+    <!-- ... digər kodlar eyni qalır ... -->
+</head>
+<body>
+    <!-- ... HTML struktur eyni qalır ... -->
+
+    <script>
         // =================================================================
         // YENİ ADSGRAM 17892 BUTTON REKLAM SİSTEMİ
         // =================================================================
@@ -2027,14 +2036,14 @@ document.getElementById('forgotPasswordForm2').addEventListener('submit', async 
                         console.log('✅ AdsGram Button reklam tamamlandı!', result);
                         buttonAdLastShown = Date.now();
                         
-                        // Reklam tamamlandıqdan sonra bonus ver
-                        const rewardAmount = 0.0005;
+                        // Reklam tamamlandıqdan sonra bonus ver - 0.001 AZN olaraq tənzimləndi
+                        const rewardAmount = 0.001; // 0.001 AZN bonus
                         currentUserState.totalMoney += rewardAmount;
                         saveUserState();
                         updateEnergyDisplay();
                         
                         showSuccess(`🎉 Button reklam tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
-                        console.log('💰 Button reklam bonusu verildi');
+                        console.log('💰 Button reklam bonusu verildi: 0.001 AZN');
                     })
                     .catch((error) => {
                         console.error('❌ AdsGram Button reklam xətası:', error);
