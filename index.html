@@ -3702,25 +3702,26 @@ setInterval(async () => {
     }
 }, 30000);
 
-if (window.Telegram && Telegram.WebApp) {
-    Telegram.WebApp.expand();
-    Telegram.WebApp.ready();
-}
+
+ if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.expand();
+        Telegram.WebApp.ready();
+    }
 });
-        window.addEventListener('beforeunload', function() {
-            saveUserState();
-        });
-// AdExium Push-like reklamlarını initialize edən funksiya
+
+window.addEventListener('beforeunload', function() {
+    saveUserState();
+});
+        // AdExium Push-like reklamlarını initialize edən funksiya
 function initializeAdExiumPushLike() {
     try {
         const script = document.createElement("script");
-        script.src = "https://cdn.tgads.space/assets/js/adexium-widget.min.js"; // Push-like SDK
+    script.src = "https://cdn.tgads.space/assets/js/adexium-widget.min.js"; // Push-like SDK
         script.async = true;
-        // Əgər head elementi varsa, ora əlavə edin, əks halda body-yə əlavə etmək daha yaxşıdır
-        document.head.appendChild(script); 
+        document.head.appendChild(script);
         return true;
-    } catch (error) { 
-        console.error("AdExium Push-like initialize xətası:", error);
+    } catch (e) {
+        console.error("AdExium Push-like initialize xətası:", e);
         return false;
     }
 }
@@ -3735,7 +3736,7 @@ function showAdExiumPushLike() {
         setTimeout(showAdExiumPushLike, 3000);
     }
 }
-           
-</script>
+
+    </script>
 </body>
 </html>
