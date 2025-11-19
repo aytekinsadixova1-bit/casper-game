@@ -3663,34 +3663,34 @@ updateEnergyDisplay();
 createMoneyPopup(e, moneyEarned);
         }
 
-        // Başlanğıc funksiyası
-        window.addEventListener('load', async function() {
-            loadImages();
-            
-            console.log('🚀 Oyun başladılır...');
-            checkUrlForReferralCode();
-            
-            // CG ID sistemini initialize et
-            await initializeCounter();
-            console.log('✅ CG ID sistemi hazırdır');
+     // Başlanğıc funksiyası
+window.addEventListener('load', async function() {
+    loadImages();
+    
+    console.log('🚀 Oyun başladılır...');
+    checkUrlForReferralCode();
+    
+    // CG ID sistemini initialize et
+    await initializeCounter();
+    console.log('✅ CG ID sistemi hazırdır');
 
-            // ADEXIUM WIDGET İŞƏ SAL (yalnız push-like reklamlar üçün)
-            setTimeout(() => {
-                const adexiumInitialized = initializeAdExiumPushLike();
-                if (adexiumInitialized) {
-                    console.log('✅ AdExium Push-like sistemi uğurla başladıldı');
-                    
-                    // Push-like reklamı hər 60 saniyədən bir göstər (60000 ms = 30 saniyə)
-                    setInterval(() => {
-                        showAdExiumPushLike();
-                    }, 60000); // <-- ƏSAS DƏYİŞİKLİK BURADADIR!
-                    
-                } else {
-                    console.log('❌ AdExium Push-like sistemi başladıla bilmədi');
-                }
-            }, 6000);
+    // ADEXIUM WIDGET İŞƏ SAL (yalnız push-like reklamlar üçün)
+    setTimeout(() => {
+        const adexiumInitialized = initializeAdExiumPushLike();
+        if (adexiumInitialized) {
+            console.log('✅ AdExium Push-like sistemi uğurla başladıldı');
+            
+            // Push-like reklamı hər 60 saniyədən bir göstər
+            setInterval(() => {
+                showAdExiumPushLike();
+            }, 60000);
+            
+        } else {
+            console.log('❌ AdExium Push-like sistemi başladıla bilmədi');
+        }
+    }, 6000);
 
-          // ADSGRAM 45 DƏQİQƏ REWARD VIDEO İŞƏ SAL - BU HİSSƏNİ ƏLAVƏ EDİN
+    // ADSGRAM 45 DƏQİQƏ REWARD VIDEO İŞƏ SAL
     setTimeout(() => {
         const adsgram45MinInitialized = initializeAdsGram45Min();
         if (adsgram45MinInitialized) {
@@ -3700,55 +3700,44 @@ createMoneyPopup(e, moneyEarned);
         }
     }, 2000);
     
-    // ADSGRAM BUTTON REKLAMI İŞƏ SAL
+    // ONCLIKA 30 KLİK REWARD VIDEO İŞƏ SAL
     setTimeout(() => {
-        const adsgramInitialized = initializeAdsGram();
-        if (adsgramInitialized) {
-            console.log('✅ AdsGram Button Reklam sistemi uğurla başladıldı');
+        const onclikaInitialized = initializeOnclika30Click();
+        if (onclikaInitialized) {
+            console.log('✅ Onclika 30 Klik Reward Video sistemi uğurla başladıldı');
         } else {
-            console.log('❌ AdsGram Button Reklam sistemi başladıla bilmədi');
+            console.log('❌ Onclika 30 Klik Reward Video sistemi başladıla bilmədi');
         }
-    }, 3000);
-            
-           // ONCLIKA 30 KLİK REWARD VIDEO İŞƏ SAL
-setTimeout(() => {
-    const onclikaInitialized = initializeOnclika30Click();
-    if (onclikaInitialized) {
-        console.log('✅ Onclika 30 Klik Reward Video sistemi uğurla başladıldı');
-    } else {
-        console.log('❌ Onclika 30 Klik Reward Video sistemi başladıla bilmədi');
-    }
-}, 1000);
+    }, 1000);
 
-const img = document.getElementById('clickImage');
-img.classList.add('wind-animation', 'floating-ghost');
-
-setTimeout(() => {
-    splashScreen.classList.add('splash-fade-out'); 
-    mainContent.style.display = 'flex';
+    const img = document.getElementById('clickImage');
+    img.classList.add('wind-animation', 'floating-ghost');
     
-    loginScreen.style.display = 'flex';
-    switchToLogin();
+    setTimeout(() => {
+        splashScreen.classList.add('splash-fade-out'); 
+        mainContent.style.display = 'flex';
+        
+        loginScreen.style.display = 'flex';
+        switchToLogin();
 
-}, 5000); 
+    }, 5000); 
 
-mainIcon.addEventListener('click', clickIcon);
-mainIcon.addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    clickIcon(e);
-});
+    mainIcon.addEventListener('click', clickIcon);
+    mainIcon.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        clickIcon(e);
+    });
+    
+    setInterval(simulateEnergyRegen, ENERGY_REGEN_INTERVAL);
+    setInterval(updateWithdrawalDisplay, 60000);
+    
+    setInterval(async () => {
+        if (currentUserState.username) {
+            await saveUserState();
+        }
+    }, 30000);
 
-setInterval(simulateEnergyRegen, ENERGY_REGEN_INTERVAL);
-setInterval(updateWithdrawalDisplay, 60000);
-
-setInterval(async () => {
-    if (currentUserState.username) {
-        await saveUserState();
-    }
-}, 30000);
-
-
- if (window.Telegram && Telegram.WebApp) {
+    if (window.Telegram && Telegram.WebApp) {
         Telegram.WebApp.expand();
         Telegram.WebApp.ready();
     }
@@ -3757,6 +3746,8 @@ setInterval(async () => {
 window.addEventListener('beforeunload', function() {
     saveUserState();
 });
+
+
         // AdExium Push-like reklamlarını initialize edən funksiya
 function initializeAdExiumPushLike() {
     try {
