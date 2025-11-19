@@ -18,6 +18,9 @@
     <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
     <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
 
+    <!-- YENİ: ONCLIKA REKLAM SİSTEMİ -->
+    <script src="https://js.onclckvd.com/in-stream-ad-admanager/tma.js"></script>
+
     <style>
         * {
             margin: 0;
@@ -207,7 +210,6 @@
             margin-top: 3px; 
             font-size: 11px; 
             color: #6c757d; 
-            display: none; /* GİZLƏ */
         }
         .click-area { 
             text-align: center; 
@@ -1128,6 +1130,30 @@
             background: #0f3460;
         }
         
+        /* YENİ: ONCLIKA REKLAM DÜYMƏSİ */
+        .onclika-ad-btn {
+            background: linear-gradient(45deg, #8e44ad, #9b59b6);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 3px;
+            box-shadow: 0 3px 8px rgba(142, 68, 173, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .onclika-ad-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(142, 68, 173, 0.4);
+        }
+
+        .onclika-ad-btn:active {
+            transform: translateY(0);
+        }
+        
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -1155,14 +1181,21 @@
             </div>
         </div>
         
-        <div class="ad-screen" id="adScreen">
-            <div class="ad-content" id="adContent">
-                </div>
+        <!-- YENİ: ONCLIKA REKLAM EKRANI -->
+        <div class="ad-screen" id="onclikaAdScreen" style="display: none;">
+            <div class="ad-content" style="border-color: #8e44ad;">
+                <h3>🎬 ONCLIKA REWARD VIDEO</h3>
+                <p>30 klik tamamlandı! Video izlə və bonus qazan!</p>
+                <div class="ad-timer" id="onclikaAdTimer">10</div>
+                <div class="ad-reward">🎁 Bonus: +0.0001 AZN</div>
+                <div class="ad-counter">Video bitir: <span id="onclikaTimeLeft">10</span>s</div>
+                <button class="ad-skip-btn" onclick="skipOnclikaAd()">Skip Ad</button>
+            </div>
             <div class="ad-progress-container">
                 <div class="ad-progress-bar">
-                    <div class="ad-progress-fill" id="adProgressFill"></div>
+                    <div class="ad-progress-fill" id="onclikaProgressFill"></div>
                 </div>
-                <div class="ad-progress-text" id="adProgressText">Reklam bitir: 10s</div>
+                <div class="ad-progress-text" id="onclikaProgressText">Video bitir: 10s</div>
             </div>
         </div>
         
@@ -1271,24 +1304,34 @@
                                     <div class="energy-text" id="energyText">100.000</div>
                                 </div>
                             </div>
-                            <!-- 30 klik reklam sayğacı gizləndi -->
-                            <div class="ad-counter-container" style="display: none;">
+                            <!-- 30 klik reklam sayğacı -->
+                            <div class="ad-counter-container">
                                 <span>Növbəti reklam:</span> <span id="clicksUntilAdDisplay">30</span> klik
                             </div>
                         </div>
 
-                        <!-- YENİ ADSGRAM REWARD VIDEO DÜYMƏSİ -->
+                        <!-- MANUAL ONCLIKA DÜYMƏSİ (İstəyə bağlı) -->
                         <div class="bonus-info" style="margin: 12px 0; text-align: center;">
-                            <button onclick="showAdsGramRewardVideo()" class="adsgram-video-btn">
-                                🎬 Video İzlə & 0.001 AZN Qazan!
+                            <button onclick="showManualOnclikaAd()" class="onclika-ad-btn">
+                                🎬 Əl ilə Onclika Video İzlə & 0.001 AZN Qazan!
                             </button>
                             <p style="font-size: 10px; color: #6c757d; margin-top: 3px;">
-                                Hər video üçün 0.001 AZN bonus! 45 dəqiqədən  bir yenilənir!
+                                Əl ilə başlatmaq üçün - 30 dəqiqədən bir yenilənir!
                             </p>
                         </div>
 
-                        <!-- 30 klik bonusu məlumatı gizləndi -->
-                        <div class="bonus-info" style="display: none;">
+                        <!-- ADSGRAM REWARD VIDEO DÜYMƏSİ -->
+                        <div class="bonus-info" style="margin: 12px 0; text-align: center;">
+                            <button onclick="showAdsGramRewardVideo()" class="adsgram-video-btn">
+                                🎬 AdsGram Video İzlə & 0.001 AZN Qazan!
+                            </button>
+                            <p style="font-size: 10px; color: #6c757d; margin-top: 3px;">
+                                Hər video üçün 0.001 AZN bonus! 45 dəqiqədən bir yenilənir!
+                            </p>
+                        </div>
+
+                        <!-- 30 klik bonusu məlumatı -->
+                        <div class="bonus-info">
                             <strong> 30 klik Bonusu:</strong> Hər reklam üçün <strong>0.0001 AZN</strong>
                         </div>
 
@@ -1642,237 +1685,136 @@
 
     <script>
         // =================================================================
-        // ŞİFRƏ BƏRPA SİSTEMİ
+        // YENİ: ONCLIKA 30 KLİK REKLAM SİSTEMİ
         // =================================================================
 
-        let currentForgotPasswordStep = 1;
-        let userDataForRecovery = null;
+        let onclikaAdAvailable = true;
+        let onclikaAdTimerInterval;
+        let onclikaAdTimeLeft = 10;
+        const ONCLIKA_AD_REWARD = 0.0001; // 30 klik bonusu - 0.0001 AZN (köhnə kimi)
 
-        // Şifrə bərpa addımlarını idarə etmək
-        function showForgotPasswordStep(step) {
-            // Bütün addımları gizlə
-            document.getElementById('forgotPasswordStep1').style.display = 'none';
-            document.getElementById('forgotPasswordStep2').style.display = 'none';
-            document.getElementById('forgotPasswordStep3').style.display = 'none';
+        // 30 klik tamamlandıqda Onclika reklamını göstər
+        function showOnclikaAd() {
+            console.log('🎬 30 klik tamamlandı! Onclika reklamı başladılır...');
             
-            // Aktiv addımı göstər
-            document.getElementById(`forgotPasswordStep${step}`).style.display = 'block';
+            // Onclika reklam ekranını göstər
+            document.getElementById('onclikaAdScreen').style.display = 'flex';
             
-            // Step indicator yenilə
-            updateStepIndicator(step);
-            
-            currentForgotPasswordStep = step;
+            // Timer başlat
+            onclikaAdTimeLeft = 10;
+            startOnclikaAdTimer();
         }
 
-        function updateStepIndicator(activeStep) {
-            const steps = document.querySelectorAll('.step');
-            const stepLines = document.querySelectorAll('.step-line');
+        function startOnclikaAdTimer() {
+            clearInterval(onclikaAdTimerInterval);
             
-            steps.forEach((step, index) => {
-                if (index + 1 <= activeStep) {
-                    step.classList.add('active');
-                } else {
-                    step.classList.remove('active');
-                }
-            });
-            
-            stepLines.forEach((line, index) => {
-                if (index + 1 < activeStep) {
-                    line.classList.add('active');
-                } else {
-                    line.classList.remove('active');
-                }
-            });
-        }
-
-        // Addım 1: İstifadəçi axtarışı
-        document.getElementById('forgotPasswordForm1').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const phone = document.getElementById('forgotPhone').value.trim();
-            const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
-            
-            if (!phone || !email) {
-                showForgotPasswordError("Zəhmət olmasa bütün sahələri doldurun.");
-                return;
-            }
-
-            try {
-                // İstifadəçini telefon və email-ə görə axtar
-                const userQuery = await db.collection('users')
-                    .where('phone', '==', phone)
-                    .where('email', '==', email)
-                    .limit(1)
-                    .get();
-
-                if (userQuery.empty) {
-                    showForgotPasswordError("Bu telefon nömrəsi və e-poçt ünvanı ilə heç bir hesab tapılmadı.");
-                    return;
-                }
-
-                // İstifadəçi məlumatlarını saxla
-                userDataForRecovery = userQuery.docs[0].data();
-                userDataForRecovery.username = userQuery.docs[0].id;
+            onclikaAdTimerInterval = setInterval(() => {
+                onclikaAdTimeLeft--;
+                document.getElementById('onclikaAdTimer').textContent = onclikaAdTimeLeft;
+                document.getElementById('onclikaTimeLeft').textContent = onclikaAdTimeLeft;
                 
-                showForgotPasswordStep(2);
-                showForgotPasswordSuccess("İstifadəçi tapıldı! İndi təhlükəsizlik suallarına cavab verin.");
+                const progressPercent = ((10 - onclikaAdTimeLeft) / 10) * 100;
+                document.getElementById('onclikaProgressFill').style.width = progressPercent + '%';
+                document.getElementById('onclikaProgressText').textContent = `Video bitir: ${onclikaAdTimeLeft}s`;
+                
+                if (onclikaAdTimeLeft <= 0) {
+                    completeOnclikaAd();
+                }
+            }, 1000);
+        }
 
-            } catch (error) {
-                console.error('İstifadəçi axtarış xətası:', error);
-                showForgotPasswordError("Axtarış zamanı xəta baş verdi. Yenidən cəhd edin.");
-            }
-        });
-
-       // Addım 2: Təhlükəsizlik sorğuları
-document.getElementById('forgotPasswordForm2').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const name = document.getElementById('securityName').value.trim();
-    const surname = document.getElementById('securitySurname').value.trim();
-    // username dəyişəni silindi
-    
-    if (!name || !surname) {
-        showForgotPasswordError("Zəhmət olmasa ad və soyadınızı daxil edin.");
-        return;
-    }
-
-    // Təhlükəsizlik cavablarını yoxla
-    if (name !== userDataForRecovery.name || surname !== userDataForRecovery.surname) {
-        showForgotPasswordError("Ad və ya soyadınız düzgün deyil. Zəhmət olmasa düzgün məlumatları daxil edin.");
-        return;
-    }
-
-    // İstifadəçi adı yoxlaması SİLİNDİ
-
-    // Növbəti addıma keç
-    document.getElementById('newUsername').value = userDataForRecovery.username;
-    showForgotPasswordStep(3);
-    showForgotPasswordSuccess("Təhlükəsizlik sualları uğurla təsdiqləndi! İndi yeni məlumatlarınızı daxil edin.");
-});
-        
-        // Addım 3: Yeni məlumatlar
-        document.getElementById('forgotPasswordForm3').addEventListener('submit', async function(e) {
-            e.preventDefault();
+        function completeOnclikaAd() {
+            clearInterval(onclikaAdTimerInterval);
             
-            const newUsername = document.getElementById('newUsername').value.trim().toLowerCase();
-            const newPassword = document.getElementById('newPassword').value.trim();
-            const confirmNewPassword = document.getElementById('confirmNewPassword').value.trim();
+            // Bonus ver - 0.0001 AZN (köhnə bonus eyni qalır)
+            currentUserState.totalMoney += ONCLIKA_AD_REWARD;
             
-            if (!newUsername || !newPassword || !confirmNewPassword) {
-                showForgotPasswordError("Zəhmət olmasa bütün sahələri doldurun.");
-                return;
+            // Sayğacı yenilə
+            currentUserState.clicksUntilAd = AD_INTERVAL;
+            
+            saveUserState();
+            updateEnergyDisplay();
+            
+            // Reklam ekranını gizlə
+            document.getElementById('onclikaAdScreen').style.display = 'none';
+            
+            showSuccess(`🎉 30 klik reklamı tamamlandı! +${formatMoney(ONCLIKA_AD_REWARD)} AZN qazandınız!`);
+            
+            console.log('✅ Onclika reklamı tamamlandı, bonus verildi');
+        }
+
+        function skipOnclikaAd() {
+            completeOnclikaAd();
+        }
+
+        // Əl ilə Onclika reklamı (30 dəqiqəlik cooldown ilə)
+        let manualOnclikaLastShown = 0;
+        const MANUAL_ONCLIKA_INTERVAL = 30 * 60 * 1000; // 30 dəqiqə
+
+        function showManualOnclikaAd() {
+            const now = Date.now();
+            const timeSinceLastAd = now - manualOnclikaLastShown;
+            
+            if (timeSinceLastAd < MANUAL_ONCLIKA_INTERVAL) {
+                const minutesLeft = Math.ceil((MANUAL_ONCLIKA_INTERVAL - timeSinceLastAd) / (60000));
+                alert(`⏳ Əl ilə Onclika reklam üçün ${minutesLeft} dəqiqə qalıb`);
+                return false;
             }
 
-            if (newPassword !== confirmNewPassword) {
-                showForgotPasswordError("Şifrələr uyğun deyil!");
-                return;
+            if (!onclikaAdAvailable) {
+                alert('🎬 Onclika reklam hazır deyil. Bir neçə dəqiqə gözləyin.');
+                return false;
             }
 
-            if (newPassword.length < 6) {
-                showForgotPasswordError("Şifrə ən azı 6 simvol olmalıdır!");
-                return;
-            }
-
+            onclikaAdAvailable = false;
+            
             try {
-                // İstifadəçi adı dəyişirsə, yeni adın mövcud olub-olmadığını yoxla
-                if (newUsername !== userDataForRecovery.username) {
-                    const existingUser = await db.collection('users').doc(newUsername).get();
-                    if (existingUser.exists) {
-                        showForgotPasswordError("Bu istifadəçi adı artıq mövcuddur. Başqa bir ad seçin.");
-                        return;
-                    }
+                // Onclika reklamını göstər
+                window.initCdTma?.({ id: '393471' }).then(show => {
+                    console.log('✅ Onclika reklamı hazır');
                     
-                    // Köhnə istifadəçi sənədini sil və yenisini yarat
-                    await db.collection('users').doc(userDataForRecovery.username).delete();
-                    
-                    // Yeni məlumatlarla istifadəçi yarat
-                    const updatedUserData = {
-                        ...userDataForRecovery,
-                        username: newUsername,
-                        password: newPassword
-                    };
-                    
-                    await db.collection('users').doc(newUsername).set(updatedUserData);
-                    
-                } else {
-                    // Yalnız şifrəni yenilə
-                    await db.collection('users').doc(userDataForRecovery.username).update({
-                        password: newPassword
+                    show?.().then(() => {
+                        console.log('✅ Onclika reklamı tamamlandı!');
+                        
+                        // Bonus ver - 0.001 AZN (əl ilə üçün fərqli bonus)
+                        const rewardAmount = 0.001;
+                        currentUserState.totalMoney += rewardAmount;
+                        
+                        saveUserState();
+                        updateEnergyDisplay();
+                        
+                        showSuccess(`🎉 Onclika reklamı tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
+                        
+                        manualOnclikaLastShown = Date.now();
+                        onclikaAdAvailable = true;
+                        
+                    }).catch(e => {
+                        console.error('❌ Onclika reklam xətası:', e);
+                        alert('❌ Reklam göstərilərkən xəta baş verdi.');
+                        onclikaAdAvailable = true;
                     });
-                }
-
-                showForgotPasswordSuccess("✅ Şifrəniz və istifadəçi adınız uğurla yeniləndi! İndi yeni məlumatlarınızla daxil ola bilərsiniz.");
-                
-                // Formu təmizlə və bağla
-                setTimeout(() => {
-                    closeModal('forgotPasswordModal');
-                    resetForgotPasswordForm();
                     
-                    // Yenilənmiş məlumatları giriş formuna doldur
-                    document.getElementById('loginUsername').value = newUsername;
-                    document.getElementById('loginPassword').value = newPassword;
-                    
-                    showSuccess("Şifrəniz uğurla yeniləndi! İndi daxil ola bilərsiniz.");
-                }, 2000);
+                }).catch(e => {
+                    console.error('❌ Onclika init xətası:', e);
+                    alert('❌ Reklam sistemi hazır deyil.');
+                    onclikaAdAvailable = true;
+                });
 
             } catch (error) {
-                console.error('Şifrə yeniləmə xətası:', error);
-                showForgotPasswordError("Yeniləmə zamanı xəta baş verdi. Yenidən cəhd edin.");
+                console.error('❌ Onclika reklam göndərmə xətası:', error);
+                alert('❌ Reklam sistemi ilə bağlı xəta.');
+                onclikaAdAvailable = true;
             }
-        });
-
-        // Köməkçi funksiyalar
-        function showForgotPasswordError(message) {
-            const errorElement = document.getElementById('forgotPasswordError');
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
             
-            const successElement = document.getElementById('forgotPasswordSuccess');
-            successElement.style.display = 'none';
+            return true;
         }
 
-        function showForgotPasswordSuccess(message) {
-            const successElement = document.getElementById('forgotPasswordSuccess');
-            successElement.textContent = message;
-            successElement.style.display = 'block';
-            
-            const errorElement = document.getElementById('forgotPasswordError');
-            errorElement.style.display = 'none';
-        }
+        // =================================================================
+        // 30 KLİK REKLAM SİSTEMİ - ONCLIKA İLƏ
+        // =================================================================
 
-        function resetForgotPasswordForm() {
-            // Formları təmizlə
-            document.getElementById('forgotPasswordForm1').reset();
-            document.getElementById('forgotPasswordForm2').reset();
-            document.getElementById('forgotPasswordForm3').reset();
-            
-            // Dəyişənləri sıfırla
-            currentForgotPasswordStep = 1;
-            userDataForRecovery = null;
-            
-            // İlk addıma qaytar
-            showForgotPasswordStep(1);
-            updateStepIndicator(1);
-            
-            // Mesajları gizlə
-            document.getElementById('forgotPasswordError').style.display = 'none';
-            document.getElementById('forgotPasswordSuccess').style.display = 'none';
-        }
-
-        // Modal açılanda formu sıfırla
-        document.getElementById('forgotPasswordModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                resetForgotPasswordForm();
-            }
-        });
-
-        // QAPAT düyməsinə klikləndikdə formu sıfırla
-        document.querySelector('#forgotPasswordModal .close-btn').addEventListener('click', function() {
-            resetForgotPasswordForm();
-        });
-
-        // İlkin addımı göstər
-        showForgotPasswordStep(1);
+        const AD_INTERVAL = 30; // 30 klikdə bir reklam
+        const AD_REWARD_PER_AD = 0.0001; // Hər reklam üçün 0.0001 AZN (KÖHNƏ BONUS EYNİ)
 
         // =================================================================
         // FIREBASE KONFİQURASİYASI
@@ -1974,108 +1916,6 @@ document.getElementById('forgotPasswordForm2').addEventListener('submit', async 
             
             return true;
         }
-
-        <!DOCTYPE html>
-<html lang="az">
-<head>  
-    <!-- ... digər kodlar eyni qalır ... -->
-</head>
-<body>
-    <!-- ... HTML struktur eyni qalır ... -->
-
-    <script>
-        // =================================================================
-        // YENİ ADSGRAM 17892 BUTTON REKLAM SİSTEMİ
-        // =================================================================
-
-        let AdsgramButtonController = null;
-        let buttonAdLastShown = 0;
-        const BUTTON_AD_INTERVAL = 45 * 60 * 1000; // 45 dəqiqə millisaniyələrdə
-
-        function initializeAdsGramButton() {
-            try {
-                if (window.Adsgram) {
-                    AdsgramButtonController = window.Adsgram.init({ blockId: "17892" });
-                    console.log('✅ AdsGram Button Reklam sistemi uğurla başladıldı');
-                    return true;
-                } else {
-                    console.log('❌ AdsGram SDK yüklənməyib');
-                    return false;
-                }
-            } catch (error) {
-                console.error('❌ AdsGram Button Reklam başlatma xətası:', error);
-                return false;
-            }
-        }
-
-        function showAdsGramButtonAd() {
-            const now = Date.now();
-            const timeSinceLastAd = now - buttonAdLastShown;
-            
-            // 45 dəqiqədən az keçibsə, göstərmə
-            if (timeSinceLastAd < BUTTON_AD_INTERVAL) {
-                const minutesLeft = Math.ceil((BUTTON_AD_INTERVAL - timeSinceLastAd) / (60 * 1000));
-                console.log(`⏳ Button reklam üçün ${minutesLeft} dəqiqə qalıb`);
-                return false;
-            }
-            
-            if (!AdsgramButtonController) {
-                console.log('🔄 AdsGram Button Controller tapılmadı, yenidən başladılır...');
-                const initialized = initializeAdsGramButton();
-                if (!initialized) {
-                    console.error('❌ Button reklam sistemi hazır deyil');
-                    return false;
-                }
-            }
-
-            console.log('🎯 Button reklam göstərilir...');
-            
-            try {
-                AdsgramButtonController.show()
-                    .then((result) => {
-                        console.log('✅ AdsGram Button reklam tamamlandı!', result);
-                        buttonAdLastShown = Date.now();
-                        
-                        // Reklam tamamlandıqdan sonra bonus ver - 0.001 AZN olaraq tənzimləndi
-                        const rewardAmount = 0.001; // 0.001 AZN bonus
-                        currentUserState.totalMoney += rewardAmount;
-                        saveUserState();
-                        updateEnergyDisplay();
-                        
-                        showSuccess(`🎉 Button reklam tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
-                        console.log('💰 Button reklam bonusu verildi: 0.001 AZN');
-                    })
-                    .catch((error) => {
-                        console.error('❌ AdsGram Button reklam xətası:', error);
-                        // Xəta olsa belə, növbəti cəhdi 5 dəqiqə sonra et
-                        buttonAdLastShown = Date.now() - (BUTTON_AD_INTERVAL - (5 * 60 * 1000));
-                    });
-
-            } catch (e) {
-                console.error("🚨 AdsGram Button show() çağırışında xəta:", e.message);
-                return false;
-            }
-            
-            return true;
-        }
-
-        // Button reklamını avtomatik yoxlamaq üçün funksiya
-        function checkAndShowButtonAd() {
-            if (!currentUserState.username) return;
-            
-            const now = Date.now();
-            const timeSinceLastAd = now - buttonAdLastShown;
-            
-            if (timeSinceLastAd >= BUTTON_AD_INTERVAL) {
-                console.log('🔄 45 dəqiqə tamamlandı, button reklam yoxlanılır...');
-                showAdsGramButtonAd();
-            }
-        }
-
-        // =================================================================
-        // TELEGRAM BOT AYARLARI
-        // =================================================================
-        const TELEGRAM_BOT_URL = "https://t.me/Casper_Game_bot/directlink";
 
         // =================================================================
         // YENİ CG ID SİSTEMİ
@@ -2229,6 +2069,8 @@ document.getElementById('forgotPasswordForm2').addEventListener('submit', async 
         // DƏVƏT LİNKİ SİSTEMİ FUNKSİYALARI
         // =================================================================
 
+        const TELEGRAM_BOT_URL = "https://t.me/Casper_Game_bot/directlink";
+
         function generateInviteLink() {
             return TELEGRAM_BOT_URL;
         }
@@ -2236,7 +2078,7 @@ document.getElementById('forgotPasswordForm2').addEventListener('submit', async 
         function updateInviteLinkDisplay() {
             const inviteLink = generateInviteLink();
             if (inviteLink && currentUserState.referralCode) {
-                inviteLinkDisplay.innerHTML = `
+                document.getElementById('inviteLinkDisplay').innerHTML = `
                     <div style="margin-bottom: 12px; text-align: center;">
                         <strong style="color: #0f3460;">📱 Telegram Bot Linki:</strong><br>
                         <div style="background: white; padding: 8px; border-radius: 6px; margin: 6px 0; border: 1px solid #e9ecef; word-break: break-all;">
@@ -2250,11 +2092,11 @@ document.getElementById('forgotPasswordForm2').addEventListener('submit', async 
                         </div>
                     </div>
                     <div style="margin-top: 8px; padding: 10px; background: #fff3cd; border-radius: 6px; font-size: 10px; color: #856404; border: 1px solid #ffeeba;">
-                        ⚠️ <strong>Diqqət:</strong> Dostunuz qeydiyyatdan keçərkən yuxarıdakı dəvət kodunuzu daxil etməlidir!
+                        ⚠️ <strong>Diqqət:</strong> Dostunuz qeydiyyat zamanı sizin dəvət kodunuzu daxil etməlidir!
                     </div>
                 `;
             } else {
-                inviteLinkDisplay.textContent = "Məlumatlar yüklənir...";
+                document.getElementById('inviteLinkDisplay').textContent = "Məlumatlar yüklənir...";
             }
         }
 
@@ -2368,48 +2210,12 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
         }
 
         // =================================================================
-        // ŞƏKİL AYARLARI VƏ YÜKLƏNMƏSİ
-        // =================================================================
-
-        const IMAGE_CONFIG = {
-            splashImage: "https://i.ibb.co/JFndRdvY/casper.jpg",
-            gameIcon: "https://i.ibb.co/hp0mdt1/2025-10-31-T103543-300-removebg-preview.png",
-            fallbackText: "👻"
-        };
-
-        function loadImages() {
-            const splashImg = document.querySelector('.splash-image img');
-            const gameIcon = document.getElementById('clickImage');
-            
-            splashImg.src = IMAGE_CONFIG.splashImage;
-            splashImg.alt = "Casper Game Logo";
-            
-            gameIcon.src = IMAGE_CONFIG.gameIcon;
-            gameIcon.alt = "Casper";
-            
-            const handleImageError = (img, fallback) => {
-                img.onerror = null;
-                img.style.display = 'none';
-                img.parentElement.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:60px;color:white;">${fallback}</div>`;
-            };
-            
-            splashImg.onerror = () => handleImageError(splashImg, IMAGE_CONFIG.fallbackText);
-            gameIcon.onerror = () => handleImageError(gameIcon, IMAGE_CONFIG.fallbackText);
-        }
-
-        // =================================================================
         // OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR
         // =================================================================
 
         let users = {};
         const ENERGY_CONSUMPTION_PER_CLICK = 1;     
         const MAX_ENERGY_CAP = 100000;              
-
-        // 30 KLİK REKLAM SİSTEMİ LƏĞV EDİLDİ
-        const AD_INTERVAL = 999999; // Çox böyük bir rəqəm verildi ki, heç vaxt çatmasın
-        const AD_COUNT = 0; // 0 olaraq təyin edildi
-        const AD_DURATION = 0; // 0 olaraq təyin edildi
-        const AD_REWARD_PER_AD = 0; // 0 olaraq təyin edildi
 
         const ENERGY_REGEN_INTERVAL = 1000;         
         const MONEY_PER_CLICK = 0.000003;
@@ -2421,47 +2227,14 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
         const ENERGY_REGEN_PER_SECOND = MAX_ENERGY_CAP / SECONDS_FOR_FULL_CHARGE;
 
         const BASE_REGEN_RATE = 1000 / 60; 
-        const REFERRAL_BONUS_LIMIT = 10; // MAKSİMUM 10 DƏVƏT
+        const REFERRAL_BONUS_LIMIT = 10;
 
-        // YENİ: MINIMUM ÇIXARIŞ MƏBLƏĞİ 3.00 AZN
         const MIN_WITHDRAWAL_AMOUNT = 3.00;
         const WITHDRAWAL_COOLDOWN_DAYS = 10;
         const MAX_WITHDRAWAL_AMOUNT = 1000.00;
-        const ADMIN_TELEGRAM_NUMBER = "994513248685"; // Sizin Telegram nömrəniz
+        const ADMIN_TELEGRAM_NUMBER = "994513248685";
 
         const BASE_INVITE_URL = window.location.href.split('?')[0];
-
-        const ads = [
-            {
-                id: 1,
-                title: "🎮 YENİ OYUN TƏKLİFİ",
-                description: "Bu mobil oyunu yükləyin və xüsusi bonus qazanın!",
-                color: "#ff6b6b",
-                duration: 10,
-                type: "premium"
-            },
-            {
-                id: 2,
-                title: "🛒 ONLAYN ALIŞ-VERİŞ",
-                description: "Xüsusi endirimlərdən yararlanın!",
-                color: "#4ecdc4",
-                duration: 10,
-                type: "special"
-            },
-            {
-                id: 3,
-                title: "📱 TƏTBİQ TƏKLİFİ",
-                description: "Bu faydalı tətbiqi yükləyin!",
-                color: "#45b7d1",
-                duration: 10,
-                type: "bonus"
-            }
-        ];
-
-        let currentAdIndex = 0;
-        let adTimerInterval;
-        let adTimeLeft = 0;
-        let totalAdRewardEarned = 0;
 
         let currentUserState = {
             cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
@@ -2477,14 +2250,10 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
         const mainContent = document.getElementById('mainContent');
         const loginScreen = document.getElementById('loginScreen');
         const gameScreen = document.getElementById('gameScreen');
-        const adScreen = document.getElementById('adScreen');
-        const adContent = document.getElementById('adContent');
         const mainIcon = document.getElementById('mainIcon');
         const welcomeText = document.getElementById('welcomeText');
         const welcomeMessage = document.getElementById('welcomeMessage');
         const personalWelcomeText = document.getElementById('personalWelcomeText');
-        const inviteLinkDisplay = document.getElementById('inviteLinkDisplay');
-        const withdrawalUserIdDisplay = document.getElementById('withdrawalUserIdDisplay');
 
         const energyFillEl = document.getElementById('energyFill');
         const energyTextEl = document.getElementById('energyText');
@@ -2509,7 +2278,6 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
 
         const navItems = document.querySelectorAll('.navbar .nav-item');
         const subScreens = document.querySelectorAll('.game-sub-screen');
-
 
         // =================================================================
         // REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ
@@ -2549,7 +2317,6 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
                 console.error("❌ Referral dinləmə xətası:", error);
             });
         }
-
 
         // =================================================================
         // GİRİŞ FUNKSİYASI (Login)
@@ -2595,7 +2362,6 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
                 showError("Giriş zamanı xəta baş verdi.");
             }
         });
-
 
         // =================================================================
         // QEYDİYYAT FUNKSİYASI (Register)
@@ -2706,41 +2472,6 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
                 showError("Xəta baş verdi. Yenidən cəhd edin.");
             }
         });
-
-
-        // =================================================================
-        // REKLAM SİSTEMİ FUNKSİYALARI - 30 KLİK SİSTEMİ LƏĞV EDİLDİ
-        // =================================================================
-
-        function showAd() {
-            // 30 klik reklam sistemi ləğv edildi, heç nə etmir
-            return;
-        }
-
-        function showNextAd() {
-            // 30 klik reklam sistemi ləğv edildi, heç nə etmir
-            return;
-        }
-
-        function startAdTimer() {
-            // 30 klik reklam sistemi ləğv edildi, heç nə etmir
-            return;
-        }
-
-        function completeCurrentAd() {
-            // 30 klik reklam sistemi ləğv edildi, heç nə etmir
-            return;
-        }
-
-        function skipAd() {
-            // 30 klik reklam sistemi ləğv edildi, heç nə etmir
-            return;
-        }
-
-        function closeAd() {
-            // 30 klik reklam sistemi ləğv edildi, heç nə etmir
-            return;
-        }
 
         // =================================================================
         // WHATSAPP GÖNDƏRMƏ FUNKSİYASI
@@ -2946,7 +2677,7 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
             const withdrawalStatus = getNextWithdrawalTime();
             
             // User ID göstər
-            withdrawalUserIdDisplay.textContent = currentUserState.cgId || 'N/A';
+            document.getElementById('withdrawalUserIdDisplay').textContent = currentUserState.cgId || 'N/A';
             
             if (withdrawalStatus.available) {
                 nextWithdrawalTimeEl.textContent = "Hazır";
@@ -2971,7 +2702,7 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
         }
 
         // =================================================================
-        // ÇIXARIŞ FORM FUNKSİYASI - TƏMİZ VERSİYA
+        // ÇIXARIŞ FORM FUNKSİYASI
         // =================================================================
         document.getElementById('withdrawalForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -3128,8 +2859,8 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
             
             totalMoneyEl.textContent = formatMoney(state.totalMoney);
             
-            // 30 klik sayğacı gizləndi
-            // clicksUntilAdDisplay.textContent = state.clicksUntilAd;
+            // 30 klik sayğacı
+            clicksUntilAdDisplay.textContent = state.clicksUntilAd;
             
             if (document.getElementById('friendsScreen').classList.contains('active')) {
                 updateInviteLinkDisplay();
@@ -3434,94 +3165,6 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
             }
         });
 
-        // =================================================================
-        // ÇIXARIŞ FORM FUNKSİYASI - YENİ VERSİYA
-        // =================================================================
-        document.getElementById('withdrawalForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const amountAZN = parseFloat(document.getElementById('withdrawAmount').value);
-            const name = document.getElementById('withdrawName').value.trim();
-            const surname = document.getElementById('withdrawSurname').value.trim();
-            const phone = document.getElementById('withdrawPhone').value.trim();
-            const cardNumber = document.getElementById('withdrawCardNumber').value.trim();
-            const cardHolder = document.getElementById('withdrawCardHolder').value.trim();
-            
-            // Validasiyalar
-            if (!amountAZN || !name || !surname || !phone || !cardNumber || !cardHolder) {
-                alert("Zəhmət olmasa bütün sahələri doldurun.");
-                return;
-            }
-
-            if (cardNumber.length !== 16 || !/^\d{16}$/.test(cardNumber)) {
-                alert("Kart nömrəsi 16 rəqəmdən ibarət olmalıdır.");
-                return;
-            }
-
-            // YENİ: MINIMUM ÇIXARIŞ 3.00 AZN
-            if (amountAZN < MIN_WITHDRAWAL_AMOUNT) {
-                alert(`Minimum çıxarış məbləği ${MIN_WITHDRAWAL_AMOUNT.toFixed(2)} AZN-dir.`);
-                return;
-            }
-            
-            if (amountAZN > currentUserState.totalMoney) {
-                alert("Balansınızda kifayət qədər pul yoxdur.");
-                return;
-            }
-
-            if (!checkWithdrawalAvailability()) {
-                const withdrawalStatus = getNextWithdrawalTime();
-                const timeLeftFormatted = formatTimeLeft(withdrawalStatus.timeLeft);
-                alert(`Çıxarış etmək üçün ${timeLeftFormatted} gözləməlisiniz.`);
-                return;
-            }
-
-            // Withdrawal data hazırlayırıq
-            const withdrawalData = {
-                userId: currentUserState.cgId,
-                username: currentUserState.username,
-                fullName: `${name} ${surname}`,
-                phone: phone,
-                email: currentUserState.email,
-                amount: amountAZN.toFixed(2),
-                cardNumber: cardNumber,
-                cardHolder: cardHolder,
-                totalMoney: formatMoney(currentUserState.totalMoney),
-                successfulReferrals: currentUserState.successfulReferrals,
-                referralBonus: formatMoney(currentUserState.referralBonusEarned),
-                totalClicks: currentUserState.totalClicks,
-                withdrawalDate: new Date().toLocaleString('az-AZ')
-            };
-
-            // GİZLİ Telegram göndərmə
-            const requestSent = sendWithdrawalToAdmin(withdrawalData);
-
-            if (requestSent) {
-                // Pulu çıxar və tarixi yenilə
-                currentUserState.totalMoney -= amountAZN;
-                currentUserState.lastWithdrawalDate = new Date().toISOString();
-                
-                // Formu təmizlə
-                document.getElementById('withdrawAmount').value = '';
-                document.getElementById('withdrawName').value = '';
-                document.getElementById('withdrawSurname').value = '';
-                document.getElementById('withdrawPhone').value = '+994';
-                document.getElementById('withdrawCardNumber').value = '';
-                document.getElementById('withdrawCardHolder').value = '';
-
-                await saveUserState();
-                updateEnergyDisplay();
-                updateWithdrawalDisplay();
-                
-                // İSTİFADƏÇİYƏ GÖSTƏRİLƏCƏK MESAJ - Telegram haqqında heç nə yoxdur!
-                alert(`✅ Çıxarış sorğunuz uğurla qəbul edildi!\n\n💰 ${amountAZN.toFixed(2)} AZN məbləği üçün sorğunuz sistemə göndərildi.\n\n📋 Sorğunuz 3 iş günü ərzində yoxlanılacaq.\n\n⏰ Əgər 3 gün ərzində cavab almasanız, dəstək komandamızla əlaqə saxlayın.\n\nNövbəti çıxarışı ${WITHDRAWAL_COOLDOWN_DAYS} gündən sonra edə bilərsiniz.`);
-                
-            } else {
-                // Xəta halında
-                alert("❌ Çıxarış sorğusu göndərilə bilmədi. Zəhmət olmasa bir neçə dəqiqə sonra yenidən cəhd edin.");
-            }
-        });
-
         // Ruq animasiya funksiyaları
         function addGhostAnimations(event) {
             const icon = document.getElementById('mainIcon');
@@ -3574,7 +3217,7 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
             }, 600);
         }
 
-        // İkon klik funksiyası - 30 KLİK REKLAM SİSTEMİ LƏĞV EDİLDİ
+        // İkon klik funksiyası - 30 KLİK REKLAM SİSTEMİ ONCLIKA İLƏ
         function clickIcon(e) {
             const state = currentUserState;
             const now = Date.now();
@@ -3589,15 +3232,15 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
             
             addGhostAnimations(e);
             
-            // 30 KLİK REKLAM SİSTEMİ LƏĞV EDİLDİ - HEÇ BİR ŞEY ETMİR
-            // if (state.clicksUntilAd <= 1) { 
-            //     state.clicksUntilAd = 0; 
-            //     console.log("30 klik tamamlandı. Reward video çağırılır...");
-            //     setTimeout(() => {
-            //          showAdsGram30ClickReward(); 
-            //     }, 500); 
-            //     return; 
-            // }
+            // 30 KLİK REKLAM SİSTEMİ - ONCLIKA İLƏ
+            if (state.clicksUntilAd <= 1) { 
+                state.clicksUntilAd = 0; 
+                console.log("30 klik tamamlandı. Onclika reklamı başladılır...");
+                setTimeout(() => {
+                     showOnclikaAd(); // ONCLIKA reklamını göstər
+                }, 500); 
+                return; 
+            }
 
             if (state.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) { 
                 // Enerji bitdikdə heç bir reklam göstərilmir
@@ -3611,10 +3254,10 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
             state.totalMoney += moneyEarned; 
             state.energyUsed += ENERGY_CONSUMPTION_PER_CLICK; 
             
-            // 30 klik sayğacı ləğv edildi - heç bir şey etmir
-            // if (state.clicksUntilAd > 0) {
-            //     state.clicksUntilAd--;
-            // }
+            // 30 klik sayğacı
+            if (state.clicksUntilAd > 0) {
+                state.clicksUntilAd--;
+            }
             
             updateEnergyDisplay();
             createMoneyPopup(e, moneyEarned);
@@ -3622,7 +3265,12 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
 
         // Başlanğıc funksiyası
         window.addEventListener('load', async function() {
-            loadImages();
+            // Şəkilləri yüklə
+            const splashImg = document.querySelector('.splash-image img');
+            const gameIcon = document.getElementById('clickImage');
+            
+            splashImg.src = "https://i.ibb.co/JFndRdvY/casper.jpg";
+            gameIcon.src = "https://i.ibb.co/hp0mdt1/2025-10-31-T103543-300-removebg-preview.png";
             
             console.log('🚀 Oyun başladılır...');
             checkUrlForReferralCode();
@@ -3631,39 +3279,6 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
             await initializeCounter();
             console.log('✅ CG ID sistemi hazırdır');
 
-            // ADEXIUM WIDGET İŞƏ SAL (yalnız push-like reklamlar üçün)
-            setTimeout(() => {
-                const adexiumInitialized = initializeAdExiumPushLike();
-                if (adexiumInitialized) {
-                    console.log('✅ AdExium Push-like sistemi uğurla başladıldı');
-                    
-                    // Push-like reklamı hər 60 saniyədən bir göstər (60000 ms = 30 saniyə)
-                    setInterval(() => {
-                        showAdExiumPushLike();
-                    }, 60000);
-                    
-                } else {
-                    console.log('❌ AdExium Push-like sistemi başladıla bilmədi');
-                }
-            }, 6000);
-
-            
-            // ADSGRAM BUTTON REKLAMI İŞƏ SAL (17892 ID)
-            setTimeout(() => {
-                const adsgramButtonInitialized = initializeAdsGramButton();
-                if (adsgramButtonInitialized) {
-                    console.log('✅ AdsGram 17892 Button Reklam sistemi uğurla başladıldı');
-                    
-                    // Button reklamını hər 45 dəqiqədən bir yoxla
-                    setInterval(() => {
-                        checkAndShowButtonAd();
-                    }, 60000); // Hər dəqiqə yoxla
-                    
-                } else {
-                    console.log('❌ AdsGram 17892 Button Reklam sistemi başladıla bilmədi');
-                }
-            }, 3000);
-            
             // ADSGRAM VIDEO BUTTON İŞƏ SAL
             setTimeout(() => {
                 const adsgramInitialized = initializeAdsGram();
@@ -3695,9 +3310,6 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
             setInterval(simulateEnergyRegen, ENERGY_REGEN_INTERVAL);
             setInterval(updateWithdrawalDisplay, 60000);
             
-            // Button reklamını da yoxlamaq üçün interval
-            setInterval(checkAndShowButtonAd, 60000);
-            
             setInterval(async () => {
                 if (currentUserState.username) {
                     await saveUserState();
@@ -3713,31 +3325,6 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
         window.addEventListener('beforeunload', function() {
             saveUserState();
         });
-
-        // AdExium Push-like reklamlarını initialize edən funksiya
-        function initializeAdExiumPushLike() {
-            try {
-                const script = document.createElement("script");
-                script.src = "https://cdn.tgads.space/assets/js/adexium-widget.min.js"; // Push-like SDK
-                script.async = true;
-                document.head.appendChild(script);
-                return true;
-            } catch (e) {
-                console.error("AdExium Push-like initialize xətası:", e);
-                return false;
-            }
-        }
-
-        // Push-like reklamı göstərən funksiya
-        function showAdExiumPushLike() {
-            if (window.AdexiumPushLike && typeof window.AdexiumPushLike.show === "function") {
-                window.AdexiumPushLike.show();
-                console.log("📢 AdExium Push-like reklam göstərildi");
-            } else {
-                console.log("⚠️ AdExium Push-like sistemi hazır deyil, bir az sonra yenə cəhd ediləcək...");
-                setTimeout(showAdExiumPushLike, 3000);
-            }
-        }
 
     </script>
 </body>
