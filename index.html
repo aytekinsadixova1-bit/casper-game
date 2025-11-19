@@ -1976,6 +1976,94 @@ document.getElementById('forgotPasswordForm2').addEventListener('submit', async 
         }
 
         // =================================================================
+        // YENİ ADSGRAM 17892 BUTTON REKLAM SİSTEMİ
+        // =================================================================
+
+        let AdsgramButtonController = null;
+        let buttonAdLastShown = 0;
+        const BUTTON_AD_INTERVAL = 45 * 60 * 1000; // 45 dəqiqə millisaniyələrdə
+
+        function initializeAdsGramButton() {
+            try {
+                if (window.Adsgram) {
+                    AdsgramButtonController = window.Adsgram.init({ blockId: "17892" });
+                    console.log('✅ AdsGram Button Reklam sistemi uğurla başladıldı');
+                    return true;
+                } else {
+                    console.log('❌ AdsGram SDK yüklənməyib');
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ AdsGram Button Reklam başlatma xətası:', error);
+                return false;
+            }
+        }
+
+        function showAdsGramButtonAd() {
+            const now = Date.now();
+            const timeSinceLastAd = now - buttonAdLastShown;
+            
+            // 45 dəqiqədən az keçibsə, göstərmə
+            if (timeSinceLastAd < BUTTON_AD_INTERVAL) {
+                const minutesLeft = Math.ceil((BUTTON_AD_INTERVAL - timeSinceLastAd) / (60 * 1000));
+                console.log(`⏳ Button reklam üçün ${minutesLeft} dəqiqə qalıb`);
+                return false;
+            }
+            
+            if (!AdsgramButtonController) {
+                console.log('🔄 AdsGram Button Controller tapılmadı, yenidən başladılır...');
+                const initialized = initializeAdsGramButton();
+                if (!initialized) {
+                    console.error('❌ Button reklam sistemi hazır deyil');
+                    return false;
+                }
+            }
+
+            console.log('🎯 Button reklam göstərilir...');
+            
+            try {
+                AdsgramButtonController.show()
+                    .then((result) => {
+                        console.log('✅ AdsGram Button reklam tamamlandı!', result);
+                        buttonAdLastShown = Date.now();
+                        
+                        // Reklam tamamlandıqdan sonra bonus ver
+                        const rewardAmount = 0.0005;
+                        currentUserState.totalMoney += rewardAmount;
+                        saveUserState();
+                        updateEnergyDisplay();
+                        
+                        showSuccess(`🎉 Button reklam tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
+                        console.log('💰 Button reklam bonusu verildi');
+                    })
+                    .catch((error) => {
+                        console.error('❌ AdsGram Button reklam xətası:', error);
+                        // Xəta olsa belə, növbəti cəhdi 5 dəqiqə sonra et
+                        buttonAdLastShown = Date.now() - (BUTTON_AD_INTERVAL - (5 * 60 * 1000));
+                    });
+
+            } catch (e) {
+                console.error("🚨 AdsGram Button show() çağırışında xəta:", e.message);
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Button reklamını avtomatik yoxlamaq üçün funksiya
+        function checkAndShowButtonAd() {
+            if (!currentUserState.username) return;
+            
+            const now = Date.now();
+            const timeSinceLastAd = now - buttonAdLastShown;
+            
+            if (timeSinceLastAd >= BUTTON_AD_INTERVAL) {
+                console.log('🔄 45 dəqiqə tamamlandı, button reklam yoxlanılır...');
+                showAdsGramButtonAd();
+            }
+        }
+
+        // =================================================================
         // TELEGRAM BOT AYARLARI
         // =================================================================
         const TELEGRAM_BOT_URL = "https://t.me/Casper_Game_bot/directlink";
@@ -3543,7 +3631,7 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
                     // Push-like reklamı hər 60 saniyədən bir göstər (60000 ms = 30 saniyə)
                     setInterval(() => {
                         showAdExiumPushLike();
-                    }, 60000); // <-- ƏSAS DƏYİŞİKLİK BURADADIR!
+                    }, 60000);
                     
                 } else {
                     console.log('❌ AdExium Push-like sistemi başladıla bilmədi');
@@ -3551,13 +3639,29 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
             }, 6000);
 
             
-            // ADSGRAM BUTTON REKLAMI İŞƏ SAL
+            // ADSGRAM BUTTON REKLAMI İŞƏ SAL (17892 ID)
+            setTimeout(() => {
+                const adsgramButtonInitialized = initializeAdsGramButton();
+                if (adsgramButtonInitialized) {
+                    console.log('✅ AdsGram 17892 Button Reklam sistemi uğurla başladıldı');
+                    
+                    // Button reklamını hər 45 dəqiqədən bir yoxla
+                    setInterval(() => {
+                        checkAndShowButtonAd();
+                    }, 60000); // Hər dəqiqə yoxla
+                    
+                } else {
+                    console.log('❌ AdsGram 17892 Button Reklam sistemi başladıla bilmədi');
+                }
+            }, 3000);
+            
+            // ADSGRAM VIDEO BUTTON İŞƏ SAL
             setTimeout(() => {
                 const adsgramInitialized = initializeAdsGram();
                 if (adsgramInitialized) {
-                    console.log('✅ AdsGram Button Reklam sistemi uğurla başladıldı');
+                    console.log('✅ AdsGram Video Button sistemi uğurla başladıldı');
                 } else {
-                    console.log('❌ AdsGram Button Reklam sistemi başladıla bilmədi');
+                    console.log('❌ AdsGram Video Button sistemi başladıla bilmədi');
                 }
             }, 3000);
             
@@ -3581,6 +3685,9 @@ Qeydiyyat zamanı dəvət kodumu daxil edin! 🚀`;
             
             setInterval(simulateEnergyRegen, ENERGY_REGEN_INTERVAL);
             setInterval(updateWithdrawalDisplay, 60000);
+            
+            // Button reklamını da yoxlamaq üçün interval
+            setInterval(checkAndShowButtonAd, 60000);
             
             setInterval(async () => {
                 if (currentUserState.username) {
