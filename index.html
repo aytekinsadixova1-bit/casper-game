@@ -18,7 +18,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
     <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
 
-    <style>
+   <style>
         * {
             margin: 0;
             padding: 0;
@@ -1126,6 +1126,21 @@
         .step-line.active {
             background: #0f3460;
         }
+
+        .adsgram-video-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .bonus-timer {
+            font-size: 10px;
+            color: #6c757d;
+            margin-top: 3px;
+            font-weight: bold;
+        }
         
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -1275,36 +1290,35 @@
                             </div>
                         </div>
 
-                        <!-- YENİ ADSGRAM REWARD VIDEO DÜYMƏSİ -->
-                        <div class="bonus-info" style="margin: 12px 0; text-align: center;">
-                            <button onclick="showAdsGramRewardVideo()" class="adsgram-video-btn">
-                                🎬 Video İzlə & 0.001 AZN Qazan!
-                            </button>
-                            <p style="font-size: 10px; color: #6c757d; margin-top: 3px;">
-                                Hər video üçün 0.001 AZN bonus! 30 saniyədən bir yenilənir!
-                            </p>
-                        </div>
+                     <!-- YENİ ADSGRAM 45 DƏQİQƏ REWARD VIDEO DÜYMƏSİ -->
+<div class="bonus-info" style="margin: 12px 0; text-align: center;">
+    <button onclick="showAdsGram45MinRewardVideo()" class="adsgram-video-btn" id="adsgram45MinButton">
+        🎬 Video İzlə & 0.001 AZN Qazan!
+    </button>
+    <div class="bonus-timer" id="adsgram45MinTimer">Hazır!</div>
+    <p style="font-size: 10px; color: #6c757d; margin-top: 3px;">
+       Hər video üçün 0.001 AZN bonus! 45 dəqiqədən  bir yenilənir!
+    </p>
+</div>
 
-                        <div class="bonus-info">
-                            <strong> 30 klik Bonusu:</strong> Hər reklam üçün <strong>0.0001 AZN</strong>
-                        </div>
+<div class="bonus-info">
+    <strong> 30 klik Bonusu:</strong> Hər reklam üçün <strong>0.0001 AZN</strong>
+</div>
 
-                        <div class="click-area">
-                            <div class="main-icon" id="mainIcon">
-                                <img id="clickImage" src="https://i.ibb.co/hp0mdt1/2025-10-31-T103543-300-removebg-preview.png" alt="Casper" 
-                                    onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22 viewBox=%220 0 180 180%22><rect width=%22180%22 height=%22180%22 fill=%23ff7e5f/><text x=%2290%22 y=%2290%22 font-family=%22Arial%22 font-size=%2260%22 fill=%22white%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>👻</text></svg>'"
-                                    style="width: 100% !important; height: 100% !important; object-fit: contain !important; display: block !important; background: transparent !important;">
-                            </div>
-                        </div>
-                        
-                        <div class="stats-block">
-                            <div class="money-stat-small">
-                                <div class="stat-value" id="totalMoney">0.000000 AZN</div> 
-                                <div class="stat-label">CƏMİ QAZANC</div>
-                            </div>
-                        </div>
-                    </div>
-                    
+<div class="click-area">
+    <div class="main-icon" id="mainIcon">
+        <img id="clickImage" src="https://i.ibb.co/hp0mdt1/2025-10-31-T103543-300-removebg-preview.png" alt="Casper" 
+            onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22 viewBox=%220 0 180 180%22><rect width=%22180%22 height=%22180%22 fill=%23ff7e5f/><text x=%2290%22 y=%2290%22 font-family=%22Arial%22 font-size=%2260%22 fill=%22white%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>👻</text></svg>'"
+            style="width: 100% !important; height: 100% !important; object-fit: contain !important; display: block !important; background: transparent !important;">
+    </div>
+</div>
+
+<div class="stats-block">
+    <div class="money-stat-small">
+        <div class="stat-value" id="totalMoney">0.000000 AZN</div> 
+        <div class="stat-label">CƏMİ QAZANC</div>
+    </div>
+</div>
                     <div class="game-sub-screen" id="profileScreen" style="display: none;">
                         <h3 class="sub-header">👤 Profil Məlumatları</h3>
                         
@@ -1907,7 +1921,7 @@ document.getElementById('forgotPasswordForm2').addEventListener('submit', async 
         function initializeAdsGram() {
             try {
                 if (window.Adsgram) {
-                    AdsgramController = window.Adsgram.init({ blockId: "17515" });
+                    AdsgramController = window.Adsgram.init({ blockId: "17892" });
                     console.log('✅ AdsGram sistemi uğurla başladıldı');
                     return true;
                 } else {
