@@ -3706,11 +3706,10 @@ if (window.Telegram && Telegram.WebApp) {
     Telegram.WebApp.expand();
     Telegram.WebApp.ready();
 }
-
+});
         window.addEventListener('beforeunload', function() {
             saveUserState();
         });
-<script>
 // AdExium Push-like reklamlarını initialize edən funksiya
 function initializeAdExiumPushLike() {
     try {
