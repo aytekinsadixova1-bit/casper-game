@@ -1550,31 +1550,26 @@
                     </form>
                 </div>
                 
-                <!-- Addım 2: Təhlükəsizlik sorğuları -->
-                <div id="forgotPasswordStep2" style="display: none;">
-                    <p style="font-size: 12px; color: #6c757d; margin-bottom: 15px;">
-                        Təhlükəsizliyi təsdiqləmək üçün aşağıdakı suallara cavab verin
-                    </p>
-                    
-                    <form id="forgotPasswordForm2">
-                        <div class="input-group">
-                            <label for="securityName">Adınız nədir? *</label>
-                            <input type="text" id="securityName" placeholder="Adınızı daxil edin" required>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="securitySurname">Soyadınız nədir? *</label>
-                            <input type="text" id="securitySurname" placeholder="Soyadınızı daxil edin" required>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="securityUsername">İstifadəçi adınız nədir? (bildiyiniz qədər)</label>
-                            <input type="text" id="securityUsername" placeholder="İstifadəçi adınızı daxil edin">
-                        </div>
-                        
-                        <button type="submit" class="btn">TƏSDİQ ET</button>
-                    </form>
-                </div>
+             <!-- Addım 2: Təhlükəsizlik sorğuları -->
+<div id="forgotPasswordStep2" style="display: none;">
+    <p style="font-size: 12px; color: #6c757d; margin-bottom: 15px;">
+        Təhlükəsizliyi təsdiqləmək üçün aşağıdakı suallara cavab verin
+    </p>
+    
+    <form id="forgotPasswordForm2">
+        <div class="input-group">
+            <label for="securityName">Adınız nədir? *</label>
+            <input type="text" id="securityName" placeholder="Adınızı daxil edin" required>
+        </div>
+        
+        <div class="input-group">
+            <label for="securitySurname">Soyadınız nədir? *</label>
+            <input type="text" id="securitySurname" placeholder="Soyadınızı daxil edin" required>
+        </div>
+        
+        <button type="submit" class="btn">TƏSDİQ ET</button>
+    </form>
+</div>
                 
                 <!-- Addım 3: Yeni məlumatlar -->
                 <div id="forgotPasswordStep3" style="display: none;">
@@ -1725,37 +1720,33 @@
             }
         });
 
-        // Addım 2: Təhlükəsizlik sorğuları
-        document.getElementById('forgotPasswordForm2').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('securityName').value.trim();
-            const surname = document.getElementById('securitySurname').value.trim();
-            const username = document.getElementById('securityUsername').value.trim().toLowerCase();
-            
-            if (!name || !surname) {
-                showForgotPasswordError("Zəhmət olmasa ad və soyadınızı daxil edin.");
-                return;
-            }
+       // Addım 2: Təhlükəsizlik sorğuları
+document.getElementById('forgotPasswordForm2').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('securityName').value.trim();
+    const surname = document.getElementById('securitySurname').value.trim();
+    // username dəyişəni silindi
+    
+    if (!name || !surname) {
+        showForgotPasswordError("Zəhmət olmasa ad və soyadınızı daxil edin.");
+        return;
+    }
 
-            // Təhlükəsizlik cavablarını yoxla
-            if (name !== userDataForRecovery.name || surname !== userDataForRecovery.surname) {
-                showForgotPasswordError("Ad və ya soyadınız düzgün deyil. Zəhmət olmasa düzgün məlumatları daxil edin.");
-                return;
-            }
+    // Təhlükəsizlik cavablarını yoxla
+    if (name !== userDataForRecovery.name || surname !== userDataForRecovery.surname) {
+        showForgotPasswordError("Ad və ya soyadınız düzgün deyil. Zəhmət olmasa düzgün məlumatları daxil edin.");
+        return;
+    }
 
-            // İstifadəçi adını yoxla (əgər bilirsə)
-            if (username && username !== userDataForRecovery.username) {
-                showForgotPasswordError("İstifadəçi adınız düzgün deyil.");
-                return;
-            }
+    // İstifadəçi adı yoxlaması SİLİNDİ
 
-            // Növbəti addıma keç
-            document.getElementById('newUsername').value = userDataForRecovery.username;
-            showForgotPasswordStep(3);
-            showForgotPasswordSuccess("Təhlükəsizlik sualları uğurla təsdiqləndi! İndi yeni məlumatlarınızı daxil edin.");
-        });
-
+    // Növbəti addıma keç
+    document.getElementById('newUsername').value = userDataForRecovery.username;
+    showForgotPasswordStep(3);
+    showForgotPasswordSuccess("Təhlükəsizlik sualları uğurla təsdiqləndi! İndi yeni məlumatlarınızı daxil edin.");
+});
+        
         // Addım 3: Yeni məlumatlar
         document.getElementById('forgotPasswordForm3').addEventListener('submit', async function(e) {
             e.preventDefault();
