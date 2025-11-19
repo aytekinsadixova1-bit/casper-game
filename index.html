@@ -2227,57 +2227,58 @@ const navItems = document.querySelectorAll('.navbar .nav-item');
 const subScreens = document.querySelectorAll('.game-sub-screen');
 
 // =================================================================
+// REFERRAL KONFİQURASİYASI (Bonus məbləği və limit)
+// =================================================================
+const REFERRAL_BONUS_AMOUNT = 0.10; // AZN
+const REFERRAL_BONUS_LIMIT = 10;    // maksimum bonus verilən dəvət sayı
+
+
+// =================================================================
 // REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ
 // =================================================================
-let referralUnsubscribe = null; // Yaddaş sızmasının qarşısını almaq üçün
+let referralUnsubscribe = null;
 
 function listenToReferralCount(username) {
-    // Əgər köhnə dinləyici açıqdırsa, bağlayırıq (təkrar yüklənmə olmasın)
-    if (referralUnsubscribe) {
-        referralUnsubscribe();
-    }
+    if (referralUnsubscribe) referralUnsubscribe();
 
     const userRef = db.collection('users').doc(username);
 
-    // onSnapshot: Bazada hər hansı dəyişiklik olan kimi bura düşür
     referralUnsubscribe = userRef.onSnapshot((doc) => {
         if (doc.exists) {
             const data = doc.data();
-            
-            // 1. Bazadan ən son məlumatları götürürük
+
             const referralCount = data.successfulReferrals || 0;
-            const referralBonus = data.referralBonusEarned || 0;
+            const referralBonus = data.referralBonusTotal || 0;
             const currentMoney = data.totalMoney || 0;
 
-            // 2. Ekrana (HTML) yazdırırıq
             const refCountEl = document.getElementById('successfulReferrals');
             const refBonusEl = document.getElementById('referralBonusTotal');
-            
+
             if (refCountEl) refCountEl.textContent = referralCount;
             if (refBonusEl) refBonusEl.textContent = referralBonus.toFixed(2) + " AZN";
 
-            // 3. Oyunun daxili dəyişənlərini (State) yeniləyirik
             if (currentUserState && currentUserState.username === username) {
                 currentUserState.successfulReferrals = referralCount;
-                currentUserState.referralBonusEarned = referralBonus;
+                currentUserState.referralBonusTotal = referralBonus;
                 currentUserState.totalMoney = currentMoney;
 
-                // Əgər enerjini yeniləyən funksiya varsa, onu çağırırıq
                 if (typeof updateEnergyDisplay === 'function') {
                     updateEnergyDisplay();
                 }
             }
         }
     }, (error) => {
-        console.error("❌ Dinləmə xətası (Referral):", error);
+        console.error("❌ Referral dinləmə xətası:", error);
     });
 }
 
+
 // =================================================================
-// GİRİŞ FUNKSİYASI - YENİLƏNMİŞ
+// GİRİŞ FUNKSİYASI (Login)
 // =================================================================
 document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+
     const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value;
 
@@ -2285,63 +2286,42 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         showError("Zəhmət olmasa bütün sahələri doldurun.");
         return;
     }
-    
+
     try {
-        console.log('🔐 Giriş cəhdi:', username);
-        
-        // Firestore-dan istifadəçi məlumatlarını yüklə
         const userData = await findUserByUsername(username);
-        
+
         if (userData && userData.password === password) {
-            console.log('🔐 Giriş uğurlu');
-            currentUserState = { ...currentUserState, ...userData };
-            currentUserState.username = username;
-            currentUserState.lastEnergyUpdate = Date.now();
-            currentUserState.energyRegenRate = BASE_REGEN_RATE; 
-            currentUserState.maxEnergy = MAX_ENERGY_CAP; 
 
-            const now = Date.now();
-            const timePassedInSeconds = (now - (userData.lastEnergyUpdate || now)) / 1000;
-            const energyToAdd = timePassedInSeconds * ENERGY_REGEN_PER_SECOND;
-            currentUserState.currentEnergy = Math.min(MAX_ENERGY_CAP, (userData.currentEnergy || MAX_ENERGY_CAP) + energyToAdd);
-            currentUserState.lastEnergyUpdate = now;
+            currentUserState = { ...userData, username };
 
-            if (!currentUserState.clicksUntilAd && currentUserState.clicksUntilAd !== 0) {
-                currentUserState.clicksUntilAd = AD_INTERVAL;
-            }
-
-            updateProfileDisplay();
-            showWelcomeMessage();
-            
-            // REAL-TIME DİNLƏYİCİNİ BAŞLAT
+            // Real-time referral dinləyicisini aç
             listenToReferralCount(username);
-            
-            showSuccess(`Xoş gəldiniz, ${username}! Oyun başladılır...`);
-            
-            this.reset(); 
-            
+
+            showSuccess(`Xoş gəldiniz, ${username}!`);
+            this.reset();
+
             setTimeout(() => {
                 loginScreen.style.display = 'none';
                 gameScreen.style.display = 'flex';
-                switchScreen('tapScreen'); 
+                switchScreen('tapScreen');
                 updateEnergyDisplay();
-                
                 saveUserState();
-            }, 1500);
+            }, 1200);
+
         } else {
             showError("İstifadəçi adı və ya şifrə yanlışdır.");
         }
+
     } catch (error) {
-        console.error('Giriş xətası:', error);
-        handleFirebaseError(error);
-        showError("Giriş zamanı xəta baş verdi. Yenidən cəhd edin.");
+        console.error("Giriş xətası:", error);
+        showError("Giriş zamanı xəta baş verdi.");
     }
 });
 
-// =====================================================
-// QEYDİYYAT FORMUNUN DÜZƏLDİLMİŞ VERSİYASI
-// =====================================================
 
+// =================================================================
+// QEYDİYYAT FUNKSİYASI (Register)
+// =================================================================
 document.getElementById('registerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -2354,37 +2334,24 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     const confirmPassword = document.getElementById('confirmPassword').value.trim();
     const referralCodeInput = document.getElementById('registerReferralCode').value.trim();
 
-    // Şifrə yoxlaması
-    if (password !== confirmPassword) {
-        showError("Şifrələr uyğun deyil!");
-        return;
-    }
-
-    // Bütün sahələrin doldurulması
-    if (!username || !name || !surname || !phone || !email || !password) {
-        showError("Zəhmət olmasa bütün xanaları doldurun!");
-        return;
-    }
+    if (password !== confirmPassword) return showError("Şifrələr uyğun deyil!");
+    if (!username || !name || !surname || !phone || !email || !password)
+        return showError("Zəhmət olmasa bütün xanaları doldurun!");
 
     try {
-        // 1. Username unikallığı
-        const userDoc = await db.collection('users').doc(username).get();
-        if (userDoc.exists) {
-            showError("Bu istifadəçi adı artıq mövcuddur.");
-            return;
-        }
+        // Username unikallığı
+        const existingUser = await db.collection('users').doc(username).get();
+        if (existingUser.exists) return showError("Bu istifadəçi adı artıq mövcuddur.");
 
-        // 2. Duplicate məlumat yoxlanışı
+        // Duplicate məlumat yoxlanışı
         const duplicateCheck = await checkDuplicateUserInfo(name, surname, phone, email);
-        if (duplicateCheck.duplicate) {
-            showError(`❌ Bu ${duplicateCheck.field} artıq qeydiyyatdan keçib! ${duplicateCheck.message}`);
-            return;
-        }
+        if (duplicateCheck.duplicate)
+            return showError(`❌ Bu ${duplicateCheck.field} artıq qeydiyyatdan keçib!`);
 
-        // 3. CG ID
+        // CG ID
         const cgId = await getNextCGId();
 
-        // 4. Yeni user məlumatları
+        // Yeni istifadəçi məlumatları
         const newUserData = {
             cgId,
             name,
@@ -2394,9 +2361,9 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
             password,
             username,
 
-            // REFERRAL SISTEMI
+            // REFERAL SİSTEMİ
             invitedFriends: [],
-            referralBonusEarned: 0,
+            referralBonusTotal: 0,
             successfulReferrals: 0,
             referralCode: generateReferralCode(username),
             referredBy: referralCodeInput || null,
@@ -2404,6 +2371,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
             // OYUN
             totalMoney: 0,
             scorePerClick: 1,
+            currentEnergy: 100000,
             maxEnergy: 100000,
 
             // ZAMAN
@@ -2413,58 +2381,44 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
             lastWithdrawalDate: null,
         };
 
-        // 5. Yeni user-i yaz
+        // Yeni user yazılır
         await db.collection('users').doc(username).set(newUserData);
-        console.log(`✅ Yeni istifadəçi yaradıldı: ${username}`);
 
-        // =====================================================
-        // 6. REFERRAL PROSESSI (Sırf Database üçün)
-        // =====================================================
+        // ================================
+        // REFERRAL PROSESSI
+        // ================================
         if (referralCodeInput) {
-            console.log(`🔍 Dəvət kodu axtarılır: ${referralCodeInput}`);
+            const referrerQuery = await db.collection('users')
+                .where('referralCode', '==', referralCodeInput)
+                .limit(1)
+                .get();
 
-            try {
-                const referrerQuery = await db.collection('users')
-                    .where('referralCode', '==', referralCodeInput)
-                    .limit(1)
-                    .get();
+            if (!referrerQuery.empty) {
+                const referrerDoc = referrerQuery.docs[0];
+                const referrerData = referrerDoc.data();
+                const referrerUsername = referrerDoc.id;
 
-                if (!referrerQuery.empty) {
-                    const referrerDoc = referrerQuery.docs[0];
-                    const referrerData = referrerDoc.data();
-                    const referrerUsername = referrerDoc.id;
+                // Dostlar siyahısına əlavə
+                await db.collection('users').doc(referrerUsername).update({
+                    invitedFriends: firebase.firestore.FieldValue.arrayUnion(username)
+                });
 
-                    console.log(`✅ Referrer tapıldı: ${referrerUsername}`);
-
-                    // Dostlar siyahısına əlavə et
+                // BONUS — yalnız ilk 10 nəfərə
+                if ((referrerData.successfulReferrals || 0) < REFERRAL_BONUS_LIMIT) {
                     await db.collection('users').doc(referrerUsername).update({
-                        invitedFriends: firebase.firestore.FieldValue.arrayUnion(username)
+                        successfulReferrals: firebase.firestore.FieldValue.increment(1),
+                        referralBonusTotal: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
+                        totalMoney: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
                     });
-
-                    // BONUS YOXLAMASI (Limit daxilində) - YALNIZ 10 NƏFƏRƏ QƏDƏR
-                    if ((referrerData.successfulReferrals || 0) < REFERRAL_BONUS_LIMIT) {
-                        await db.collection('users').doc(referrerUsername).update({
-                            successfulReferrals: firebase.firestore.FieldValue.increment(1),
-                            referralBonusEarned: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
-                            totalMoney: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
-                        });
-                        console.log(`🎁 Bonus bazaya yazıldı: +${REFERRAL_BONUS_AMOUNT} AZN`);
-                    } else {
-                        // 10 NƏFƏRDƏN SONRA YALNIZ SAYI ARTIR, BONUS VERMƏ
-                        await db.collection('users').doc(referrerUsername).update({
-                            successfulReferrals: firebase.firestore.FieldValue.increment(1)
-                        });
-                        console.log(`ℹ️ Limit dolub (${REFERRAL_BONUS_LIMIT}). Yalnız say artırıldı, bonus verilmir.`);
-                    }
                 } else {
-                    console.warn("⚠️ Dəvət kodu tapılmadı:", referralCodeInput);
+                    // Limit dolub — bonus yoxdur, amma say artır
+                    await db.collection('users').doc(referrerUsername).update({
+                        successfulReferrals: firebase.firestore.FieldValue.increment(1),
+                    });
                 }
-            } catch (err) {
-                console.error("❌ Referral xətası:", err);
             }
         }
 
-        // 7. UĞURLU QEYDİYYAT
         showSuccess("✅ Qeydiyyat tamamlandı! İndi giriş edə bilərsiniz.");
         document.getElementById('registerForm').reset();
         switchToLogin();
@@ -2474,6 +2428,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         showError("Xəta baş verdi. Yenidən cəhd edin.");
     }
 });
+
 
 // =================================================================
 // REKLAM SİSTEMİ FUNKSİYALARI
