@@ -18,7 +18,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
     <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
 
-      <!-- Onclika SDK -->
+    <!-- Onclika SDK -->
     <script src="https://js.onclckvd.com/in-stream-ad-admanager/tma.js"></script>
     
    <style>
@@ -1322,6 +1322,9 @@
         <div class="stat-label">CƏMİ QAZANC</div>
     </div>
 </div>
+                    </div>
+                    
+                    <!-- PROFİL HİSSƏSİ -->
                     <div class="game-sub-screen" id="profileScreen" style="display: none;">
                         <h3 class="sub-header">👤 Profil Məlumatları</h3>
                         
@@ -1383,6 +1386,7 @@
                         </div>
                     </div>
 
+                    <!-- DƏVƏT HİSSƏSİ -->
                     <div class="game-sub-screen" id="friendsScreen" style="display: none;">
                         <h3 class="sub-header">🤝 Dostlarınızı Dəvət Edin</h3>
                         
@@ -1440,6 +1444,7 @@
                         </div>
                     </div>
 
+                    <!-- ÇIXARIŞ HİSSƏSİ -->
                     <div class="game-sub-screen" id="withdrawalScreen" style="display: none;">
                         <h3 class="sub-header">💸 AZN Çıxarışı</h3> 
                         
@@ -1583,8 +1588,6 @@
             <label for="securitySurname">Soyadınız nədir? *</label>
             <input type="text" id="securitySurname" placeholder="Soyadınızı daxil edin" required>
         </div>
-        
-        <!-- BU HİSSƏ SİLİNDİ -->
         
         <button type="submit" class="btn">TƏSDİQ ET</button>
     </form>
@@ -1745,7 +1748,6 @@ document.getElementById('forgotPasswordForm2').addEventListener('submit', async 
     
     const name = document.getElementById('securityName').value.trim();
     const surname = document.getElementById('securitySurname').value.trim();
-    // username dəyişəni silindi
     
     if (!name || !surname) {
         showForgotPasswordError("Zəhmət olmasa ad və soyadınızı daxil edin.");
@@ -1758,13 +1760,12 @@ document.getElementById('forgotPasswordForm2').addEventListener('submit', async 
         return;
     }
 
-    // İstifadəçi adı yoxlaması SİLİNDİ
-
     // Növbəti addıma keç
     document.getElementById('newUsername').value = userDataForRecovery.username;
     showForgotPasswordStep(3);
     showForgotPasswordSuccess("Təhlükəsizlik sualları uğurla təsdiqləndi! İndi yeni məlumatlarınızı daxil edin.");
 });
+
         // Addım 3: Yeni məlumatlar
         document.getElementById('forgotPasswordForm3').addEventListener('submit', async function(e) {
             e.preventDefault();
