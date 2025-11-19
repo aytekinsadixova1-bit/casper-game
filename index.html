@@ -3710,15 +3710,17 @@ if (window.Telegram && Telegram.WebApp) {
         window.addEventListener('beforeunload', function() {
             saveUserState();
         });
+<script>
 // AdExium Push-like reklamlarını initialize edən funksiya
 function initializeAdExiumPushLike() {
     try {
         const script = document.createElement("script");
         script.src = "https://cdn.tgads.space/assets/js/adexium-widget.min.js"; // Push-like SDK
         script.async = true;
-        document.head.appendChild(script);
+        // Əgər head elementi varsa, ora əlavə edin, əks halda body-yə əlavə etmək daha yaxşıdır
+        document.head.appendChild(script); 
         return true;
-    } catch (error) { // ← e yerinə error yazın
+    } catch (error) { 
         console.error("AdExium Push-like initialize xətası:", error);
         return false;
     }
@@ -3734,7 +3736,7 @@ function showAdExiumPushLike() {
         setTimeout(showAdExiumPushLike, 3000);
     }
 }
-            
- </script>
+           
+</script>
 </body>
 </html>
