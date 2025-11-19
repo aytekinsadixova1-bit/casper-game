@@ -1914,82 +1914,118 @@ document.getElementById('forgotPasswordForm2').addEventListener('submit', async 
             console.error('❌ Firebase xətası:', error);
         }
 
-        // =================================================================
-        // ADSGRAM REKLAM SİSTEMİ
-        // =================================================================
+       // =================================================================
+// ADSGRAM 45 DƏQİQƏ REWARD VIDEO SİSTEMİ
+// =================================================================
 
-        let AdsgramController = null;
-        let adsgramRewardAvailable = true;
+let Adsgram45MinController = null;
+let adsgram45MinRewardAvailable = true;
+let adsgram45MinTimer = 0;
 
-        function initializeAdsGram() {
-            try {
-                if (window.Adsgram) {
-                    AdsgramController = window.Adsgram.init({ blockId: "17892" });
-                    console.log('✅ AdsGram sistemi uğurla başladıldı');
-                    return true;
-                } else {
-                    console.log('❌ AdsGram SDK yüklənməyib');
-                    return false;
-                }
-            } catch (error) {
-                console.error('❌ AdsGram başlatma xətası:', error);
-                return false;
-            }
-        }
-
-        function showAdsGramRewardVideo() {
-            if (!adsgramRewardAvailable) {
-                alert('🎬 Reward video hazır deyil. Bir neçə dəqiqə gözləyin.');
-                return false;
-            }
-            
-            if (!AdsgramController) {
-                const initialized = initializeAdsGram();
-                if (!initialized) {
-                    alert('❌ Reklam sistemi hazır deyil. Yenidən cəhd edin.');
-                    return false;
-                }
-            }
-
-            adsgramRewardAvailable = false;
-            
-            AdsgramController.show()
-                .then((result) => {
-                    console.log('✅ AdsGram reward video tamamlandı!', result);
-                    
-                    const rewardAmount = 0.001;
-                    currentUserState.totalMoney += rewardAmount;
-                    
-                    saveUserState();
-                    updateEnergyDisplay();
-                    
-                    showSuccess(`🎉 Reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
-                    
-                    setTimeout(() => {
-                        adsgramRewardAvailable = true;
-                        console.log('🔄 Reward video yenidən aktiv oldu');
-                    }, 30000);
-                })
-                .catch((error) => {
-                    console.error('❌ AdsGram reward video xətası:', error);
-                    
-                    let errorMessage = 'Reklam göstərilərkən xəta baş verdi.';
-                    
-                    if (error && error.description) {
-                        errorMessage = error.description;
-                    }
-                    
-                    alert(`❌ ${errorMessage}`);
-                    
-                    setTimeout(() => {
-                        adsgramRewardAvailable = true;
-                        console.log('🔄 Reward video yenidən aktiv oldu');
-                    }, 30000);
-                });
-            
+function initializeAdsGram45Min() {
+    try {
+        if (window.Adsgram) {
+            Adsgram45MinController = window.Adsgram.init({ blockId: "17892" });
+            console.log('✅ AdsGram 45 Dəqiqə Reward Video sistemi uğurla başladıldı');
             return true;
+        } else {
+            console.log('❌ AdsGram SDK yüklənməyib');
+            return false;
         }
+    } catch (error) {
+        console.error('❌ AdsGram 45 Dəqiqə Reward Video başlatma xətası:', error);
+        return false;
+    }
+}
 
+function showAdsGram45MinRewardVideo() {
+    if (!adsgram45MinRewardAvailable) {
+        const minutesLeft = Math.ceil(adsgram45MinTimer / 60000);
+        alert(`🎬 Reward video hazır deyil. ${minutesLeft} dəqiqə gözləyin.`);
+        return false;
+    }
+    
+    if (!Adsgram45MinController) {
+        const initialized = initializeAdsGram45Min();
+        if (!initialized) {
+            alert('❌ Reklam sistemi hazır deyil. Yenidən cəhd edin.');
+            return false;
+        }
+    }
+
+    adsgram45MinRewardAvailable = false;
+    
+    // 45 dəqiqəlik timer başlat
+    adsgram45MinTimer = 45 * 60 * 1000; // 45 dəqiqə millisaniyələrdə
+    startAdsGram45MinTimer();
+    
+    Adsgram45MinController.show()
+        .then((result) => {
+            console.log('✅ AdsGram 45 dəqiqə reward video tamamlandı!', result);
+            
+            const rewardAmount = 0.001;
+            currentUserState.totalMoney += rewardAmount;
+            
+            saveUserState();
+            updateEnergyDisplay();
+            
+            showSuccess(`🎉 45 dəqiqəlik reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
+        })
+        .catch((error) => {
+            console.error('❌ AdsGram 45 dəqiqə reward video xətası:', error);
+            
+            let errorMessage = 'Reklam göstərilərkən xəta baş verdi.';
+            
+            if (error && error.description) {
+                errorMessage = error.description;
+            }
+            
+            alert(`❌ ${errorMessage}`);
+            
+            // Xəta olsa belə timer-i sıfırla
+            adsgram45MinRewardAvailable = true;
+            adsgram45MinTimer = 0;
+            updateAdsGram45MinTimerDisplay();
+        });
+    
+    return true;
+}
+
+function startAdsGram45MinTimer() {
+    const timerInterval = setInterval(() => {
+        adsgram45MinTimer -= 1000; // 1 saniyə
+        
+        if (adsgram45MinTimer <= 0) {
+            adsgram45MinRewardAvailable = true;
+            adsgram45MinTimer = 0;
+            clearInterval(timerInterval);
+        }
+        
+        updateAdsGram45MinTimerDisplay();
+    }, 1000);
+}
+
+function updateAdsGram45MinTimerDisplay() {
+    const timerElement = document.getElementById('adsgram45MinTimer');
+    const buttonElement = document.getElementById('adsgram45MinButton');
+    
+    if (!timerElement || !buttonElement) return;
+    
+    if (adsgram45MinTimer <= 0) {
+        timerElement.textContent = "Hazır!";
+        buttonElement.disabled = false;
+        buttonElement.style.opacity = "1";
+    } else {
+        const minutes = Math.floor(adsgram45MinTimer / 60000);
+        const seconds = Math.floor((adsgram45MinTimer % 60000) / 1000);
+        timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        buttonElement.disabled = true;
+        buttonElement.style.opacity = "0.6";
+    }
+}
+
+// Timer display-i hər dəqiqə yenilə
+setInterval(updateAdsGram45MinTimerDisplay, 1000);
        // =================================================================
 // ONCLIKA 30 KLİK REWARD VIDEO SİSTEMİ
 // =================================================================
