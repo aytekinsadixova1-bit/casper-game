@@ -1659,7 +1659,7 @@
 
     <script>
         // =================================================================
-        // SUPABASE KONFİQURASİYASI
+        // SUPABASE KONFİQURASİYASI - YENİ VERSİYA
         // =================================================================
         const SUPABASE_URL = "https://xdmgfldclkzuepiutdbp.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhkbWdmbGRjbGt6dWVwaXV0ZGJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MTk0NTksImV4cCI6MjA3OTE5NTQ1OX0.gzWmw-YoiYkayO74Ragim2aF7rRzrGF7jQAkTrhu5X4";
@@ -1667,26 +1667,41 @@
         // Supabase-i işə sal
         let supabase;
         try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                db: {
+                    schema: 'public'
+                },
+                auth: {
+                    persistSession: true,
+                    autoRefreshToken: true
+                }
+            });
             console.log('✅ Supabase uğurla işə salındı');
         } catch (error) {
             console.error('❌ Supabase xətası:', error);
         }
 
         // =================================================================
-        // SUPABASE FUNKSİYALARI
+        // SUPABASE FUNKSİYALARI - YENİ VERSİYA
         // =================================================================
 
         // İstifadəçi axtarışı
         async function findUserByUsername(username) {
             try {
+                console.log('🔍 İstifadəçi axtarılır:', username);
+                
                 const { data, error } = await supabase
                     .from('users')
                     .select('*')
                     .eq('username', username)
-                    .single();
+                    .maybeSingle();
 
                 if (error) {
+                    console.error('❌ Supabase xətası:', error);
+                    return null;
+                }
+
+                if (!data) {
                     console.log('❌ İstifadəçi tapılmadı:', username);
                     return null;
                 }
@@ -1695,22 +1710,25 @@
                 return data;
             } catch (error) {
                 console.error('❌ İstifadəçi axtarış xətası:', error);
-                throw error;
+                return null;
             }
         }
 
         // Eyni məlumatları yoxlamaq
         async function checkDuplicateUserInfo(name, surname, phone, email) {
             try {
+                console.log('🔍 Duplicate yoxlanılır...');
+                
                 // Telefon nömrəsi yoxlaması
                 const { data: phoneData, error: phoneError } = await supabase
                     .from('users')
                     .select('username')
                     .eq('phone', phone)
-                    .limit(1);
+                    .maybeSingle();
 
-                if (phoneError) throw phoneError;
-                if (phoneData && phoneData.length > 0) {
+                if (phoneError) {
+                    console.error('Telefon yoxlama xətası:', phoneError);
+                } else if (phoneData) {
                     return { duplicate: true, field: 'telefon nömrəsi', message: 'Bu telefon nömrəsi artıq qeydiyyatdan keçib' };
                 }
 
@@ -1719,28 +1737,16 @@
                     .from('users')
                     .select('username')
                     .eq('email', email.toLowerCase())
-                    .limit(1);
+                    .maybeSingle();
 
-                if (emailError) throw emailError;
-                if (emailData && emailData.length > 0) {
+                if (emailError) {
+                    console.error('Email yoxlama xətası:', emailError);
+                } else if (emailData) {
                     return { duplicate: true, field: 'e-poçt', message: 'Bu e-poçt ünvanı artıq qeydiyyatdan keçib' };
                 }
 
-                // Ad və soyad yoxlaması
-                const { data: nameData, error: nameError } = await supabase
-                    .from('users')
-                    .select('username')
-                    .eq('name', name)
-                    .eq('surname', surname)
-                    .eq('phone', phone)
-                    .limit(1);
-
-                if (nameError) throw nameError;
-                if (nameData && nameData.length > 0) {
-                    return { duplicate: true, field: 'ad və soyad', message: 'Bu ad, soyad və telefon nömrəsi kombinasiyası artıq mövcuddur' };
-                }
-
                 return { duplicate: false };
+                
             } catch (error) {
                 console.error('❌ Duplicate yoxlama xətası:', error);
                 return { duplicate: false };
@@ -1825,6 +1831,7 @@
                 return `CG${Date.now()}${Math.random().toString(36).substr(2, 5)}`.toUpperCase();
             }
         }
+
 
         // =================================================================
         // ŞİFRƏ BƏRPA SİSTEMİ
@@ -2057,7 +2064,7 @@
         // İlkin addımı göstər
         showForgotPasswordStep(1);
 
-       // =================================================================
+  // =================================================================
 // ADSGRAM 45 DƏQİQƏ REWARD VIDEO SİSTEMİ
 // =================================================================
 
@@ -2591,59 +2598,50 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
 
 
         // =================================================================
-        // REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ
+        // REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ - SADƏLƏŞDİRİLMİŞ
         // =================================================================
         let referralUnsubscribe = null;
 
         function listenToReferralCount(username) {
-            if (referralUnsubscribe) referralUnsubscribe();
+            if (referralUnsubscribe) {
+                referralUnsubscribe();
+            }
 
-            // Supabase real-time abunəliyi
-            const subscription = supabase
-                .channel('custom-insert-channel')
-                .on(
-                    'postgres_changes',
-                    {
-                        event: '*',
-                        schema: 'public',
-                        table: 'users',
-                        filter: `username=eq.${username}`
-                    },
-                    (payload) => {
-                        console.log('Change received!', payload);
-                        const data = payload.new;
-
-                        const referralCount = data.successful_referrals || 0;
-                        const referralBonus = data.referral_bonus_total || 0;
-                        const currentMoney = data.total_money || 0;
-
-                        const refCountEl = document.getElementById('successfulReferrals');
-                        const refBonusEl = document.getElementById('referralBonusTotal');
-
-                        if (refCountEl) refCountEl.textContent = referralCount;
-                        if (refBonusEl) refBonusEl.textContent = referralBonus.toFixed(2) + " AZN";
-
-                        if (currentUserState && currentUserState.username === username) {
-                            currentUserState.successfulReferrals = referralCount;
-                            currentUserState.referralBonusTotal = referralBonus;
-                            currentUserState.totalMoney = currentMoney;
-
-                            if (typeof updateEnergyDisplay === 'function') {
-                                updateEnergyDisplay();
-                            }
-                        }
-                    }
-                )
-                .subscribe();
+            console.log('📡 Real-time dinləyici başladı:', username);
+            
+            // Sadə həll - interval ilə yenilə
+            const intervalId = setInterval(async () => {
+                if (currentUserState.username === username) {
+                    await refreshUserData(username);
+                }
+            }, 10000); // 10 saniyədə bir
 
             referralUnsubscribe = () => {
-                supabase.removeChannel(subscription);
+                clearInterval(intervalId);
+                console.log('📡 Real-time dinləyici dayandırıldı');
             };
         }
 
+        // İstifadəçi məlumatlarını yenilə
+        async function refreshUserData(username) {
+            try {
+                const userData = await findUserByUsername(username);
+                if (userData && currentUserState.username === username) {
+                    // Məlumatları yenilə
+                    currentUserState.totalMoney = userData.total_money || 0;
+                    currentUserState.successfulReferrals = userData.successful_referrals || 0;
+                    currentUserState.referralBonusEarned = userData.referral_bonus_total || 0;
+                    
+                    updateEnergyDisplay();
+                    console.log('🔄 İstifadəçi məlumatları yeniləndi');
+                }
+            } catch (error) {
+                console.error('Yeniləmə xətası:', error);
+            }
+        }
 
-        // =================================================================
-        // GİRİŞ FUNKSİYASI (Login)
+       // =================================================================
+        // GİRİŞ FUNKSİYASI (Login) - YENİLƏNİB
         // =================================================================
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -2706,8 +2704,9 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
         });
 
 
-        // =================================================================
-        // QEYDİYYAT FUNKSİYASI (Register)
+
+         // =================================================================
+        // QEYDİYYAT FUNKSİYASI (Register) - YENİLƏNİB
         // =================================================================
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -2764,7 +2763,6 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
 
                 // Yeni user yazılır
                 await createUser(newUserData);
-
                 // ================================
                 // REFERRAL PROSESSI
                 // ================================
@@ -2773,8 +2771,7 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                         .from('users')
                         .select('*')
                         .eq('referral_code', referralCodeInput)
-                        .limit(1)
-                        .single();
+                        .maybeSingle();
 
                     if (!referrerError && referrerData) {
                         const referrerUsername = referrerData.username;
@@ -2785,11 +2782,11 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                         });
 
                         // BONUS — yalnız ilk 10 nəfərə
-                        if ((referrerData.successful_referrals || 0) < REFERRAL_BONUS_LIMIT) {
+                        if ((referrerData.successful_referrals || 0) < 10) {
                             await updateUser(referrerUsername, {
                                 successful_referrals: (referrerData.successful_referrals || 0) + 1,
-                                referral_bonus_total: (referrerData.referral_bonus_total || 0) + REFERRAL_BONUS_AMOUNT,
-                                total_money: (referrerData.total_money || 0) + REFERRAL_BONUS_AMOUNT,
+                                referral_bonus_total: (referrerData.referral_bonus_total || 0) + 0.10,
+                                total_money: (referrerData.total_money || 0) + 0.10,
                             });
                         } else {
                             // Limit dolub — bonus yoxdur, amma say artır
