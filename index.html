@@ -2292,6 +2292,17 @@ function handleInterstitialReward() {
         // =================================================================
         const TELEGRAM_BOT_URL = "https://t.me/Casper_Game_bot/directlink";
 
+ // =================================================================
+// GLOBAL DƏYİŞƏNLƏR - BURAYA ƏLAVƏ EDİN
+// =================================================================
+let users = {};
+let referralUnsubscribe = null;
+let adexiumWidget = null;
+let adexiumInitialized = false;
+let Adsgram45MinController = null;
+let adsgram45MinTimer = 0;
+const AD_INTERVAL = 45 * 60 * 1000; // 45 dəqiqə
+        
         // =================================================================
         // YENİ CG ID SİSTEMİ
         // =================================================================
@@ -2725,7 +2736,7 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
         const subScreens = document.querySelectorAll('.game-sub-screen');
 
 
-      // =================================================================
+ // =================================================================
 // REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ - DÜZƏLDİLMİŞ
 // =================================================================
 function listenToReferralCount(username) {
@@ -2815,8 +2826,8 @@ function listenToReferralCount(username) {
         });
 
 
- // =================================================================
-// QEYDİYYAT FUNKSİYASI (Register) - DÜZƏLDİLMİŞ VERSİYA
+// =================================================================
+// QEYDİYYAT FUNKSİYASI (Register) - BURAYA ƏLAVƏ EDİN
 // =================================================================
 document.getElementById('registerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -2857,10 +2868,10 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
             password,
             username,
 
-            // REFERAL SİSTEMİ - DÜZƏLDİ
+            // REFERAL SİSTEMİ
             invitedFriends: [],
             referralBonusTotal: 0,
-            referralBonusEarned: 0, // ƏLAVƏ EDİLDİ
+            referralBonusEarned: 0,
             successfulReferrals: 0,
             referralCode: generateReferralCode(username),
             referredBy: referralCodeInput || null,
@@ -2882,7 +2893,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         await db.collection('users').doc(username).set(newUserData);
 
         // ================================
-        // REFERRAL PROSESSI - DÜZƏLDİLMİŞ
+        // REFERRAL PROSESSI
         // ================================
         if (referralCodeInput) {
             const referrerQuery = await db.collection('users')
@@ -2910,16 +2921,12 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
                     await db.collection('users').doc(referrerUsername).update({
                         successfulReferrals: firebase.firestore.FieldValue.increment(1),
                         referralBonusTotal: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
-                        referralBonusEarned: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT), // ƏLAVƏ EDİLDİ
+                        referralBonusEarned: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
                         totalMoney: firebase.firestore.FieldValue.increment(REFERRAL_BONUS_AMOUNT),
                     });
                     
                     console.log(`✅ Referral bonus verildi: ${referrerUsername} üçün +${REFERRAL_BONUS_AMOUNT} AZN`);
                     
-                    // Real-time dinləyicini tetikle
-                    if (referralUnsubscribe) {
-                        console.log(`🔄 Real-time dinləyici tetiklendi: ${referrerUsername}`);
-                    }
                 } else {
                     // Limit dolub — bonus yoxdur, amma say artır
                     await db.collection('users').doc(referrerUsername).update({
