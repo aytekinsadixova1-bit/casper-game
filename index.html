@@ -1915,189 +1915,163 @@ document.getElementById('forgotPasswordForm2').addEventListener('submit', async 
             console.error('❌ Firebase xətası:', error);
         }
 
-        // =================================================================
-        // ADSGRAM 45 DƏQİQƏ REWARD VIDEO SİSTEMİ - YENİLƏNMİŞ
-        // =================================================================
+       // =================================================================
+// ADSGRAM 45 DƏQİQƏ REWARD VIDEO SİSTEMİ - TAM DÜZƏLDİLMİŞ
+// =================================================================
 
-        let Adsgram45MinController = null;
-        let adsgram45MinRewardAvailable = true;
-        let adsgram45MinTimer = 0;
-        let adsgram45MinLastUsed = 0;
+let Adsgram45MinController = null;
+let adsgram45MinRewardAvailable = true;
+let adsgram45MinTimer = 0;
+let adsgram45MinLastUsed = 0;
 
-        function initializeAdsGram45Min() {
-            try {
-                if (window.Adsgram) {
-                    Adsgram45MinController = window.Adsgram.init({ blockId: "17892" });
-                    console.log('✅ AdsGram 45 Dəqiqə Reward Video sistemi uğurla başladıldı');
-                    
-                    // Timer vəziyyətini yüklə
-                    loadAdsGram45MinState();
-                    return true;
-                } else {
-                    console.log('❌ AdsGram SDK yüklənməyib');
-                    return false;
-                }
-            } catch (error) {
-                console.error('❌ AdsGram 45 Dəqiqə Reward Video başlatma xətası:', error);
-                return false;
-            }
+function initializeAdsGram45Min() {
+    try {
+        if (window.Adsgram) {
+            Adsgram45MinController = window.Adsgram.init({ blockId: "17892" });
+            console.log('✅ AdsGram 45 Dəqiqə Reward Video sistemi uğurla başladıldı');
+            loadAdsGram45MinState();  // <-- mühüm düzəliş
+            return true;
+        } else {
+            console.log('❌ AdsGram SDK yüklənməyib');
+            return false;
         }
+    } catch (error) {
+        console.error('❌ AdsGram 45 Dəqiqə Reward Video başlatma xətası:', error);
+        return false;
+    }
+}
 
-        // Timer vəziyyətini yüklə
-        async function loadAdsGram45MinState() {
-            if (!currentUserState.username) return;
-            
-            try {
-                const userDoc = await db.collection('users').doc(currentUserState.username).get();
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    const lastUsed = userData.adsgram45MinLastUsed || 0;
-                    const now = Date.now();
-                    
-                    // 45 dəqiqə keçib?
-                    const timePassed = now - lastUsed;
-                    const cooldownTime = 45 * 60 * 1000; // 45 dəqiqə
-                    
-                    if (lastUsed === 0 || timePassed >= cooldownTime) {
-                        // Hazırdır
-                        adsgram45MinRewardAvailable = true;
-                        adsgram45MinTimer = 0;
-                        adsgram45MinLastUsed = 0;
-                    } else {
-                        // Hələ gözləməlidir
-                        adsgram45MinRewardAvailable = false;
-                        adsgram45MinTimer = cooldownTime - timePassed;
-                        adsgram45MinLastUsed = lastUsed;
-                        startAdsGram45MinTimer();
-                    }
-                    
-                    updateAdsGram45MinTimerDisplay();
-                }
-            } catch (error) {
-                console.error('❌ AdsGram state yükləmə xətası:', error);
-                // Xəta halında default vəziyyət
+// ======================= TIMER STATE YÜKLƏ =======================
+async function loadAdsGram45MinState() {
+    if (!currentUserState.username) return;
+
+    try {
+        const userDoc = await db.collection('users').doc(currentUserState.username).get();
+
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            const lastUsed = userData.adsgram45MinLastUsed || 0;
+            const now = Date.now();
+
+            const cooldown = 45 * 60 * 1000;
+            const passed = now - lastUsed;
+
+            if (lastUsed === 0 || passed >= cooldown) {
                 adsgram45MinRewardAvailable = true;
                 adsgram45MinTimer = 0;
-            }
-        }
-
-        // Timer vəziyyətini saxla
-        async function saveAdsGram45MinState() {
-            if (!currentUserState.username) return;
-            
-            try {
-                await db.collection('users').doc(currentUserState.username).update({
-                    adsgram45MinLastUsed: adsgram45MinLastUsed,
-                    adsgram45MinTimer: adsgram45MinTimer
-                });
-            } catch (error) {
-                console.error('❌ AdsGram state saxlanması xətası:', error);
-            }
-        }
-
-        function showAdsGram45MinRewardVideo() {
-            if (!adsgram45MinRewardAvailable) {
-                const minutesLeft = Math.ceil(adsgram45MinTimer / 60000);
-                alert(`🎬 Reward video hazır deyil. ${minutesLeft} dəqiqə gözləyin.`);
-                return false;
-            }
-            
-            if (!Adsgram45MinController) {
-                const initialized = initializeAdsGram45Min();
-                if (!initialized) {
-                    alert('❌ Reklam sistemi hazır deyil. Yenidən cəhd edin.');
-                    return false;
-                }
-            }
-
-            adsgram45MinRewardAvailable = false;
-            adsgram45MinLastUsed = Date.now();
-            
-            // 45 dəqiqəlik timer başlat
-            adsgram45MinTimer = 45 * 60 * 1000; // 45 dəqiqə millisaniyələrdə
-            
-            // Vəziyyəti saxla
-            saveAdsGram45MinState();
-            startAdsGram45MinTimer();
-            
-            Adsgram45MinController.show()
-                .then((result) => {
-                    console.log('✅ AdsGram 45 dəqiqə reward video tamamlandı!', result);
-                    
-                    const rewardAmount = 0.001;
-                    currentUserState.totalMoney += rewardAmount;
-                    
-                    saveUserState();
-                    updateEnergyDisplay();
-                    
-                    showSuccess(`🎉 45 dəqiqəlik reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
-                })
-                .catch((error) => {
-                    console.error('❌ AdsGram 45 dəqiqə reward video xətası:', error);
-                    
-                    let errorMessage = 'Reklam göstərilərkən xəta baş verdi.';
-                    
-                    if (error && error.description) {
-                        errorMessage = error.description;
-                    }
-                    
-                    alert(`❌ ${errorMessage}`);
-                    
-                    // Xəta olsa belə timer-i sıfırla və yenidən aktiv et
-                    adsgram45MinRewardAvailable = true;
-                    adsgram45MinTimer = 0;
-                    adsgram45MinLastUsed = 0;
-                    saveAdsGram45MinState();
-                    updateAdsGram45MinTimerDisplay();
-                });
-            
-            return true;
-        }
-
-        function startAdsGram45MinTimer() {
-            // Əvvəlki intervalı təmizlə
-            if (window.adsgram45MinInterval) {
-                clearInterval(window.adsgram45MinInterval);
-            }
-            
-            window.adsgram45MinInterval = setInterval(() => {
-                adsgram45MinTimer -= 1000; // 1 saniyə
-                
-                if (adsgram45MinTimer <= 0) {
-                    adsgram45MinRewardAvailable = true;
-                    adsgram45MinTimer = 0;
-                    adsgram45MinLastUsed = 0;
-                    clearInterval(window.adsgram45MinInterval);
-                    
-                    // Vəziyyəti yenilə
-                    saveAdsGram45MinState();
-                }
-                
-                updateAdsGram45MinTimerDisplay();
-            }, 1000);
-        }
-
-        function updateAdsGram45MinTimerDisplay() {
-            const timerElement = document.getElementById('adsgram45MinTimer');
-            const buttonElement = document.getElementById('adsgram45MinButton');
-            
-            if (!timerElement || !buttonElement) return;
-            
-            if (adsgram45MinTimer <= 0) {
-                timerElement.textContent = "Hazır!";
-                buttonElement.disabled = false;
-                buttonElement.style.opacity = "1";
+                adsgram45MinLastUsed = 0;
             } else {
-                const minutes = Math.floor(adsgram45MinTimer / 60000);
-                const seconds = Math.floor((adsgram45MinTimer % 60000) / 1000);
-                timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                buttonElement.disabled = true;
-                buttonElement.style.opacity = "0.6";
+                adsgram45MinRewardAvailable = false;
+                adsgram45MinTimer = cooldown - passed;
+                adsgram45MinLastUsed = lastUsed;
+                startAdsGram45MinTimer();
             }
         }
 
-        // Timer display-i hər dəqiqə yenilə
-        setInterval(updateAdsGram45MinTimerDisplay, 1000);
+        updateAdsGram45MinTimerDisplay();
+
+    } catch (e) {
+        console.error("❌ AdsGram state load error:", e);
+        adsgram45MinRewardAvailable = true;
+        adsgram45MinTimer = 0;
+    }
+}
+
+// ======================= TIMER STATE SAXLA =======================
+async function saveAdsGram45MinState() {
+    if (!currentUserState.username) return;
+
+    try {
+        await db.collection('users').doc(currentUserState.username).update({
+            adsgram45MinLastUsed,
+            adsgram45MinTimer
+        });
+    } catch (e) {
+        console.error("❌ AdsGram save error:", e);
+    }
+}
+
+// ======================= VİDEONU GÖSTƏR ===========================
+function showAdsGram45MinRewardVideo() {
+    if (!adsgram45MinRewardAvailable) {
+        alert(`🎬 Video hələ hazır deyil. ${Math.ceil(adsgram45MinTimer / 60000)} dəqiqə qalıb.`);
+        return false;
+    }
+
+    if (!Adsgram45MinController) {
+        if (!initializeAdsGram45Min()) {
+            alert("❌ Reklam sistemi hazır deyil.");
+            return false;
+        }
+    }
+
+    adsgram45MinRewardAvailable = false;
+    adsgram45MinLastUsed = Date.now();
+    adsgram45MinTimer = 45 * 60 * 1000;
+
+    saveAdsGram45MinState();
+    startAdsGram45MinTimer();
+
+    Adsgram45MinController.show()
+        .then(() => {
+            const reward = 0.001;
+            currentUserState.totalMoney += reward;
+            saveUserState();
+            updateEnergyDisplay();
+
+            showSuccess(`🎉 +${reward} AZN qazandın!`);
+        })
+        .catch((error) => {
+            console.error("❌ Reklam xətası:", error);
+
+            adsgram45MinRewardAvailable = true;
+            adsgram45MinTimer = 0;
+            adsgram45MinLastUsed = 0;
+            saveAdsGram45MinState();
+        });
+
+    return true;
+}
+
+// ======================= TIMER START ===========================
+function startAdsGram45MinTimer() {
+    if (window.adsgram45MinInterval) clearInterval(window.adsgram45MinInterval);
+
+    window.adsgram45MinInterval = setInterval(() => {
+        adsgram45MinTimer -= 1000;
+
+        if (adsgram45MinTimer <= 0) {
+            adsgram45MinRewardAvailable = true;
+            adsgram45MinTimer = 0;
+            adsgram45MinLastUsed = 0;
+            clearInterval(window.adsgram45MinInterval);
+            saveAdsGram45MinState();
+        }
+
+        updateAdsGram45MinTimerDisplay();
+    }, 1000);
+}
+
+// ======================= TIMER UI ===========================
+function updateAdsGram45MinTimerDisplay() {
+    const el = document.getElementById('adsgram45MinTimer');
+    const btn = document.getElementById('adsgram45MinButton');
+
+    if (!el || !btn) return;
+
+    if (adsgram45MinTimer <= 0) {
+        el.textContent = "Hazır!";
+        btn.disabled = false;
+        btn.style.opacity = "1";
+    } else {
+        const m = Math.floor(adsgram45MinTimer / 60000);
+        const s = Math.floor((adsgram45MinTimer % 60000) / 1000);
+        el.textContent = `${m}:${s.toString().padStart(2, "0")}`;
+        btn.disabled = true;
+        btn.style.opacity = "0.5";
+    }
+}
+
 
         // =================================================================
         // ONCLIKA 30 KLİK REWARD VIDEO SİSTEMİ
@@ -2584,43 +2558,55 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             adsgram45MinTimer: 0
         };
 
-        // DOM Elementləri
-        const splashScreen = document.getElementById('splashScreen');
-        const mainContent = document.getElementById('mainContent');
-        const loginScreen = document.getElementById('loginScreen');
-        const gameScreen = document.getElementById('gameScreen');
-        const adScreen = document.getElementById('adScreen');
-        const adContent = document.getElementById('adContent');
-        const mainIcon = document.getElementById('mainIcon');
-        const welcomeText = document.getElementById('welcomeText');
-        const welcomeMessage = document.getElementById('welcomeMessage');
-        const personalWelcomeText = document.getElementById('personalWelcomeText');
-        const inviteLinkDisplay = document.getElementById('inviteLinkDisplay');
-        const withdrawalUserIdDisplay = document.getElementById('withdrawalUserIdDisplay');
+        // =========================
+// DOM ELEMENTLƏRİNİN SEÇİLMƏSİ
+// =========================
 
-        const energyFillEl = document.getElementById('energyFill');
-        const energyTextEl = document.getElementById('energyText');
-        const totalMoneyEl = document.getElementById('totalMoney'); 
-        const clicksUntilAdDisplay = document.getElementById('clicksUntilAdDisplay');
+// Əsas ekranlar
+const splashScreen = document.getElementById('splashScreen');
+const mainContent = document.getElementById('mainContent');
+const loginScreen = document.getElementById('loginScreen');
+const gameScreen = document.getElementById('gameScreen');
+const adScreen = document.getElementById('adScreen');
+const adContent = document.getElementById('adContent');
 
-        const profileCGIDEl = document.getElementById('profileCGID');
-        const profileUsernameEl = document.getElementById('profileUsername');
-        const profileFullNameEl = document.getElementById('profileFullName');
-        const profilePhoneEl = document.getElementById('profilePhone');
-        const profileEmailEl = document.getElementById('profileEmail');
-        const profileMoneyEl = document.getElementById('profileMoney');
-        const profileReferralCodeEl = document.getElementById('profileReferralCode');
+// Ümumi UI elementləri
+const mainIcon = document.getElementById('mainIcon');
+const welcomeText = document.getElementById('welcomeText');
+const welcomeMessage = document.getElementById('welcomeMessage');
+const personalWelcomeText = document.getElementById('personalWelcomeText');
 
-        const availableMoneyEl = document.getElementById('availableMoney');
-        const successfulReferralsEl = document.getElementById('successfulReferrals');
-        const referralBonusTotalEl = document.getElementById('referralBonusTotal');
-        const referralLimitEl = document.getElementById('referralLimit');
-        const nextWithdrawalTimeEl = document.getElementById('nextWithdrawalTime');
-        const withdrawalTimerInfoEl = document.getElementById('withdrawalTimerInfo');
-        const withdrawSubmitBtn = document.getElementById('withdrawSubmitBtn');
+// Dəvət və balans məlumatları
+const inviteLinkDisplay = document.getElementById('inviteLinkDisplay');
+const withdrawalUserIdDisplay = document.getElementById('withdrawalUserIdDisplay');
 
-        const navItems = document.querySelectorAll('.navbar .nav-item');
-        const subScreens = document.querySelectorAll('.game-sub-screen');
+// Enerji və reklam kontrolleri
+const energyFillEl = document.getElementById('energyFill');
+const energyTextEl = document.getElementById('energyText');
+const totalMoneyEl = document.getElementById('totalMoney');
+const clicksUntilAdDisplay = document.getElementById('clicksUntilAdDisplay');
+
+// Profil məlumatları
+const profileCGIDEl = document.getElementById('profileCGID');
+const profileUsernameEl = document.getElementById('profileUsername');
+const profileFullNameEl = document.getElementById('profileFullName');
+const profilePhoneEl = document.getElementById('profilePhone');
+const profileEmailEl = document.getElementById('profileEmail');
+const profileMoneyEl = document.getElementById('profileMoney');
+const profileReferralCodeEl = document.getElementById('profileReferralCode');
+
+// Referral və çıxarış məlumatları
+const availableMoneyEl = document.getElementById('availableMoney');
+const successfulReferralsEl = document.getElementById('successfulReferrals');
+const referralBonusTotalEl = document.getElementById('referralBonusTotal');
+const referralLimitEl = document.getElementById('referralLimit');
+const nextWithdrawalTimeEl = document.getElementById('nextWithdrawalTime');
+const withdrawalTimerInfoEl = document.getElementById('withdrawalTimerInfo');
+const withdrawSubmitBtn = document.getElementById('withdrawSubmitBtn');
+
+// Naviqasiya
+const navItems = document.querySelectorAll('.navbar .nav-item');
+const subScreens = document.querySelectorAll('.game-sub-screen');
 
 
         // =================================================================
