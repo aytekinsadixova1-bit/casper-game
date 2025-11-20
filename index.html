@@ -2165,34 +2165,113 @@ setInterval(updateAdsGram45MinTimerDisplay, 1000);
 // =================================================================
 
 let onclikaShowFunction = null;
+let onclikaFallbackUsed = false;
 
 function initializeOnclika30Click() {
     try {
-        window.initCdTma?.({ id: '393471' })
+        // Reklam bloklanıb-bloklanmadığını yoxla
+        if (typeof window.initCdTma === 'undefined') {
+            console.warn('⚠️ Onclika SDK yüklənməyib. Reklam bloklanıb ola bilər.');
+            setupFallbackAdSystem();
+            return false;
+        }
+        
+        window.initCdTma({ id: '6099028' })
             .then(show => {
                 onclikaShowFunction = show;
                 console.log('✅ Onclika 30 Klik Reward Video sistemi uğurla başladıldı');
             })
             .catch(e => {
                 console.error('❌ Onclika başlatma xətası:', e);
+                // Xəta halında alternativ sistemə keç
+                setupFallbackAdSystem();
             });
         return true;
     } catch (error) {
         console.error('❌ Onclika 30 Klik Reward Video başlatma xətası:', error);
+        setupFallbackAdSystem();
         return false;
     }
 }
 
+// Ehtiyat reklam sistemi
+function setupFallbackAdSystem() {
+    console.log('🔄 Ehtiyat reklam sistemi qurulur...');
+    onclikaFallbackUsed = true;
+    
+    onclikaShowFunction = () => {
+        return new Promise((resolve) => {
+            showSimpleAdScreen(resolve);
+        });
+    };
+    
+    return true;
+}
+
+function showSimpleAdScreen(resolve) {
+    // Sadə reklam ekranı göstər
+    const adHtml = `
+        <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; font-family: Arial, sans-serif;">
+            <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; text-align: center; border: 2px solid #00b894; max-width: 300px;">
+                <h2 style="color: #00b894; margin-bottom: 15px;">🎬 Reklam</h2>
+                <p style="margin-bottom: 10px;">Reklam sistemində müvəqqəti problem var</p>
+                <p style="margin-bottom: 20px;">5 saniyə gözləyin...</p>
+                <div id="fallbackTimer" style="font-size: 24px; font-weight: bold; color: #00b894; margin: 15px 0;">5</div>
+                <button onclick="closeFallbackAd()" style="padding: 10px 20px; background: #00b894; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">Bağla</button>
+            </div>
+        </div>
+    `;
+    
+    const adOverlay = document.createElement('div');
+    adOverlay.innerHTML = adHtml;
+    document.body.appendChild(adOverlay);
+    
+    // Timer
+    let timeLeft = 5;
+    const timerElement = adOverlay.querySelector('#fallbackTimer');
+    const timerInterval = setInterval(() => {
+        timeLeft--;
+        timerElement.textContent = timeLeft;
+        
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            closeFallbackAd();
+            resolve({ completed: true });
+        }
+    }, 1000);
+    
+    window.closeFallbackAd = function() {
+        clearInterval(timerInterval);
+        if (adOverlay.parentNode) {
+            document.body.removeChild(adOverlay);
+        }
+        resolve({ completed: true });
+    };
+}
+
 function showOnclika30ClickReward() {
     console.log('🔄 30 klik Onclika reklamı başladı...');
+    
+    // Birbaşa alternativ sistemə keç (VAST xətası üçün)
+    if (onclikaFallbackUsed) {
+        console.log('🔄 Ehtiyat reklam sistemi istifadə edilir...');
+        onclikaShowFunction()
+            .then((result) => {
+                handleRewardCompletion();
+            })
+            .catch((error) => {
+                console.error('❌ Ehtiyat sistem xətası:', error);
+                handleRewardCompletion(); // Yenə də mükafat ver
+            });
+        return true;
+    }
     
     if (!onclikaShowFunction) {
         console.error('❌ Onclika controller tapılmadı! Yenidən başladılır...');
         const initialized = initializeOnclika30Click(); 
         if (!initialized) {
             console.error('❌ Onclika sistemi hazır deyil.'); 
-            currentUserState.clicksUntilAd = CLICKS_FOR_AD; // AD_INTERVAL → CLICKS_FOR_AD
-            updateEnergyDisplay();
+            handleRewardCompletion(); // Birbaşa mükafat ver
             return false;
         }
         
@@ -2201,8 +2280,7 @@ function showOnclika30ClickReward() {
             if (onclikaShowFunction) {
                 showOnclika30ClickReward();
             } else {
-                currentUserState.clicksUntilAd = CLICKS_FOR_AD; // AD_INTERVAL → CLICKS_FOR_AD
-                updateEnergyDisplay();
+                handleRewardCompletion(); // Birbaşa mükafat ver
             }
         }, 1000);
         return false;
@@ -2214,33 +2292,36 @@ function showOnclika30ClickReward() {
         onclikaShowFunction()
             .then((result) => {
                 console.log('✅ Onclika 30 klik reward video tamamlandı!', result);
-                
-                const rewardAmount = 0.0001; 
-                currentUserState.totalMoney += rewardAmount;
-                saveUserState();
-                updateEnergyDisplay();
-                showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
-                
-                currentUserState.clicksUntilAd = CLICKS_FOR_AD; // AD_INTERVAL → CLICKS_FOR_AD
-                updateEnergyDisplay();
-                console.log('✅ Onclika reklam uğurla tamamlandı, sayğac sıfırlandı');
+                handleRewardCompletion();
             })
             .catch((error) => {
                 console.error('❌ Onclika 30 klik reward video xətası:', error);
-                currentUserState.clicksUntilAd = CLICKS_FOR_AD; // AD_INTERVAL → CLICKS_FOR_AD
-                updateEnergyDisplay();
-                console.log('🔄 Xəta olsa belə sayğac sıfırlandı');
+                // Xəta halında ehtiyat sistemə keç və yenidən cəhd et
+                setupFallbackAdSystem();
+                showOnclika30ClickReward();
             });
 
     } catch (e) {
         console.error("🚨 Onclika show() çağırışında dərhal xəta:", e.message);
-        currentUserState.clicksUntilAd = CLICKS_FOR_AD; // AD_INTERVAL → CLICKS_FOR_AD
-        updateEnergyDisplay();
-        console.log('🔄 Catch blokunda sayğac sıfırlandı');
+        // Xəta halında ehtiyat sistemə keç və yenidən cəhd et
+        setupFallbackAdSystem();
+        showOnclika30ClickReward();
         return false;
     }
     
     return true;
+}
+
+// Ümumi mükafat emal funksiyası
+function handleRewardCompletion() {
+    const rewardAmount = 0.0001; 
+    currentUserState.totalMoney += rewardAmount;
+    currentUserState.clicksUntilAd = CLICKS_FOR_AD;
+    
+    saveUserState();
+    updateEnergyDisplay();
+    showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
+    console.log('✅ Mükafat uğurla verildi, sayğac sıfırlandı');
 }
         // =================================================================
         // TELEGRAM BOT AYARLARI
