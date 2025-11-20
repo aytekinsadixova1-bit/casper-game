@@ -19,10 +19,23 @@
 <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', () => {
-        const adexiumWidget = new AdexiumWidget({wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae', adFormat: 'push-like'});
-        adexiumWidget.autoMode();
+        // Push-like reklam üçün
+        const adexiumPushLike = new AdexiumWidget({
+            wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae', 
+            adFormat: 'push-like'
+        });
+        adexiumPushLike.autoMode();
+        
+        // Interstitial reklam üçün (30 klikdə bir)
+        const adexiumInterstitial = new AdexiumWidget({
+            wid: '1f16b658-52d6-4522-aebf-5e0c437c7a9b', 
+            adFormat: 'interstitial'
+        });
+        // Interstitial autoMode olmadan, manual idarə edəcəyik
+        console.log('✅ Hər iki Adexium reklam formatı başladıldı');
     });
 </script>
+
     <!-- Onclika SDK -->
     <script src="https://js.onclckvd.com/in-stream-ad-admanager/tma.js"></script>
     
@@ -2161,159 +2174,103 @@ setInterval(updateAdsGram45MinTimerDisplay, 1000);
 
       
 // =================================================================
-// ONCLIKA 30 KLİK REWARD VIDEO SİSTEMİ
+// ADEXIUM 30 KLİK INTERSTITIAL REWARD SİSTEMİ
 // =================================================================
 
-let onclikaShowFunction = null;
-let onclikaFallbackUsed = false;
+let adexiumInterstitial = null;
+let interstitialReady = false;
 
-function initializeOnclika30Click() {
+function initializeAdexiumInterstitial() {
     try {
-        // Reklam bloklanıb-bloklanmadığını yoxla
-        if (typeof window.initCdTma === 'undefined') {
-            console.warn('⚠️ Onclika SDK yüklənməyib. Reklam bloklanıb ola bilər.');
-            setupFallbackAdSystem();
+        if (typeof AdexiumWidget === 'undefined') {
+            console.error('❌ Adexium SDK yüklənməyib');
             return false;
         }
         
-        window.initCdTma({ id: '6099028' })
-            .then(show => {
-                onclikaShowFunction = show;
-                console.log('✅ Onclika 30 Klik Reward Video sistemi uğurla başladıldı');
-            })
-            .catch(e => {
-                console.error('❌ Onclika başlatma xətası:', e);
-                // Xəta halında alternativ sistemə keç
-                setupFallbackAdSystem();
+        // Interstitial reklamını başlat
+        adexiumInterstitial = new AdexiumWidget({
+            wid: '1f16b658-52d6-4522-aebf-5e0c437c7a9b',
+            adFormat: 'interstitial'
+        });
+        
+        // Interstitial reklam hadisələrini dinlə
+        if (adexiumInterstitial.on) {
+            adexiumInterstitial.on('ad-loaded', () => {
+                console.log('✅ Interstitial reklam yükləndi');
+                interstitialReady = true;
             });
+            
+            adexiumInterstitial.on('ad-failed', (error) => {
+                console.error('❌ Interstitial reklam xətası:', error);
+                interstitialReady = false;
+            });
+            
+            adexiumInterstitial.on('ad-closed', () => {
+                console.log('✅ Interstitial reklam bağlandı');
+                handleInterstitialReward();
+            });
+        }
+        
+        interstitialReady = true;
+        console.log('✅ Adexium Interstitial sistemi uğurla başladıldı');
         return true;
     } catch (error) {
-        console.error('❌ Onclika 30 Klik Reward Video başlatma xətası:', error);
-        setupFallbackAdSystem();
+        console.error('❌ Adexium Interstitial başlatma xətası:', error);
         return false;
     }
 }
 
-// Ehtiyat reklam sistemi
-function setupFallbackAdSystem() {
-    console.log('🔄 Ehtiyat reklam sistemi qurulur...');
-    onclikaFallbackUsed = true;
+function showAdexiumInterstitialReward() {
+    console.log('🔄 30 klik Interstitial reklamı başladı...');
     
-    onclikaShowFunction = () => {
-        return new Promise((resolve) => {
-            showSimpleAdScreen(resolve);
-        });
-    };
-    
-    return true;
-}
-
-function showSimpleAdScreen(resolve) {
-    // Sadə reklam ekranı göstər
-    const adHtml = `
-        <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; font-family: Arial, sans-serif;">
-            <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; text-align: center; border: 2px solid #00b894; max-width: 300px;">
-                <h2 style="color: #00b894; margin-bottom: 15px;">🎬 Reklam</h2>
-                <p style="margin-bottom: 10px;">Reklam sistemində müvəqqəti problem var</p>
-                <p style="margin-bottom: 20px;">5 saniyə gözləyin...</p>
-                <div id="fallbackTimer" style="font-size: 24px; font-weight: bold; color: #00b894; margin: 15px 0;">5</div>
-                <button onclick="closeFallbackAd()" style="padding: 10px 20px; background: #00b894; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">Bağla</button>
-            </div>
-        </div>
-    `;
-    
-    const adOverlay = document.createElement('div');
-    adOverlay.innerHTML = adHtml;
-    document.body.appendChild(adOverlay);
-    
-    // Timer
-    let timeLeft = 5;
-    const timerElement = adOverlay.querySelector('#fallbackTimer');
-    const timerInterval = setInterval(() => {
-        timeLeft--;
-        timerElement.textContent = timeLeft;
-        
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            closeFallbackAd();
-            resolve({ completed: true });
-        }
-    }, 1000);
-    
-    window.closeFallbackAd = function() {
-        clearInterval(timerInterval);
-        if (adOverlay.parentNode) {
-            document.body.removeChild(adOverlay);
-        }
-        resolve({ completed: true });
-    };
-}
-
-function showOnclika30ClickReward() {
-    console.log('🔄 30 klik Onclika reklamı başladı...');
-    
-    // Birbaşa alternativ sistemə keç (VAST xətası üçün)
-    if (onclikaFallbackUsed) {
-        console.log('🔄 Ehtiyat reklam sistemi istifadə edilir...');
-        onclikaShowFunction()
-            .then((result) => {
-                handleRewardCompletion();
-            })
-            .catch((error) => {
-                console.error('❌ Ehtiyat sistem xətası:', error);
-                handleRewardCompletion(); // Yenə də mükafat ver
-            });
-        return true;
-    }
-    
-    if (!onclikaShowFunction) {
-        console.error('❌ Onclika controller tapılmadı! Yenidən başladılır...');
-        const initialized = initializeOnclika30Click(); 
+    if (!adexiumInterstitial) {
+        console.log('🔄 Interstitial controller tapılmadı! Yenidən başladılır...');
+        const initialized = initializeAdexiumInterstitial(); 
         if (!initialized) {
-            console.error('❌ Onclika sistemi hazır deyil.'); 
-            handleRewardCompletion(); // Birbaşa mükafat ver
+            console.error('❌ Interstitial sistemi hazır deyil.'); 
+            // Sistem hazır deyilsə, birbaşa mükafat ver
+            handleInterstitialReward();
             return false;
         }
         
         // Bir az gözlə və yenidən cəhd et
         setTimeout(() => {
-            if (onclikaShowFunction) {
-                showOnclika30ClickReward();
+            if (adexiumInterstitial && interstitialReady) {
+                showAdexiumInterstitialReward();
             } else {
-                handleRewardCompletion(); // Birbaşa mükafat ver
+                handleInterstitialReward(); // Birbaşa mükafat ver
             }
         }, 1000);
         return false;
     }
 
     try {
-        console.log('🎬 Onclika reklam göstərilməyə çalışılır...');
+        if (!interstitialReady) {
+            console.warn('⚠️ Interstitial hazır deyil, mükafat verilir...');
+            handleInterstitialReward();
+            return true;
+        }
         
-        onclikaShowFunction()
-            .then((result) => {
-                console.log('✅ Onclika 30 klik reward video tamamlandı!', result);
-                handleRewardCompletion();
-            })
-            .catch((error) => {
-                console.error('❌ Onclika 30 klik reward video xətası:', error);
-                // Xəta halında ehtiyat sistemə keç və yenidən cəhd et
-                setupFallbackAdSystem();
-                showOnclika30ClickReward();
-            });
+        console.log('🎬 Interstitial reklam göstərilir...');
+        
+        // Interstitial reklamı göstər
+        if (typeof adexiumInterstitial.show === 'function') {
+            adexiumInterstitial.show();
+        } else {
+            console.error('❌ Interstitial show metodu tapılmadı');
+            handleInterstitialReward();
+        }
 
     } catch (e) {
-        console.error("🚨 Onclika show() çağırışında dərhal xəta:", e.message);
-        // Xəta halında ehtiyat sistemə keç və yenidən cəhd et
-        setupFallbackAdSystem();
-        showOnclika30ClickReward();
+        console.error("🚨 Interstitial xətası:", e.message);
+        handleInterstitialReward(); // Xəta halında yenə də mükafat ver
         return false;
     }
     
     return true;
 }
 
-// Ümumi mükafat emal funksiyası
-function handleRewardCompletion() {
+function handleInterstitialReward() {
     const rewardAmount = 0.0001; 
     currentUserState.totalMoney += rewardAmount;
     currentUserState.clicksUntilAd = CLICKS_FOR_AD;
@@ -2321,7 +2278,14 @@ function handleRewardCompletion() {
     saveUserState();
     updateEnergyDisplay();
     showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
-    console.log('✅ Mükafat uğurla verildi, sayğac sıfırlandı');
+    console.log('✅ Interstitial mükafat verildi, sayğac sıfırlandı');
+    
+    // Interstitial-i yenidən hazırla
+    interstitialReady = false;
+    setTimeout(() => {
+        interstitialReady = true;
+        console.log('🔄 Interstitial yenidən hazırdır');
+    }, 1000);
 }
         // =================================================================
         // TELEGRAM BOT AYARLARI
@@ -3682,8 +3646,9 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             }
         });
 
+
         // =================================================================
-        // ÇIXARIŞ FORM FUNKSİYASI - YENİ VERSİYA
+        // ÇIXARIŞ FORM FUNKSİYASI
         // =================================================================
         document.getElementById('withdrawalForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -3706,7 +3671,6 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                 return;
             }
 
-            // YENİ: MINIMUM ÇIXARIŞ 3.00 AZN
             if (amountAZN < MIN_WITHDRAWAL_AMOUNT) {
                 alert(`Minimum çıxarış məbləği ${MIN_WITHDRAWAL_AMOUNT.toFixed(2)} AZN-dir.`);
                 return;
@@ -3761,16 +3725,16 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                 updateEnergyDisplay();
                 updateWithdrawalDisplay();
                 
-                // İSTİFADƏÇİYƏ GÖSTƏRİLƏCƏK MESAJ - Telegram haqqında heç nə yoxdur!
                 alert(`✅ Çıxarış sorğunuz uğurla qəbul edildi!\n\n💰 ${amountAZN.toFixed(2)} AZN məbləği üçün sorğunuz sistemə göndərildi.\n\n📋 Sorğunuz 3 iş günü ərzində yoxlanılacaq.\n\n⏰ Əgər 3 gün ərzində cavab almasanız, dəstək komandamızla əlaqə saxlayın.\n\nNövbəti çıxarışı ${WITHDRAWAL_COOLDOWN_DAYS} gündən sonra edə bilərsiniz.`);
                 
             } else {
-                // Xəta halında
                 alert("❌ Çıxarış sorğusu göndərilə bilmədi. Zəhmət olmasa bir neçə dəqiqə sonra yenidən cəhd edin.");
             }
         });
 
-        // Ruq animasiya funksiyaları
+        // =================================================================
+        // ANİMASİYA FUNKSİYALARI
+        // =================================================================
         function addGhostAnimations(event) {
             const icon = document.getElementById('mainIcon');
             const img = document.getElementById('clickImage');
@@ -3822,7 +3786,9 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             }, 600);
         }
 
-        // İkon klik funksiyası
+        // =================================================================
+        // İKON KLİK FUNKSİYASI
+        // =================================================================
         function clickIcon(e) {
             const state = currentUserState;
             const now = Date.now();
@@ -3837,158 +3803,165 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             
             addGhostAnimations(e);
             
-           // 30 klikdən sonra ONCLIKA reklamı göstər
-if (state.clicksUntilAd <= 1) { 
-    state.clicksUntilAd = 0; 
-    
-    console.log("30 klik tamamlandı. Onclika reward video çağırılır...");
-    
-    setTimeout(() => {
-         showOnclika30ClickReward(); // AdsGram yerinə Onclika
-    }, 500); 
-    
-    return; 
-}
+            // 30 klikdən sonra ADEXIUM INTERSTITIAL reklamı göstər
+            if (state.clicksUntilAd <= 1) { 
+                state.clicksUntilAd = 0; 
+                
+                console.log("30 klik tamamlandı. Adexium Interstitial reklamı çağırılır...");
+                
+                setTimeout(() => {
+                    showAdexiumInterstitialReward();
+                }, 500); 
+                
+                return; 
+            }
 
-if (state.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) { 
-    if (state.clicksUntilAd > 0) {
-        state.clicksUntilAd = 0; 
-        
-        console.log("Enerji bitdi, lakin reklam vaxtıdır. Onclika reward video çağırılır...");
-        
-        setTimeout(() => {
-             showOnclika30ClickReward(); // AdsGram yerinə Onclika
-        }, 500);
-    }
-    return;
-}
+            if (state.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) { 
+                if (state.clicksUntilAd > 0) {
+                    state.clicksUntilAd = 0; 
+                    
+                    console.log("Enerji bitdi, lakin reklam vaxtıdır. Adexium Interstitial reklamı çağırılır...");
+                    
+                    setTimeout(() => {
+                        showAdexiumInterstitialReward();
+                    }, 500);
+                }
+                return;
+            }
 
-const moneyEarned = MONEY_PER_CLICK;
+            const moneyEarned = MONEY_PER_CLICK;
 
-state.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK; 
-state.totalClicks++;
-state.totalMoney += moneyEarned; 
-state.energyUsed += ENERGY_CONSUMPTION_PER_CLICK; 
+            state.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK; 
+            state.totalClicks++;
+            state.totalMoney += moneyEarned; 
+            state.energyUsed += ENERGY_CONSUMPTION_PER_CLICK; 
 
-if (state.clicksUntilAd > 0) {
-    state.clicksUntilAd--;
-}
+            if (state.clicksUntilAd > 0) {
+                state.clicksUntilAd--;
+            }
 
-updateEnergyDisplay();
-createMoneyPopup(e, moneyEarned);
+            updateEnergyDisplay();
+            createMoneyPopup(e, moneyEarned);
         }
 
-     // Başlanğıc funksiyası
-window.addEventListener('load', async function() {
-    loadImages();
-    
-    console.log('🚀 Oyun başladılır...');
-    checkUrlForReferralCode();
-    
-    // CG ID sistemini initialize et
-    await initializeCounter();
-    console.log('✅ CG ID sistemi hazırdır');
-
-    // ADEXIUM WIDGET İŞƏ SAL (yalnız push-like reklamlar üçün)
-    setTimeout(() => {
-        const adexiumInitialized = initializeAdExiumPushLike();
-        if (adexiumInitialized) {
-            console.log('✅ AdExium Push-like sistemi uğurla başladıldı');
+        // =================================================================
+        // BAŞLANĞIÇ FUNKSİYASI
+        // =================================================================
+        window.addEventListener('load', async function() {
+            loadImages();
             
-            // Push-like reklamı hər 60 saniyədən bir göstər
-            setInterval(() => {
-                showAdExiumPushLike();
-            }, 60000);
+            console.log('🚀 Oyun başladılır...');
+            checkUrlForReferralCode();
             
-        } else {
-            console.log('❌ AdExium Push-like sistemi başladıla bilmədi');
+            // CG ID sistemini initialize et
+            await initializeCounter();
+            console.log('✅ CG ID sistemi hazırdır');
+
+            // ADSGRAM 45 DƏQİQƏ REWARD VIDEO İŞƏ SAL
+            setTimeout(() => {
+                const adsgram45MinInitialized = initializeAdsGram45Min();
+                if (adsgram45MinInitialized) {
+                    console.log('✅ AdsGram 45 Dəqiqə Reward Video sistemi uğurla başladıldı');
+                } else {
+                    console.log('❌ AdsGram 45 Dəqiqə Reward Video sistemi başladıla bilmədi');
+                }
+            }, 2000);
+            
+            // ADEXIUM INTERSTITIAL SİSTEMİNİ İŞƏ SAL
+            setTimeout(() => {
+                const interstitialInitialized = initializeAdexiumInterstitial();
+                if (interstitialInitialized) {
+                    console.log('✅ Adexium Interstitial sistemi uğurla başladıldı');
+                } else {
+                    console.log('❌ Adexium Interstitial sistemi başladıla bilmədi');
+                }
+            }, 1000);
+
+            // ADEXIUM PUSH-LIKE SİSTEMİNİ İŞƏ SAL
+            setTimeout(() => {
+                const pushInitialized = initializeAdExiumPushLike();
+                if (pushInitialized) {
+                    console.log('✅ Adexium Push-like sistemi uğurla başladıldı');
+                    
+                    // Push-like reklamı hər 60 saniyədən bir göstər
+                    setInterval(() => {
+                        showAdExiumPushLike();
+                    }, 60000);
+                } else {
+                    console.log('❌ Adexium Push-like sistemi başladıla bilmədi');
+                }
+            }, 3000);
+
+            const img = document.getElementById('clickImage');
+            img.classList.add('wind-animation', 'floating-ghost');
+
+            setTimeout(() => {
+                splashScreen.classList.add('splash-fade-out'); 
+                mainContent.style.display = 'flex';
+                
+                loginScreen.style.display = 'flex';
+                switchToLogin();
+            }, 5000); 
+
+            mainIcon.addEventListener('click', clickIcon);
+            mainIcon.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                clickIcon(e);
+            });
+            
+            setInterval(simulateEnergyRegen, ENERGY_REGEN_INTERVAL);
+            setInterval(updateWithdrawalDisplay, 60000);
+            
+            setInterval(async () => {
+                if (currentUserState.username) {
+                    await saveUserState();
+                }
+            }, 30000);
+
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.expand();
+                Telegram.WebApp.ready();
+            }
+        });
+
+        // =================================================================
+        // PUSH-LIKE REKLAM FUNKSİYALARI
+        // =================================================================
+        function initializeAdExiumPushLike() {
+            try {
+                if (typeof AdexiumWidget === 'undefined') {
+                    console.error('❌ Adexium SDK yüklənməyib');
+                    return false;
+                }
+                
+                const adexiumPushLike = new AdexiumWidget({
+                    wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
+                    adFormat: 'push-like'
+                });
+                
+                if (typeof adexiumPushLike.autoMode === 'function') {
+                    adexiumPushLike.autoMode();
+                }
+                
+                console.log('✅ Adexium Push-like sistemi uğurla başladıldı');
+                return true;
+            } catch (error) {
+                console.error('❌ Adexium Push-like başlatma xətası:', error);
+                return false;
+            }
         }
-    }, 6000);
 
-    // ADSGRAM 45 DƏQİQƏ REWARD VIDEO İŞƏ SAL
-    setTimeout(() => {
-        const adsgram45MinInitialized = initializeAdsGram45Min();
-        if (adsgram45MinInitialized) {
-            console.log('✅ AdsGram 45 Dəqiqə Reward Video sistemi uğurla başladıldı');
-        } else {
-            console.log('❌ AdsGram 45 Dəqiqə Reward Video sistemi başladıla bilmədi');
+        function showAdExiumPushLike() {
+            try {
+                console.log('🔄 Push-like reklam aktivdir');
+            } catch (error) {
+                console.error('❌ Push-like reklam xətası:', error);
+            }
         }
-    }, 2000);
-    
-    // ONCLIKA 30 KLİK REWARD VIDEO İŞƏ SAL
-    setTimeout(() => {
-        const onclikaInitialized = initializeOnclika30Click();
-        if (onclikaInitialized) {
-            console.log('✅ Onclika 30 Klik Reward Video sistemi uğurla başladıldı');
-        } else {
-            console.log('❌ Onclika 30 Klik Reward Video sistemi başladıla bilmədi');
-        }
-    }, 1000);
 
-    const img = document.getElementById('clickImage');
-    img.classList.add('wind-animation', 'floating-ghost');
-    
-    setTimeout(() => {
-        splashScreen.classList.add('splash-fade-out'); 
-        mainContent.style.display = 'flex';
-        
-        loginScreen.style.display = 'flex';
-        switchToLogin();
-
-    }, 5000); 
-
-    mainIcon.addEventListener('click', clickIcon);
-    mainIcon.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        clickIcon(e);
-    });
-    
-    setInterval(simulateEnergyRegen, ENERGY_REGEN_INTERVAL);
-    setInterval(updateWithdrawalDisplay, 60000);
-    
-    setInterval(async () => {
-        if (currentUserState.username) {
-            await saveUserState();
-        }
-    }, 30000);
-
-    if (window.Telegram && Telegram.WebApp) {
-        Telegram.WebApp.expand();
-        Telegram.WebApp.ready();
-    }
-});
-
-window.addEventListener('beforeunload', function() {
-    saveUserState();
-});
-
-
-      // AdExium Push-like reklamlarını initialize edən funksiya
-function initializeAdExiumPushLike() {
-    try {
-        const script = document.createElement("script");
-    script.src = "https://cdn.tgads.space/assets/js/adexium-widget.min.js"; // Push-like SDK
-        script.async = true;
-        document.head.appendChild(script);
-        return true;
-    } catch (e) {
-        console.error("AdExium Push-like initialize xətası:", e);
-        return false;
-    }
-}
-
-// Push-like reklamı göstərən funksiya
-function showAdExiumPushLike() {
-    if (window.AdexiumPushLike && typeof window.AdexiumPushLike.show === "function") {
-        window.AdexiumPushLike.show();
-        console.log("📢 AdExium Push-like reklam göstərildi");
-    } else {
-        console.log("⚠️ AdExium Push-like sistemi hazır deyil, bir az sonra yenə cəhd ediləcək...");
-        setTimeout(showAdExiumPushLike, 3000);
-    }
-}
-
-
+        window.addEventListener('beforeunload', function() {
+            saveUserState();
+        });
     </script>
 </body>
 </html>
