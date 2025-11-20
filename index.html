@@ -1915,200 +1915,273 @@ document.getElementById('forgotPasswordForm2').addEventListener('submit', async 
             console.error('❌ Firebase xətası:', error);
         }
 
-       // =================================================================
-// ADSGRAM 45 DƏQİQƏ REWARD VIDEO SİSTEMİ
-// =================================================================
+        // =================================================================
+        // ADSGRAM 45 DƏQİQƏ REWARD VIDEO SİSTEMİ - YENİLƏNMİŞ
+        // =================================================================
 
-let Adsgram45MinController = null;
-let adsgram45MinRewardAvailable = true;
-let adsgram45MinTimer = 0;
+        let Adsgram45MinController = null;
+        let adsgram45MinRewardAvailable = true;
+        let adsgram45MinTimer = 0;
+        let adsgram45MinLastUsed = 0;
 
-function initializeAdsGram45Min() {
-    try {
-        if (window.Adsgram) {
-            Adsgram45MinController = window.Adsgram.init({ blockId: "17892" });
-            console.log('✅ AdsGram 45 Dəqiqə Reward Video sistemi uğurla başladıldı');
+        function initializeAdsGram45Min() {
+            try {
+                if (window.Adsgram) {
+                    Adsgram45MinController = window.Adsgram.init({ blockId: "17892" });
+                    console.log('✅ AdsGram 45 Dəqiqə Reward Video sistemi uğurla başladıldı');
+                    
+                    // Timer vəziyyətini yüklə
+                    loadAdsGram45MinState();
+                    return true;
+                } else {
+                    console.log('❌ AdsGram SDK yüklənməyib');
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ AdsGram 45 Dəqiqə Reward Video başlatma xətası:', error);
+                return false;
+            }
+        }
+
+        // Timer vəziyyətini yüklə
+        async function loadAdsGram45MinState() {
+            if (!currentUserState.username) return;
+            
+            try {
+                const userDoc = await db.collection('users').doc(currentUserState.username).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    const lastUsed = userData.adsgram45MinLastUsed || 0;
+                    const now = Date.now();
+                    
+                    // 45 dəqiqə keçib?
+                    const timePassed = now - lastUsed;
+                    const cooldownTime = 45 * 60 * 1000; // 45 dəqiqə
+                    
+                    if (lastUsed === 0 || timePassed >= cooldownTime) {
+                        // Hazırdır
+                        adsgram45MinRewardAvailable = true;
+                        adsgram45MinTimer = 0;
+                        adsgram45MinLastUsed = 0;
+                    } else {
+                        // Hələ gözləməlidir
+                        adsgram45MinRewardAvailable = false;
+                        adsgram45MinTimer = cooldownTime - timePassed;
+                        adsgram45MinLastUsed = lastUsed;
+                        startAdsGram45MinTimer();
+                    }
+                    
+                    updateAdsGram45MinTimerDisplay();
+                }
+            } catch (error) {
+                console.error('❌ AdsGram state yükləmə xətası:', error);
+                // Xəta halında default vəziyyət
+                adsgram45MinRewardAvailable = true;
+                adsgram45MinTimer = 0;
+            }
+        }
+
+        // Timer vəziyyətini saxla
+        async function saveAdsGram45MinState() {
+            if (!currentUserState.username) return;
+            
+            try {
+                await db.collection('users').doc(currentUserState.username).update({
+                    adsgram45MinLastUsed: adsgram45MinLastUsed,
+                    adsgram45MinTimer: adsgram45MinTimer
+                });
+            } catch (error) {
+                console.error('❌ AdsGram state saxlanması xətası:', error);
+            }
+        }
+
+        function showAdsGram45MinRewardVideo() {
+            if (!adsgram45MinRewardAvailable) {
+                const minutesLeft = Math.ceil(adsgram45MinTimer / 60000);
+                alert(`🎬 Reward video hazır deyil. ${minutesLeft} dəqiqə gözləyin.`);
+                return false;
+            }
+            
+            if (!Adsgram45MinController) {
+                const initialized = initializeAdsGram45Min();
+                if (!initialized) {
+                    alert('❌ Reklam sistemi hazır deyil. Yenidən cəhd edin.');
+                    return false;
+                }
+            }
+
+            adsgram45MinRewardAvailable = false;
+            adsgram45MinLastUsed = Date.now();
+            
+            // 45 dəqiqəlik timer başlat
+            adsgram45MinTimer = 45 * 60 * 1000; // 45 dəqiqə millisaniyələrdə
+            
+            // Vəziyyəti saxla
+            saveAdsGram45MinState();
+            startAdsGram45MinTimer();
+            
+            Adsgram45MinController.show()
+                .then((result) => {
+                    console.log('✅ AdsGram 45 dəqiqə reward video tamamlandı!', result);
+                    
+                    const rewardAmount = 0.001;
+                    currentUserState.totalMoney += rewardAmount;
+                    
+                    saveUserState();
+                    updateEnergyDisplay();
+                    
+                    showSuccess(`🎉 45 dəqiqəlik reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
+                })
+                .catch((error) => {
+                    console.error('❌ AdsGram 45 dəqiqə reward video xətası:', error);
+                    
+                    let errorMessage = 'Reklam göstərilərkən xəta baş verdi.';
+                    
+                    if (error && error.description) {
+                        errorMessage = error.description;
+                    }
+                    
+                    alert(`❌ ${errorMessage}`);
+                    
+                    // Xəta olsa belə timer-i sıfırla və yenidən aktiv et
+                    adsgram45MinRewardAvailable = true;
+                    adsgram45MinTimer = 0;
+                    adsgram45MinLastUsed = 0;
+                    saveAdsGram45MinState();
+                    updateAdsGram45MinTimerDisplay();
+                });
+            
             return true;
-        } else {
-            console.log('❌ AdsGram SDK yüklənməyib');
-            return false;
         }
-    } catch (error) {
-        console.error('❌ AdsGram 45 Dəqiqə Reward Video başlatma xətası:', error);
-        return false;
-    }
-}
 
-function showAdsGram45MinRewardVideo() {
-    if (!adsgram45MinRewardAvailable) {
-        const minutesLeft = Math.ceil(adsgram45MinTimer / 60000);
-        alert(`🎬 Reward video hazır deyil. ${minutesLeft} dəqiqə gözləyin.`);
-        return false;
-    }
-    
-    if (!Adsgram45MinController) {
-        const initialized = initializeAdsGram45Min();
-        if (!initialized) {
-            alert('❌ Reklam sistemi hazır deyil. Yenidən cəhd edin.');
-            return false;
-        }
-    }
-
-    adsgram45MinRewardAvailable = false;
-    
-    // 45 dəqiqəlik timer başlat
-    adsgram45MinTimer = 45 * 60 * 1000; // 45 dəqiqə millisaniyələrdə
-    startAdsGram45MinTimer();
-    
-    Adsgram45MinController.show()
-        .then((result) => {
-            console.log('✅ AdsGram 45 dəqiqə reward video tamamlandı!', result);
-            
-            const rewardAmount = 0.001;
-            currentUserState.totalMoney += rewardAmount;
-            
-            saveUserState();
-            updateEnergyDisplay();
-            
-            showSuccess(`🎉 45 dəqiqəlik reward video tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
-        })
-        .catch((error) => {
-            console.error('❌ AdsGram 45 dəqiqə reward video xətası:', error);
-            
-            let errorMessage = 'Reklam göstərilərkən xəta baş verdi.';
-            
-            if (error && error.description) {
-                errorMessage = error.description;
+        function startAdsGram45MinTimer() {
+            // Əvvəlki intervalı təmizlə
+            if (window.adsgram45MinInterval) {
+                clearInterval(window.adsgram45MinInterval);
             }
             
-            alert(`❌ ${errorMessage}`);
+            window.adsgram45MinInterval = setInterval(() => {
+                adsgram45MinTimer -= 1000; // 1 saniyə
+                
+                if (adsgram45MinTimer <= 0) {
+                    adsgram45MinRewardAvailable = true;
+                    adsgram45MinTimer = 0;
+                    adsgram45MinLastUsed = 0;
+                    clearInterval(window.adsgram45MinInterval);
+                    
+                    // Vəziyyəti yenilə
+                    saveAdsGram45MinState();
+                }
+                
+                updateAdsGram45MinTimerDisplay();
+            }, 1000);
+        }
+
+        function updateAdsGram45MinTimerDisplay() {
+            const timerElement = document.getElementById('adsgram45MinTimer');
+            const buttonElement = document.getElementById('adsgram45MinButton');
             
-            // Xəta olsa belə timer-i sıfırla
-            adsgram45MinRewardAvailable = true;
-            adsgram45MinTimer = 0;
-            updateAdsGram45MinTimerDisplay();
-        });
-    
-    return true;
-}
-
-function startAdsGram45MinTimer() {
-    const timerInterval = setInterval(() => {
-        adsgram45MinTimer -= 1000; // 1 saniyə
-        
-        if (adsgram45MinTimer <= 0) {
-            adsgram45MinRewardAvailable = true;
-            adsgram45MinTimer = 0;
-            clearInterval(timerInterval);
-        }
-        
-        updateAdsGram45MinTimerDisplay();
-    }, 1000);
-}
-
-function updateAdsGram45MinTimerDisplay() {
-    const timerElement = document.getElementById('adsgram45MinTimer');
-    const buttonElement = document.getElementById('adsgram45MinButton');
-    
-    if (!timerElement || !buttonElement) return;
-    
-    if (adsgram45MinTimer <= 0) {
-        timerElement.textContent = "Hazır!";
-        buttonElement.disabled = false;
-        buttonElement.style.opacity = "1";
-    } else {
-        const minutes = Math.floor(adsgram45MinTimer / 60000);
-        const seconds = Math.floor((adsgram45MinTimer % 60000) / 1000);
-        timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        buttonElement.disabled = true;
-        buttonElement.style.opacity = "0.6";
-    }
-}
-
-// Timer display-i hər dəqiqə yenilə
-setInterval(updateAdsGram45MinTimerDisplay, 1000);
-       // =================================================================
-// ONCLIKA 30 KLİK REWARD VIDEO SİSTEMİ
-// =================================================================
-
-let onclikaShowFunction = null;
-
-function initializeOnclika30Click() {
-    try {
-        window.initCdTma?.({ id: '6099028' })
-            .then(show => {
-                onclikaShowFunction = show;
-                console.log('✅ Onclika 30 Klik Reward Video sistemi uğurla başladıldı');
-            })
-            .catch(e => {
-                console.error('❌ Onclika başlatma xətası:', e);
-            });
-        return true;
-    } catch (error) {
-        console.error('❌ Onclika 30 Klik Reward Video başlatma xətası:', error);
-        return false;
-    }
-}
-
-function showOnclika30ClickReward() {
-    console.log('🔄 30 klik Onclika reklamı başladı...');
-    
-    if (!onclikaShowFunction) {
-        console.error('❌ Onclika controller tapılmadı! Yenidən başladılır...');
-        const initialized = initializeOnclika30Click(); 
-        if (!initialized) {
-            console.error('❌ Onclika sistemi hazır deyil.'); 
-            currentUserState.clicksUntilAd = AD_INTERVAL;
-            updateEnergyDisplay();
-            return false;
-        }
-        
-        // Bir az gözlə və yenidən cəhd et
-        setTimeout(() => {
-            if (onclikaShowFunction) {
-                showOnclika30ClickReward();
+            if (!timerElement || !buttonElement) return;
+            
+            if (adsgram45MinTimer <= 0) {
+                timerElement.textContent = "Hazır!";
+                buttonElement.disabled = false;
+                buttonElement.style.opacity = "1";
             } else {
-                currentUserState.clicksUntilAd = AD_INTERVAL;
-                updateEnergyDisplay();
+                const minutes = Math.floor(adsgram45MinTimer / 60000);
+                const seconds = Math.floor((adsgram45MinTimer % 60000) / 1000);
+                timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                buttonElement.disabled = true;
+                buttonElement.style.opacity = "0.6";
             }
-        }, 1000);
-        return false;
-    }
+        }
 
-    try {
-        console.log('🎬 Onclika reklam göstərilməyə çalışılır...');
-        
-        onclikaShowFunction()
-            .then((result) => {
-                console.log('✅ Onclika 30 klik reward video tamamlandı!', result);
+        // Timer display-i hər dəqiqə yenilə
+        setInterval(updateAdsGram45MinTimerDisplay, 1000);
+
+        // =================================================================
+        // ONCLIKA 30 KLİK REWARD VIDEO SİSTEMİ
+        // =================================================================
+
+        let onclikaShowFunction = null;
+
+        function initializeOnclika30Click() {
+            try {
+                window.initCdTma?.({ id: '6099028' })
+                    .then(show => {
+                        onclikaShowFunction = show;
+                        console.log('✅ Onclika 30 Klik Reward Video sistemi uğurla başladıldı');
+                    })
+                    .catch(e => {
+                        console.error('❌ Onclika başlatma xətası:', e);
+                    });
+                return true;
+            } catch (error) {
+                console.error('❌ Onclika 30 Klik Reward Video başlatma xətası:', error);
+                return false;
+            }
+        }
+
+        function showOnclika30ClickReward() {
+            console.log('🔄 30 klik Onclika reklamı başladı...');
+            
+            if (!onclikaShowFunction) {
+                console.error('❌ Onclika controller tapılmadı! Yenidən başladılır...');
+                const initialized = initializeOnclika30Click(); 
+                if (!initialized) {
+                    console.error('❌ Onclika sistemi hazır deyil.'); 
+                    currentUserState.clicksUntilAd = AD_INTERVAL;
+                    updateEnergyDisplay();
+                    return false;
+                }
                 
-                const rewardAmount = 0.0001; 
-                currentUserState.totalMoney += rewardAmount;
-                saveUserState();
-                updateEnergyDisplay();
-                showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
+                // Bir az gözlə və yenidən cəhd et
+                setTimeout(() => {
+                    if (onclikaShowFunction) {
+                        showOnclika30ClickReward();
+                    } else {
+                        currentUserState.clicksUntilAd = AD_INTERVAL;
+                        updateEnergyDisplay();
+                    }
+                }, 1000);
+                return false;
+            }
+
+            try {
+                console.log('🎬 Onclika reklam göstərilməyə çalışılır...');
                 
+                onclikaShowFunction()
+                    .then((result) => {
+                        console.log('✅ Onclika 30 klik reward video tamamlandı!', result);
+                        
+                        const rewardAmount = 0.0001; 
+                        currentUserState.totalMoney += rewardAmount;
+                        saveUserState();
+                        updateEnergyDisplay();
+                        showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
+                        
+                        currentUserState.clicksUntilAd = AD_INTERVAL;
+                        updateEnergyDisplay();
+                        console.log('✅ Onclika reklam uğurla tamamlandı, sayğac sıfırlandı');
+                    })
+                    .catch((error) => {
+                        console.error('❌ Onclika 30 klik reward video xətası:', error);
+                        currentUserState.clicksUntilAd = AD_INTERVAL;
+                        updateEnergyDisplay();
+                        console.log('🔄 Xəta olsa belə sayğac sıfırlandı');
+                    });
+
+            } catch (e) {
+                console.error("🚨 Onclika show() çağırışında dərhal xəta:", e.message);
                 currentUserState.clicksUntilAd = AD_INTERVAL;
                 updateEnergyDisplay();
-                console.log('✅ Onclika reklam uğurla tamamlandı, sayğac sıfırlandı');
-            })
-            .catch((error) => {
-                console.error('❌ Onclika 30 klik reward video xətası:', error);
-                currentUserState.clicksUntilAd = AD_INTERVAL;
-                updateEnergyDisplay();
-                console.log('🔄 Xəta olsa belə sayğac sıfırlandı');
-            });
+                console.log('🔄 Catch blokunda sayğac sıfırlandı');
+                return false;
+            }
+            
+            return true;
+        }
 
-    } catch (e) {
-        console.error("🚨 Onclika show() çağırışında dərhal xəta:", e.message);
-        currentUserState.clicksUntilAd = AD_INTERVAL;
-        updateEnergyDisplay();
-        console.log('🔄 Catch blokunda sayğac sıfırlandı');
-        return false;
-    }
-    
-    return true;
-}
         // =================================================================
         // TELEGRAM BOT AYARLARI
         // =================================================================
@@ -2505,7 +2578,10 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             clicksUntilAd: AD_INTERVAL, totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
             energyRegenRate: BASE_REGEN_RATE, scorePerClick: 1, lastEnergyUpdate: Date.now(), 
             lastClickTime: Date.now(), successfulReferrals: 0, referralBonusEarned: 0.00, 
-            lastWithdrawalDate: null, registrationDate: null
+            lastWithdrawalDate: null, registrationDate: null,
+            // YENİ: AdsGram timer məlumatları
+            adsgram45MinLastUsed: 0,
+            adsgram45MinTimer: 0
         };
 
         // DOM Elementləri
@@ -2588,7 +2664,7 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
 
 
         // =================================================================
-        // GİRİŞ FUNKSİYASI (Login)
+        // GİRİŞ FUNKSİYASI (Login) - YENİLƏNMİŞ
         // =================================================================
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -2605,11 +2681,13 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                 const userData = await findUserByUsername(username);
 
                 if (userData && userData.password === password) {
-
                     currentUserState = { ...userData, username };
 
                     // Real-time referral dinləyicisini aç
                     listenToReferralCount(username);
+
+                    // AdsGram 45 dəqiqə timer vəziyyətini yüklə
+                    loadAdsGram45MinState();
 
                     showSuccess(`Xoş gəldiniz, ${username}!`);
                     this.reset();
@@ -2674,6 +2752,10 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                     email,
                     password,
                     username,
+
+                    // YENİ: AdsGram timer məlumatları
+                    adsgram45MinLastUsed: 0,
+                    adsgram45MinTimer: 0,
 
                     // REFERAL SİSTEMİ
                     invitedFriends: [],
@@ -3337,7 +3419,10 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                 lastEnergyUpdate: Date.now(), 
                 lastClickTime: Date.now(), 
                 lastWithdrawalDate: null, 
-                registrationDate: null
+                registrationDate: null,
+                // YENİ: AdsGram timer məlumatları
+                adsgram45MinLastUsed: 0,
+                adsgram45MinTimer: 0
             };
 
             gameScreen.style.display = 'none';
