@@ -973,7 +973,7 @@
             animation: pulse 2s infinite;
         }
 
-        /* Firebase statusunu gizlə */
+        /* Supabase statusunu gizlə */
         .supabase-status {
             display: none !important;
         }
@@ -1667,7 +1667,21 @@
         // Supabase-i işə sal
         let supabase;
         try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                auth: {
+                    persistSession: true,
+                    autoRefreshToken: true
+                },
+                db: {
+                    schema: 'public'
+                },
+                global: {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                }
+            });
             console.log('✅ Supabase uğurla işə salındı');
         } catch (error) {
             console.error('❌ Supabase xətası:', error);
@@ -1684,9 +1698,14 @@
                     .from('users')
                     .select('*')
                     .eq('username', username)
-                    .single();
+                    .maybeSingle();
 
                 if (error) {
+                    console.log('❌ İstifadəçi axtarış xətası:', error);
+                    return null;
+                }
+
+                if (!data) {
                     console.log('❌ İstifadəçi tapılmadı:', username);
                     return null;
                 }
@@ -1695,7 +1714,7 @@
                 return data;
             } catch (error) {
                 console.error('❌ İstifadəçi axtarış xətası:', error);
-                throw error;
+                return null;
             }
         }
 
@@ -1706,10 +1725,13 @@
                 const { data: phoneData, error: phoneError } = await supabase
                     .from('users')
                     .select('phone')
-                    .eq('phone', phone)
-                    .limit(1);
+                    .eq('phone', phone);
 
-                if (phoneError) throw phoneError;
+                if (phoneError) {
+                    console.error('Telefon yoxlama xətası:', phoneError);
+                    return { duplicate: false };
+                }
+                
                 if (phoneData && phoneData.length > 0) {
                     return { duplicate: true, field: 'telefon nömrəsi', message: 'Bu telefon nömrəsi artıq qeydiyyatdan keçib' };
                 }
@@ -1718,26 +1740,15 @@
                 const { data: emailData, error: emailError } = await supabase
                     .from('users')
                     .select('email')
-                    .eq('email', email.toLowerCase())
-                    .limit(1);
+                    .eq('email', email.toLowerCase());
 
-                if (emailError) throw emailError;
+                if (emailError) {
+                    console.error('E-poçt yoxlama xətası:', emailError);
+                    return { duplicate: false };
+                }
+                
                 if (emailData && emailData.length > 0) {
                     return { duplicate: true, field: 'e-poçt', message: 'Bu e-poçt ünvanı artıq qeydiyyatdan keçib' };
-                }
-
-                // Ad və soyad yoxlaması
-                const { data: nameData, error: nameError } = await supabase
-                    .from('users')
-                    .select('name, surname, phone')
-                    .eq('name', name)
-                    .eq('surname', surname)
-                    .eq('phone', phone)
-                    .limit(1);
-
-                if (nameError) throw nameError;
-                if (nameData && nameData.length > 0) {
-                    return { duplicate: true, field: 'ad və soyad', message: 'Bu ad, soyad və telefon nömrəsi kombinasiyası artıq mövcuddur' };
                 }
 
                 return { duplicate: false };
@@ -1801,32 +1812,24 @@
         // Counter üçün funksiya
         async function getNextCGId() {
             try {
-                // İlk olaraq counter'ı yoxla
-                const { data: counterData, error: counterError } = await supabase
-                    .from('counters')
-                    .select('count')
-                    .eq('id', 'userCounter')
-                    .single();
+                const { data: users, error } = await supabase
+                    .from('users')
+                    .select('cgId')
+                    .order('telegram_id', { ascending: false })
+                    .limit(1);
 
-                let newCount;
-                if (counterError || !counterData) {
-                    // Counter yoxdursa, yenisini yarat
-                    newCount = 1;
-                    const { error } = await supabase
-                        .from('counters')
-                        .insert([{ id: 'userCounter', count: newCount }]);
-                    if (error) throw error;
-                } else {
-                    // Counter varsa, artır
-                    newCount = counterData.count + 1;
-                    const { error } = await supabase
-                        .from('counters')
-                        .update({ count: newCount })
-                        .eq('id', 'userCounter');
-                    if (error) throw error;
+                if (error || !users || users.length === 0) {
+                    return "CG1";
                 }
 
-                return `CG${newCount}`;
+                // Son CG ID-ni tap və artır
+                const lastCGId = users[0].cgId;
+                if (lastCGId && lastCGId.startsWith('CG')) {
+                    const lastNumber = parseInt(lastCGId.substring(2)) || 0;
+                    return `CG${lastNumber + 1}`;
+                }
+
+                return "CG1";
             } catch (error) {
                 console.error('CG ID xətası:', error);
                 return `CG${Date.now()}${Math.random().toString(36).substr(2, 5)}`.toUpperCase();
@@ -2307,7 +2310,6 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
         // OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR
         // =================================================================
 
-        let users = {};
         const ENERGY_CONSUMPTION_PER_CLICK = 1;     
         const MAX_ENERGY_CAP = 100000;              
 
@@ -2326,56 +2328,39 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
         const ENERGY_REGEN_PER_SECOND = MAX_ENERGY_CAP / SECONDS_FOR_FULL_CHARGE;
 
         const BASE_REGEN_RATE = 1000 / 60; 
-        const REFERRAL_BONUS_LIMIT = 10; // MAKSİMUM 10 DƏVƏT
+        const REFERRAL_BONUS_LIMIT = 10;
 
         // YENİ: MINIMUM ÇIXARIŞ MƏBLƏĞİ 3.00 AZN
         const MIN_WITHDRAWAL_AMOUNT = 3.00;
         const WITHDRAWAL_COOLDOWN_DAYS = 10;
         const MAX_WITHDRAWAL_AMOUNT = 1000.00;
-        const ADMIN_TELEGRAM_NUMBER = "994513248685"; // Sizin Telegram nömrəniz
+        const ADMIN_TELEGRAM_NUMBER = "994513248685";
 
         const BASE_INVITE_URL = window.location.href.split('?')[0];
 
-        const ads = [
-            {
-                id: 1,
-                title: "🎮 YENİ OYUN TƏKLİFİ",
-                description: "Bu mobil oyunu yükləyin və xüsusi bonus qazanın!",
-                color: "#ff6b6b",
-                duration: 10,
-                type: "premium"
-            },
-            {
-                id: 2,
-                title: "🛒 ONLAYN ALIŞ-VERİŞ",
-                description: "Xüsusi endirimlərdən yararlanın!",
-                color: "#4ecdc4",
-                duration: 10,
-                type: "special"
-            },
-            {
-                id: 3,
-                title: "📱 TƏTBİQ TƏKLİFİ",
-                description: "Bu faydalı tətbiqi yükləyin!",
-                color: "#45b7d1",
-                duration: 10,
-                type: "bonus"
-            }
-        ];
-
-        let currentAdIndex = 0;
-        let adTimerInterval;
-        let adTimeLeft = 0;
-        let totalAdRewardEarned = 0;
-
         let currentUserState = {
-            cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
-            maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP,
-            clicksUntilAd: AD_INTERVAL, totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
-            energyRegenRate: BASE_REGEN_RATE, scorePerClick: 1, lastEnergyUpdate: Date.now(), 
-            lastClickTime: Date.now(), successfulReferrals: 0, referralBonusEarned: 0.00, 
-            lastWithdrawalDate: null, registrationDate: null,
-            // YENİ: AdsGram timer məlumatları
+            telegram_id: null,
+            cgId: null, 
+            username: null, 
+            name: null, 
+            surname: null, 
+            phone: null, 
+            email: null, 
+            referralCode: null, 
+            maxEnergy: 100000, 
+            currentEnergy: 100000,
+            clicksUntilAd: 30, 
+            totalClicks: 0, 
+            totalMoney: 0.00, 
+            energyUsed: 0, 
+            energyRegenRate: 16.67, 
+            scorePerClick: 1, 
+            lastEnergyUpdate: Date.now(), 
+            lastClickTime: Date.now(), 
+            successfulReferrals: 0, 
+            referralBonusEarned: 0.00, 
+            lastWithdrawalDate: null, 
+            registrationDate: null,
             adsgram45MinLastUsed: 0,
             adsgram45MinTimer: 0
         };
@@ -2476,7 +2461,7 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
         }
 
         // =================================================================
-        // GİRİŞ FUNKSİYASI (Login) - YENİLƏNMİŞ
+        // GİRİŞ FUNKSİYASI (Login)
         // =================================================================
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -2554,7 +2539,7 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                 // CG ID
                 const cgId = await getNextCGId();
 
-                // Yeni istifadəçi məlumatları
+                // Yeni istifadəçi məlumatları - CƏDVƏL STRUKTURUNA UYĞUN
                 const newUserData = {
                     cgId,
                     name,
@@ -2563,29 +2548,23 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                     email,
                     password,
                     username,
-
-                    // YENİ: AdsGram timer məlumatları
-                    adsgram45MinLastUsed: 0,
-                    adsgram45MinTimer: 0,
-
-                    // REFERAL SİSTEMİ
-                    invitedFriends: [],
-                    referralBonusTotal: 0,
-                    successfulReferrals: 0,
                     referralCode: generateReferralCode(username),
                     referredBy: referralCodeInput || null,
-
-                    // OYUN
                     totalMoney: 0,
-                    scorePerClick: 1,
                     currentEnergy: 100000,
                     maxEnergy: 100000,
-
-                    // ZAMAN
-                    registrationDate: new Date().toISOString(),
+                    clicksUntilAd: 30,
+                    totalClicks: 0,
+                    energyUsed: 0,
+                    energyRegenRate: 16.67,
+                    successfulReferrals: 0,
+                    referralBonusTotal: 0,
                     lastEnergyUpdate: Date.now(),
                     lastClickTime: Date.now(),
-                    lastWithdrawalDate: null,
+                    registrationDate: new Date().toISOString(),
+                    // AdsGram timer məlumatları
+                    adsgram45MinLastUsed: 0,
+                    adsgram45MinTimer: 0
                 };
 
                 // Yeni user yazılır
@@ -2599,30 +2578,19 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                         .from('users')
                         .select('*')
                         .eq('referralCode', referralCodeInput)
-                        .limit(1)
-                        .single();
+                        .maybeSingle();
 
                     if (referrerData && !referrerError) {
-                        const referrerUsername = referrerData.username;
+                        // Referral bonusu tətbiq et
+                        const newSuccessfulReferrals = (referrerData.successfulReferrals || 0) + 1;
+                        const newReferralBonus = (referrerData.referralBonusTotal || 0) + REFERRAL_BONUS_AMOUNT;
+                        const newTotalMoney = (referrerData.totalMoney || 0) + REFERRAL_BONUS_AMOUNT;
 
-                        // Dostlar siyahısına əlavə
-                        await updateUser(referrerUsername, {
-                            invitedFriends: [...(referrerData.invitedFriends || []), username]
+                        await updateUser(referrerData.username, {
+                            successfulReferrals: newSuccessfulReferrals,
+                            referralBonusTotal: newReferralBonus,
+                            totalMoney: newTotalMoney
                         });
-
-                        // BONUS — yalnız ilk 10 nəfərə
-                        if ((referrerData.successfulReferrals || 0) < REFERRAL_BONUS_LIMIT) {
-                            await updateUser(referrerUsername, {
-                                successfulReferrals: (referrerData.successfulReferrals || 0) + 1,
-                                referralBonusTotal: (referrerData.referralBonusTotal || 0) + REFERRAL_BONUS_AMOUNT,
-                                totalMoney: (referrerData.totalMoney || 0) + REFERRAL_BONUS_AMOUNT,
-                            });
-                        } else {
-                            // Limit dolub — bonus yoxdur, amma say artır
-                            await updateUser(referrerUsername, {
-                                successfulReferrals: (referrerData.successfulReferrals || 0) + 1,
-                            });
-                        }
                     }
                 }
 
@@ -2643,11 +2611,11 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
         function showAd() {
             if (adScreen.style.display === 'flex') return;
             
-            showAdsGram30ClickReward();
+            showOnclika30ClickReward();
         }
 
         function showNextAd() {
-            showAdsGram30ClickReward();
+            showOnclika30ClickReward();
         }
 
         function startAdTimer() {
@@ -2843,7 +2811,7 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
         }
 
         // =================================================================
-        // ÇIXARIŞ FORM FUNKSİYASI - TƏMİZ VERSİYA
+        // ÇIXARIŞ FORM FUNKSİYASI
         // =================================================================
         document.getElementById('withdrawalForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -2969,8 +2937,8 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             if (currentUserState.username) {
                 const stateToSave = { 
                     ...currentUserState, 
-                    energyRegenRate: BASE_REGEN_RATE, 
-                    maxEnergy: MAX_ENERGY_CAP,
+                    energyRegenRate: 16.67, 
+                    maxEnergy: 100000,
                 };
                 
                 // Supabase-ə göndər
@@ -3153,6 +3121,7 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             }
             
             currentUserState = {
+                telegram_id: null,
                 cgId: null, 
                 username: null, 
                 name: null, 
@@ -3160,13 +3129,13 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                 phone: null, 
                 email: null, 
                 referralCode: null, 
-                maxEnergy: MAX_ENERGY_CAP, 
-                currentEnergy: MAX_ENERGY_CAP, 
-                clicksUntilAd: AD_INTERVAL,
+                maxEnergy: 100000, 
+                currentEnergy: 100000, 
+                clicksUntilAd: 30,
                 totalClicks: 0, 
                 totalMoney: 0.00, 
                 energyUsed: 0, 
-                energyRegenRate: BASE_REGEN_RATE, 
+                energyRegenRate: 16.67, 
                 successfulReferrals: 0, 
                 referralBonusEarned: 0.00, 
                 scorePerClick: 1, 
@@ -3174,7 +3143,6 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                 lastClickTime: Date.now(), 
                 lastWithdrawalDate: null, 
                 registrationDate: null,
-                // YENİ: AdsGram timer məlumatları
                 adsgram45MinLastUsed: 0,
                 adsgram45MinTimer: 0
             };
@@ -3329,7 +3297,7 @@ if (state.clicksUntilAd <= 1) {
     console.log("30 klik tamamlandı. Onclika reward video çağırılır...");
     
     setTimeout(() => {
-         showOnclika30ClickReward(); // AdsGram yerinə Onclika
+         showOnclika30ClickReward();
     }, 500); 
     
     return; 
@@ -3342,7 +3310,7 @@ if (state.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) {
         console.log("Enerji bitdi, lakin reklam vaxtıdır. Onclika reward video çağırılır...");
         
         setTimeout(() => {
-             showOnclika30ClickReward(); // AdsGram yerinə Onclika
+             showOnclika30ClickReward();
         }, 500);
     }
     return;
@@ -3493,14 +3461,14 @@ createMoneyPopup(e, moneyEarned);
 
         window.addEventListener('beforeunload', function() {
             saveUserState();
-            saveAdsGram45MinState(); // <- burada AdsGram timer state-i də saxlayırıq
+            saveAdsGram45MinState();
         });
 
         // AdExium Push-like reklamlarını initialize edən funksiya
         function initializeAdExiumPushLike() {
             try {
                 const script = document.createElement("script");
-                script.src = "https://cdn.tgads.space/assets/js/adexium-widget.min.js"; // Push-like SDK
+                script.src = "https://cdn.tgads.space/assets/js/adexium-widget.min.js";
                 script.async = true;
                 document.head.appendChild(script);
                 return true;
@@ -3584,8 +3552,7 @@ createMoneyPopup(e, moneyEarned);
                     .select('*')
                     .eq('phone', phone)
                     .eq('email', email)
-                    .limit(1)
-                    .single();
+                    .maybeSingle();
 
                 if (error || !data) {
                     showForgotPasswordError("Bu telefon nömrəsi və e-poçt ünvanı ilə heç bir hesab tapılmadı.");
