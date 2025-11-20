@@ -1908,30 +1908,30 @@ document.getElementById('forgotPasswordForm2').addEventListener('submit', async 
         // İlkin addımı göstər
         showForgotPasswordStep(1);
 
-        // =================================================================
-        // FIREBASE KONFİQURASİYASI
-        // =================================================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyAw5P8Y-IZRGXHiKvjM6WSCfTzRyLYY99U",
-            authDomain: "caspergame27102.firebaseapp.com",
-            projectId: "caspergame27102",
-            storageBucket: "caspergame27102.firebasestorage.app",
-            messagingSenderId: "846750787173",
-            appId: "1:846750787173:web:7ba7d1313a46bf0509c88c",
-            measurementId: "G-27VLW1WKLS"
-        };
+// =================================================================
+// FIREBASE KONFİQURASİYASI
+// =================================================================
+const firebaseConfig = {
+    apiKey: "AIzaSyAw5P8Y-IZRGXHiKvjM6WSCfTzRyLYY99U",
+    authDomain: "caspergame27102.firebaseapp.com",
+    projectId: "caspergame27102",
+    storageBucket: "caspergame27102.firebasestorage.app",
+    messagingSenderId: "846750787173",
+    appId: "1:846750787173:web:7ba7d1313a46bf0509c88c",
+    measurementId: "G-27VLW1WKLS"
+};
 
-        // Firebase-i işə sal
-        let auth, db;
-        try {
-            const app = firebase.initializeApp(firebaseConfig);
-            auth = firebase.auth();
-            db = firebase.firestore();
-            
-            console.log('✅ Firebase uğurla işə salındı');
-        } catch (error) {
-            console.error('❌ Firebase xətası:', error);
-        }
+// Firebase-i işə sal
+let auth, db;
+try {
+    const app = firebase.initializeApp(firebaseConfig);
+    auth = firebase.auth();
+    db = firebase.firestore();
+    
+    console.log('✅ Firebase uğurla işə salındı');
+} catch (error) {
+    console.error('❌ Firebase xətası:', error);
+}
 
 
 
@@ -2291,12 +2291,10 @@ function handleInterstitialReward() {
         // TELEGRAM BOT AYARLARI
         // =================================================================
         const TELEGRAM_BOT_URL = "https://t.me/Casper_Game_bot/directlink";
-
- // =================================================================
-// GLOBAL DƏYİŞƏNLƏR - BURAYA ƏLAVƏ EDİN
+// =================================================================
+// GLOBAL DƏYİŞƏNLƏR
 // =================================================================
 let users = {};
-let referralUnsubscribe = null;
 let adexiumWidget = null;
 let adexiumInitialized = false;
 let Adsgram45MinController = null;
@@ -2827,7 +2825,7 @@ function listenToReferralCount(username) {
 
 
 // =================================================================
-// QEYDİYYAT FUNKSİYASI (Register) - BURAYA ƏLAVƏ EDİN
+// QEYDİYYAT FUNKSİYASI (Register) - TƏCİL HƏLL
 // =================================================================
 document.getElementById('registerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -2893,7 +2891,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         await db.collection('users').doc(username).set(newUserData);
 
         // ================================
-        // REFERRAL PROSESSI
+        // REFERRAL PROSESSI - SADƏLƏŞDİRİLMİŞ (referralUnsubscribe OLMADAN)
         // ================================
         if (referralCodeInput) {
             const referrerQuery = await db.collection('users')
