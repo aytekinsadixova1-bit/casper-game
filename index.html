@@ -14,15 +14,15 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
-    <!-- ADEXIUM WIDGET SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
-    <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
+   <!-- ADEXIUM WIDGET SDK -->
+<script src="https://telegram.org/js/telegram-web-app.js?56"></script>
+<script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', () => {
         const adexiumWidget = new AdexiumWidget({wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae', adFormat: 'push-like'});
         adexiumWidget.autoMode();
     });
-
+</script>
     <!-- Onclika SDK -->
     <script src="https://js.onclckvd.com/in-stream-ad-admanager/tma.js"></script>
     
@@ -2191,7 +2191,7 @@ function showOnclika30ClickReward() {
         const initialized = initializeOnclika30Click(); 
         if (!initialized) {
             console.error('❌ Onclika sistemi hazır deyil.'); 
-            currentUserState.clicksUntilAd = AD_INTERVAL;
+            currentUserState.clicksUntilAd = CLICKS_FOR_AD; // AD_INTERVAL → CLICKS_FOR_AD
             updateEnergyDisplay();
             return false;
         }
@@ -2201,7 +2201,7 @@ function showOnclika30ClickReward() {
             if (onclikaShowFunction) {
                 showOnclika30ClickReward();
             } else {
-                currentUserState.clicksUntilAd = AD_INTERVAL;
+                currentUserState.clicksUntilAd = CLICKS_FOR_AD; // AD_INTERVAL → CLICKS_FOR_AD
                 updateEnergyDisplay();
             }
         }, 1000);
@@ -2221,20 +2221,20 @@ function showOnclika30ClickReward() {
                 updateEnergyDisplay();
                 showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
                 
-                currentUserState.clicksUntilAd = AD_INTERVAL;
+                currentUserState.clicksUntilAd = CLICKS_FOR_AD; // AD_INTERVAL → CLICKS_FOR_AD
                 updateEnergyDisplay();
                 console.log('✅ Onclika reklam uğurla tamamlandı, sayğac sıfırlandı');
             })
             .catch((error) => {
                 console.error('❌ Onclika 30 klik reward video xətası:', error);
-                currentUserState.clicksUntilAd = AD_INTERVAL;
+                currentUserState.clicksUntilAd = CLICKS_FOR_AD; // AD_INTERVAL → CLICKS_FOR_AD
                 updateEnergyDisplay();
                 console.log('🔄 Xəta olsa belə sayğac sıfırlandı');
             });
 
     } catch (e) {
         console.error("🚨 Onclika show() çağırışında dərhal xəta:", e.message);
-        currentUserState.clicksUntilAd = AD_INTERVAL;
+        currentUserState.clicksUntilAd = CLICKS_FOR_AD; // AD_INTERVAL → CLICKS_FOR_AD
         updateEnergyDisplay();
         console.log('🔄 Catch blokunda sayğac sıfırlandı');
         return false;
@@ -2575,10 +2575,10 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
         const ENERGY_CONSUMPTION_PER_CLICK = 1;     
         const MAX_ENERGY_CAP = 100000;              
 
-        const AD_INTERVAL = 30;
         const AD_COUNT = 3;
         const AD_DURATION = 10;
         const AD_REWARD_PER_AD = 0.0001;
+        const CLICKS_FOR_AD = 30; // AD_INTERVAL yerinə CLICKS_FOR_AD istifadə edin
 
         const ENERGY_REGEN_INTERVAL = 1000;         
         const MONEY_PER_CLICK = 0.000003;
