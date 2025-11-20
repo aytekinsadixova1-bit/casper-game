@@ -2733,7 +2733,10 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
 // REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ - DÜZƏLDİLMİŞ
 // =================================================================
 function listenToReferralCount(username) {
-    if (referralUnsubscribe) referralUnsubscribe();
+    // Əvvəlcə referralUnsubscribe dəyişəninin olub-olmadığını yoxla
+    if (typeof referralUnsubscribe !== 'undefined' && referralUnsubscribe) {
+        referralUnsubscribe();
+    }
 
     const userRef = db.collection('users').doc(username);
 
@@ -2742,7 +2745,7 @@ function listenToReferralCount(username) {
             const data = doc.data();
 
             const referralCount = data.successfulReferrals || 0;
-            const referralBonus = data.referralBonusEarned || 0; // DÜZƏLDİ: referralBonusEarned istifadə et
+            const referralBonus = data.referralBonusEarned || 0;
             const currentMoney = data.totalMoney || 0;
 
             console.log(`📊 Real-time update: ${username} - Referrals: ${referralCount}, Bonus: ${referralBonus}, Total: ${currentMoney}`);
@@ -2771,7 +2774,6 @@ function listenToReferralCount(username) {
         console.error("❌ Referral dinləmə xətası:", error);
     });
 }
-
 
         // =================================================================
         // GİRİŞ FUNKSİYASI (Login)
