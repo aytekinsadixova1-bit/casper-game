@@ -2292,15 +2292,18 @@ function handleInterstitialReward() {
         // TELEGRAM BOT AYARLARI
         // =================================================================
         const TELEGRAM_BOT_URL = "https://t.me/Casper_Game_bot/directlink";
-// GLOBAL DƏYİŞƏNLƏR
+
+        
+// =================================================================
+// ƏN YUXARI GLOBAL DƏYİŞƏNLƏR - BÜTÜN DƏYİŞƏNLƏR BURADA
+// =================================================================
+let referralUnsubscribe = null;
+const AD_INTERVAL = 45 * 60 * 1000; // 45 dəqiqə
 let users = {};
 let adexiumWidget = null;
 let adexiumInitialized = false;
 let Adsgram45MinController = null;
 let adsgram45MinTimer = 0;
-const AD_INTERVAL = 45 * 60 * 1000; // 45 dəqiqə
-// ❗ ƏLAVƏ ET
-let referralUnsubscribe = null;
 
         
         // =================================================================
