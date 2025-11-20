@@ -17,6 +17,11 @@
     <!-- ADEXIUM WIDGET SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
     <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+        const adexiumWidget = new AdexiumWidget({wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae', adFormat: 'push-like'});
+        adexiumWidget.autoMode();
+    });
 
     <!-- Onclika SDK -->
     <script src="https://js.onclckvd.com/in-stream-ad-admanager/tma.js"></script>
@@ -1915,7 +1920,117 @@ document.getElementById('forgotPasswordForm2').addEventListener('submit', async 
             console.error('❌ Firebase xətası:', error);
         }
 
-       // =================================================================
+
+
+        // =================================================================
+// ADEXIUM WIDGET INTEGRATION - YENİLƏNMİŞ VERSİYA
+// =================================================================
+
+let adexiumWidget = null;
+let adexiumInitialized = false;
+
+function initializeAdExium() {
+    try {
+        // Telegram WebView kontekstində olub-olmadığımızı yoxla
+        const isTelegramWebView = window.Telegram && Telegram.WebApp;
+        
+        if (!isTelegramWebView) {
+            console.log('ℹ️ AdExium: Telegram kontekstində deyilik, test rejimində işləyirik');
+            if (!window.Telegram) window.Telegram = {};
+            if (!Telegram.WebApp) {
+                Telegram.WebApp = {
+                    initData: '',
+                    initDataUnsafe: {},
+                    version: '6.0',
+                    platform: 'web',
+                    colorScheme: 'light',
+                    themeParams: {},
+                    isExpanded: true,
+                    viewportHeight: 600,
+                    viewportStableHeight: 600,
+                    isClosingConfirmationEnabled: false,
+                    headerColor: '#000000',
+                    backgroundColor: '#ffffff',
+                    BackButton: { isVisible: false, show(){}, hide(){}, onClick(cb){} },
+                    MainButton: { text:'', isVisible:false, show(){}, hide(){}, enable(){}, disable(){}, onClick(cb){} },
+                    ready(){ console.log('Telegram WebApp ready (mock)'); },
+                    expand(){ console.log('Telegram WebApp expand (mock)'); },
+                    close(){ console.log('Telegram WebApp close (mock)'); }
+                };
+            }
+        }
+
+        if (typeof AdexiumWidget !== 'undefined') {
+            console.log('🔄 AdExium Widget başladılır...');
+            adexiumWidget = new AdexiumWidget({
+                width: 'a4ec28f0-91d1-4929-a965-e5131e577cae',
+                adformat: 'push-like'
+            });
+
+            if (typeof adexiumWidget.autohide === 'function') adexiumWidget.autohide();
+            
+            adexiumInitialized = true;
+            console.log('✅ AdExium Widget uğurla başladıldı');
+            return true;
+        } else {
+            console.log('❌ AdExium SDK yüklənməyib');
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ AdExium başlatma xətası:', error);
+        showFallbackAd();
+        return false;
+    }
+}
+
+function showAdExiumAd() {
+    if (!adexiumInitialized) {
+        if (!initializeAdExium()) {
+            console.error('❌ AdExium sistemi hazır deyil');
+            showFallbackAd();
+            return false;
+        }
+    }
+
+    try {
+        console.log('🔄 AdExium reklamı göstərilir...');
+        if (typeof adexiumWidget.show === 'function') {
+            adexiumWidget.show();
+            console.log('✅ AdExium reklamı göstərildi');
+            return true;
+        } else {
+            console.warn('⚠️ AdExium show metodu tapılmadı');
+            showFallbackAd();
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ AdExium reklam göstərilmə xətası:', error);
+        showFallbackAd();
+        return false;
+    }
+}
+
+function showFallbackAd() {
+    console.log('🔄 Alternativ reklam göstərilir...');
+    const adContainer = document.getElementById('adexium-ad-placeholder');
+    if (adContainer) {
+        adContainer.innerHTML = `
+            <div style="padding: 10px; background: linear-gradient(135deg, #0f3460, #1a1a2e); color: white; border-radius: 8px; text-align: center;">
+                <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">🎮 CASPER GAME</div>
+                <div style="font-size: 10px; opacity: 0.8;">Daha çox qazanmaq üçün klikləməyə davam edin!</div>
+                <div style="font-size: 8px; margin-top: 5px; color: #00b894;">Reklam sistemi hazırlanır...</div>
+            </div>
+        `;
+    }
+}
+
+function checkAdExiumStatus() {
+    if (typeof AdexiumWidget === 'undefined') return 'sdk_not_loaded';
+    if (!adexiumInitialized) return 'not_initialized';
+    return 'active';
+}
+
+  // =================================================================
 // ADSGRAM 45 DƏQİQƏ REWARD VIDEO SİSTEMİ
 // =================================================================
 
@@ -2027,7 +2142,8 @@ function updateAdsGram45MinTimerDisplay() {
 
 // Timer display-i hər dəqiqə yenilə
 setInterval(updateAdsGram45MinTimerDisplay, 1000);
-       // =================================================================
+      
+// =================================================================
 // ONCLIKA 30 KLİK REWARD VIDEO SİSTEMİ
 // =================================================================
 
@@ -2035,7 +2151,7 @@ let onclikaShowFunction = null;
 
 function initializeOnclika30Click() {
     try {
-        window.initCdTma?.({ id: '6099028' })
+        window.initCdTma?.({ id: '393471' })
             .then(show => {
                 onclikaShowFunction = show;
                 console.log('✅ Onclika 30 Klik Reward Video sistemi uğurla başladıldı');
@@ -3749,7 +3865,7 @@ window.addEventListener('beforeunload', function() {
 });
 
 
-        // AdExium Push-like reklamlarını initialize edən funksiya
+      // AdExium Push-like reklamlarını initialize edən funksiya
 function initializeAdExiumPushLike() {
     try {
         const script = document.createElement("script");
@@ -3773,6 +3889,7 @@ function showAdExiumPushLike() {
         setTimeout(showAdExiumPushLike, 3000);
     }
 }
+
 
     </script>
 </body>
