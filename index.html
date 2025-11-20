@@ -19,6 +19,7 @@
 <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', () => {
+        
         // Push-like reklam üçün
         const adexiumPushLike = new AdexiumWidget({
             wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae', 
@@ -2291,15 +2292,17 @@ function handleInterstitialReward() {
         // TELEGRAM BOT AYARLARI
         // =================================================================
         const TELEGRAM_BOT_URL = "https://t.me/Casper_Game_bot/directlink";
-// =================================================================
 // GLOBAL DƏYİŞƏNLƏR
-// =================================================================
 let users = {};
 let adexiumWidget = null;
 let adexiumInitialized = false;
 let Adsgram45MinController = null;
 let adsgram45MinTimer = 0;
-const AD_INTERVAL = 45 * 60 * 1000; // 45 dəqiqə
+const AD_INTERVAL = 45 * 60 * 1000;
+
+// ❗ ƏLAVƏ ET
+let referralUnsubscribe = null;
+
         
         // =================================================================
         // YENİ CG ID SİSTEMİ
