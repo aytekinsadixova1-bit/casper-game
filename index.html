@@ -17,26 +17,23 @@
 <!-- ADEXIUM WIDGET SDK -->
 <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
     
-  <!-- SDK yüklənməsini təmin etmək üçün əlavə script -->
-<script>
-// SDK yüklənməsini gözlə və yenidən cəhd et
+// =================================================================
+// SDK YÜKLƏNMƏSİ ÜÇÜN KÖMƏKÇİ FUNKSİYA - SADƏ VERSİYA
+// =================================================================
 function loadAdexiumSDK() {
-    return new Promise((resolve, reject) => {
-        if (typeof AdexiumWidget !== 'undefined') {
-            resolve();
-            return;
-        }
-        
-        // SDK artıq head-də yüklənib, lakin hələ hazır deyil
+    return new Promise((resolve) => {
+        // SDK artıq head-də var, sadəcə gözlə
         let attempts = 0;
         const checkSDK = setInterval(() => {
             attempts++;
             if (typeof AdexiumWidget !== 'undefined') {
                 clearInterval(checkSDK);
+                console.log('✅ SDK hazırdır');
                 resolve();
-            } else if (attempts > 20) { // 10 saniyə cəhd
+            } else if (attempts > 30) { // 15 saniyə
                 clearInterval(checkSDK);
-                reject(new Error('Adexium SDK yüklənmədi'));
+                console.warn('⚠️ SDK hazır deyil, lakin davam edirik');
+                resolve(); // Xəta vermə, sadəcə davam et
             }
         }, 500);
     });
