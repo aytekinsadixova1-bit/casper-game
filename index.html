@@ -15,11 +15,23 @@
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
 <!-- ADEXIUM WIDGET SDK -->
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js?56"></script>
+<script type="text/javascript" src="https://cdn.tqads.space/assets/js/adexium-widget.min.js"></script>
+<script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Push-like (Şəkil 1) ---
+            new AdexiumWidget({
+                wid: 'a46e20f0-9161-4929-a9d5-e5131e577cae', // Sizin ID
+                adFormat: 'push-like'
+            }).autoMode();
 
-<script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
-    
+            // --- Interstitial (Şəkil 2) ---
+            new AdexiumWidget({
+                wid: '1f1b6658-52d6-4522-ae8f-5e0c43f7c7a9', // Sizin ID
+                adFormat: 'interstitial'
+            }).autoMode();
+        });
+    </script>
    <style>
         * {
             margin: 0;
