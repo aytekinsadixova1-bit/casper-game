@@ -14,25 +14,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
-<!-- ADEXIUM WIDGET SDK -->
-<script src="https://telegram.org/js/telegram-web-app.js?56"></script>
-<script type="text/javascript" src="https://cdn.tqads.space/assets/js/adexium-widget.min.js"></script>
-<script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- Push-like (Şəkil 1) ---
-            new AdexiumWidget({
-                wid: 'a46e20f0-9161-4929-a9d5-e5131e577cae', // Sizin ID
-                adFormat: 'push-like'
-            }).autoMode();
-
-            // --- Interstitial (Şəkil 2) ---
-            new AdexiumWidget({
-                wid: '1f1b6658-52d6-4522-ae8f-5e0c43f7c7a9', // Sizin ID
-                adFormat: 'interstitial'
-            }).autoMode();
-        });
-    </script>
-   <style>
+    <style>
         * {
             margin: 0;
             padding: 0;
@@ -793,125 +775,6 @@
             border: 1px solid #00b894;
         }
 
-        .ad-screen {
-            display: none; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); 
-            z-index: 2000; 
-            align-items: center; 
-            justify-content: center; 
-            flex-direction: column; 
-            color: white; 
-            text-align: center;
-            padding: 15px;
-        }
-
-        .ad-content {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px 20px;
-            border-radius: 15px;
-            max-width: 300px;
-            width: 90%;
-            border: 2px solid;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            margin-bottom: 15px;
-        }
-
-        .ad-timer {
-            font-size: 36px;
-            font-weight: bold;
-            margin: 15px 0;
-            color: #00b894;
-            text-shadow: 0 0 8px rgba(0, 184, 148, 0.5);
-        }
-
-        .ad-message {
-            font-size: 12px;
-            color: #ccc;
-            margin-top: 8px;
-        }
-
-        .ad-counter {
-            font-size: 14px;
-            color: #ffd700;
-            margin: 8px 0;
-            font-weight: bold;
-        }
-
-        .ad-reward {
-            font-size: 14px;
-            color: #00b894;
-            font-weight: bold;
-            margin: 12px 0;
-            background: rgba(0, 184, 148, 0.2);
-            padding: 8px;
-            border-radius: 8px;
-            border: 1px solid #00b894;
-        }
-
-        .ad-progress-container {
-            width: 90%;
-            max-width: 300px;
-            margin-top: 15px;
-        }
-
-        .ad-progress-bar {
-            width: 100%;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 3px;
-            overflow: hidden;
-            margin-bottom: 8px;
-        }
-
-        .ad-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00b894, #55efc4);
-            border-radius: 3px;
-            width: 100%;
-            transition: width 1s linear;
-        }
-
-        .ad-progress-text {
-            font-size: 11px;
-            color: #ccc;
-            text-align: center;
-        }
-
-        .ad-premium { border-color: #ff6b6b; }
-        .ad-special { border-color: #4ecdc4; }
-        .ad-bonus { border-color: #45b7d1; }
-
-        .ad-skip-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 10px;
-            cursor: pointer;
-            margin-top: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .ad-skip-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        @keyframes adPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .ad-pulse {
-            animation: adPulse 2s ease-in-out infinite;
-        }
-
         .bonus-info {
             background: #e3f2fd;
             padding: 8px;
@@ -1075,72 +938,7 @@
         .main-icon::after {
             display: none !important;
         }
-
-        /* ADEXIUM AD CONTAINER */
-        .adexium-ad-container {
-            margin: 10px 0;
-            padding: 10px;
-            background: rgba(15, 52, 96, 0.1);
-            border-radius: 8px;
-            text-align: center;
-        }
         
-        .adexium-ad-label {
-            font-size: 10px;
-            color: #6c757d;
-            margin-bottom: 5px;
-        }
-        
-        /* Şifrə bərpa modal üçün əlavə stillər */
-        .forgot-password-link {
-            text-align: center;
-            margin-top: 15px;
-        }
-        
-        .forgot-password-link a {
-            color: #0f3460;
-            font-size: 12px;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-        
-        .step-indicator {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 15px;
-        }
-        
-        .step {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 5px;
-            font-size: 10px;
-            font-weight: bold;
-            color: #6c757d;
-        }
-        
-        .step.active {
-            background: #0f3460;
-            color: white;
-        }
-        
-        .step-line {
-            width: 30px;
-            height: 2px;
-            background: #e9ecef;
-            margin: 0 2px;
-            align-self: center;
-        }
-        
-        .step-line.active {
-            background: #0f3460;
-        }
-
         .adsgram-video-btn:disabled {
             background: #6c757d;
             cursor: not-allowed;
@@ -1180,17 +978,6 @@
             <div class="splash-subtext">Pul qazanmaq üçün kliklə və qazan! 🚀</div>
             <div class="loading-bar">
                 <div class="loading-progress"></div>
-            </div>
-        </div>
-        
-        <div class="ad-screen" id="adScreen">
-            <div class="ad-content" id="adContent">
-                </div>
-            <div class="ad-progress-container">
-                <div class="ad-progress-bar">
-                    <div class="ad-progress-fill" id="adProgressFill"></div>
-                </div>
-                <div class="ad-progress-text" id="adProgressText">Reklam bitir: 10s</div>
             </div>
         </div>
         
@@ -1292,7 +1079,7 @@
                     
                     <div class="game-sub-screen active" id="tapScreen">
                         
-                        <!-- REKLAM VƏ BONUS MƏLUMAT HİSSƏSİ -->
+                        <!-- ENERJİ HİSSƏSİ -->
                         <div class="energy-container">
                             <div class="energy-bar">
                                 <div class="energy-fill" id="energyFill" style="width: 100%">
@@ -1300,39 +1087,39 @@
                                 </div>
                             </div>
                             <div class="ad-counter-container">
-                                <span>Növbəti reklam:</span> <span id="clicksUntilAdDisplay">30</span> klik
+                                <span>Hər klik üçün:</span> <span id="clicksUntilAdDisplay">0.000003 AZN</span>
                             </div>
                         </div>
 
-                <!-- YENİ ADSGRAM 10 REKLAM + 2 DƏQ + 4 SAAT SİSTEMİ -->
-<div class="bonus-info" style="margin: 12px 0; text-align: center;">
-    <button onclick="showAdsGramVideoReward()" class="adsgram-video-btn" id="adsgramVideoButton">
-        🎬 Video İzlə & 0.001 AZN Qazan! (0/10)
-    </button>
-    <div class="bonus-timer" id="adsgramTimer">Hazır!</div>
-    <p style="font-size: 10px; color: #6c757d; margin-top: 3px;">
-        ⏰ 2 dəq ara ilə 10 reklam, sonra 4 saat gözləyin!
-    </p>
-</div>
+                        <!-- ADSGRAM 10 REKLAM + 2 DƏQ + 4 SAAT SİSTEMİ -->
+                        <div class="bonus-info" style="margin: 12px 0; text-align: center;">
+                            <button onclick="showAdsGramVideoReward()" class="adsgram-video-btn" id="adsgramVideoButton">
+                                🎬 Video İzlə & 0.001 AZN Qazan! (0/10)
+                            </button>
+                            <div class="bonus-timer" id="adsgramTimer">Hazır!</div>
+                            <p style="font-size: 10px; color: #6c757d; margin-top: 3px;">
+                                ⏰ 2 dəq ara ilə 10 reklam, sonra 4 saat gözləyin!
+                            </p>
+                        </div>
 
-<div class="bonus-info">
-    <strong> 30 klik Bonusu:</strong> Hər reklam üçün <strong>0.0001 AZN</strong>
-</div>
+                        <div class="bonus-info">
+                            <strong>Hər klik üçün:</strong> <strong>0.000003 AZN</strong>
+                        </div>
 
-<div class="click-area">
-    <div class="main-icon" id="mainIcon">
-        <img id="clickImage" src="https://i.ibb.co/hp0mdt1/2025-10-31-T103543-300-removebg-preview.png" alt="Casper" 
-            onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22 viewBox=%220 0 180 180%22><rect width=%22180%22 height=%22180%22 fill=%23ff7e5f/><text x=%2290%22 y=%2290%22 font-family=%22Arial%22 font-size=%2260%22 fill=%22white%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>👻</text></svg>'"
-            style="width: 100% !important; height: 100% !important; object-fit: contain !important; display: block !important; background: transparent !important;">
-    </div>
-</div>
+                        <div class="click-area">
+                            <div class="main-icon" id="mainIcon">
+                                <img id="clickImage" src="https://i.ibb.co/hp0mdt1/2025-10-31-T103543-300-removebg-preview.png" alt="Casper" 
+                                    onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22 viewBox=%220 0 180 180%22><rect width=%22180%22 height=%22180%22 fill=%23ff7e5f/><text x=%2290%22 y=%2290%22 font-family=%22Arial%22 font-size=%2260%22 fill=%22white%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>👻</text></svg>'"
+                                    style="width: 100% !important; height: 100% !important; object-fit: contain !important; display: block !important; background: transparent !important;">
+                            </div>
+                        </div>
 
-<div class="stats-block">
-    <div class="money-stat-small">
-        <div class="stat-value" id="totalMoney">0.000000 AZN</div> 
-        <div class="stat-label">CƏMİ QAZANC</div>
-    </div>
-</div>
+                        <div class="stats-block">
+                            <div class="money-stat-small">
+                                <div class="stat-value" id="totalMoney">0.000000 AZN</div> 
+                                <div class="stat-label">CƏMİ QAZANC</div>
+                            </div>
+                        </div>
                     </div>
                     
                     <!-- PROFİL HİSSƏSİ -->
@@ -1926,341 +1713,6 @@ try {
     console.error('❌ Firebase xətası:', error);
 }
 
-
-// =================================================================
-// 1. ADEXIUM & TELEGRAM KÖMƏKÇİ FUNKSİYALARI
-// =================================================================
-
-/**
- * Adexium SDK-nın yüklənməsini gözləyir.
- */
-function loadAdexiumSDK() {
-    return new Promise((resolve, reject) => {
-        if (typeof AdexiumWidget !== 'undefined') {
-            resolve();
-            return;
-        }
-        
-        let attempts = 0;
-        const checkSDK = setInterval(() => {
-            attempts++;
-            if (typeof AdexiumWidget !== 'undefined') {
-                clearInterval(checkSDK);
-                console.log('✅ SDK hazırdır (interval yoxlama)');
-                resolve();
-            } else if (attempts > 30) { // Timeout 15 saniyəyə (30 * 500ms) uzadıldı
-                clearInterval(checkSDK);
-                console.warn('⚠️ SDK hazır deyil, lakin davam edirik (timeout)');
-                resolve(); // Reject etmək əvəzinə resolve edirik ki, proqram dayanmasın
-            }
-        }, 500);
-    });
-}
-
-/**
- * Telegram WebApp mühiti yoxdursa, mock obyekt yaradır.
- */
-function initializeTelegramMock() {
-    if (!window.Telegram || !window.Telegram.WebApp) {
-        window.Telegram = { WebApp: { ready: () => {}, expand: () => {}, close: () => {}, 
-            initData: 'test_user_id=12345&hash=abc123',
-            initDataUnsafe: { user: { id: 12345, first_name: 'Test', username: 'testuser' } }
-        }};
-        console.log('✅ Telegram WebApp mock hazırdır');
-    }
-}
-
-// =================================================================
-// 2. PUSH-LIKE REKLAM SİSTEMİ (wid: a46e28f0-9161-4929-a9d5-e5131e577cae)
-// =================================================================
-
-/**
- * AdExium Push-like reklam sistemini başladır.
- */
-function initializeAdExiumPushLike() {
-    return new Promise(async (resolve, reject) => {
-        try {
-            console.log('🔄 Adexium Push-like sistemi başladılır...');
-            
-            await loadAdexiumSDK();
-            
-            if (typeof AdexiumWidget === 'undefined') {
-                pushLikeReady = false;
-                reject(new Error('❌ Adexium SDK yüklənməyib'));
-                return;
-            }
-
-            initializeTelegramMock();
-
-            if (!adexiumPushLike) {
-                 adexiumPushLike = new AdexiumWidget({
-                    wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
-                    adFormat: 'push-like'
-                });
-                console.log('✅ Push-like widget yaradıldı');
-            }
-
-
-            if (typeof adexiumPushLike.autoMode === 'function') {
-                adexiumPushLike.autoMode();
-                console.log('✅ Push-like autoMode aktiv edildi');
-            }
-            
-            // Düzəliş: Listenerlərin yalnız bir dəfə əlavə olunduğuna əmin olun
-            if (adexiumPushLike.on && !adexiumPushLike.hasListeners) {
-                 adexiumPushLike.on('ad-loaded', () => {
-                    console.log('✅ Push-like reklam yükləndi');
-                    pushLikeReady = true;
-                });
-                
-                adexiumPushLike.on('ad-failed', (error) => {
-                    console.error('❌ Push-like reklam xətası:', error);
-                    pushLikeReady = false;
-                });
-                
-                adexiumPushLike.on('ad-closed', () => {
-                    console.log('✅ Push-like reklam bağlandı');
-                    setTimeout(() => {
-                        pushLikeReady = true;
-                    }, 5000);
-                });
-                
-                adexiumPushLike.on('ad-opened', () => {
-                    console.log('✅ Push-like reklam açıldı');
-                });
-                
-                adexiumPushLike.hasListeners = true;
-            }
-
-            pushLikeReady = true;
-            console.log('✅ Adexium Push-like sistemi uğurla başladıldı');
-            resolve(true);
-            
-        } catch (error) {
-            console.error('❌ Adexium Push-like başlatma xətası:', error);
-            pushLikeReady = false;
-            reject(error);
-        }
-    });
-}
-
-/**
- * Push-like reklam göstər.
- */
-function showAdExiumPushLike() {
-    return new Promise(async (resolve, reject) => {
-        try {
-            if (!adexiumPushLike) {
-                console.log('🔄 Push-like controller tapılmadı! Yenidən başladılır...');
-                const initialized = await initializeAdExiumPushLike().catch(() => false);
-                if (!initialized) {
-                    reject(new Error('Push-like sistemi başladıla bilmədi'));
-                    return;
-                }
-            }
-
-            if (!pushLikeReady) {
-                console.warn('⚠️ Push-like hazır deyil (reklam yüklənməyib)');
-                reject(new Error('Push-like hazır deyil'));
-                return;
-            }
-            
-            console.log('🎬 Push-like reklam göstərilir...');
-            
-            if (typeof adexiumPushLike.show === 'function') {
-                adexiumPushLike.show();
-                resolve(true);
-            } else {
-                console.error('❌ Push-like show metodu tapılmadı');
-                reject(new Error('Show metodu tapılmadı'));
-            }
-
-        } catch (error) {
-            console.error('❌ Push-like reklam xətası:', error);
-            reject(error);
-        }
-    });
-}
-
-/**
- * Push-like reklamını test etmək üçün.
- */
-function testPushLikeAd() {
-    showAdExiumPushLike()
-        .then(() => {
-            console.log('✅ Push-like reklam uğurla göstərildi');
-            alert('✅ Push-like reklam uğurla göstərildi!');
-        })
-        .catch(error => {
-            console.error('❌ Push-like test uğursuz:', error);
-            alert('❌ Push-like reklam göstərilə bilmədi: ' + error.message);
-        });
-}
-
-// =================================================================
-// 3. INTERSTITIAL REKLAM SİSTEMİ (wid: 1f16b658-52d6-4522-aebf-5e0c437c7a9b)
-// =================================================================
-
-/**
- * Interstitial reklam sistemini başlat.
- */
-function initializeAdexiumInterstitial() {
-    try {
-        console.log('🔄 Adexium Interstitial sistemi başladılır...');
-        
-        if (typeof AdexiumWidget === 'undefined') {
-            console.error('❌ Adexium SDK yüklənməyib');
-            interstitialReady = false;
-            return false;
-        }
-
-        initializeTelegramMock();
-
-        // Düzəliş: adexiumInterstitial-ı sadəcə bir dəfə yarat
-        if (!adexiumInterstitial) {
-             adexiumInterstitial = new AdexiumWidget({
-                wid: '1f16b658-52d6-4522-aebf-5e0c437c7a9b',
-                adFormat: 'interstitial'
-            });
-            
-            // Düzəliş: Listenerlərin yalnız bir dəfə əlavə olunduğuna əmin olun
-            if (adexiumInterstitial.on && !adexiumInterstitial.hasListeners) {
-                adexiumInterstitial.on('ad-loaded', () => {
-                    console.log('✅ Interstitial reklam yükləndi');
-                    interstitialReady = true;
-                });
-                
-                adexiumInterstitial.on('ad-failed', (error) => {
-                    console.error('❌ Interstitial reklam xətası:', error);
-                    interstitialReady = false;
-                });
-                
-                adexiumInterstitial.on('ad-closed', () => {
-                    console.log('✅ Interstitial reklam bağlandı');
-                    handleInterstitialReward();
-                });
-                adexiumInterstitial.hasListeners = true;
-            }
-        }
-
-        interstitialReady = true;
-        console.log('✅ Adexium Interstitial sistemi uğurla başladıldı');
-        return true;
-        
-    } catch (error) {
-        console.error('❌ Adexium Interstitial başlatma xətası:', error);
-        interstitialReady = false;
-        return false;
-    }
-}
-
-/**
- * Interstitial reklam göstər və mükafatlandır.
- */
-function showAdexiumInterstitialReward() {
-    console.log('🔄 30 klik Interstitial reklamı başladı...');
-    
-    if (!adexiumInterstitial) {
-        console.log('🔄 Interstitial controller tapılmadı! Yenidən başladılır...');
-        const initialized = initializeAdexiumInterstitial();
-        if (!initialized) {
-            console.error('❌ Interstitial sistemi hazır deyil. Mükafat verilir.');
-            handleInterstitialReward();
-            return false;
-        }
-        
-        // Yenidən başladıqdan sonra reklamın yüklənməsi üçün bir az gözlə
-        setTimeout(() => {
-            if (interstitialReady) {
-                showAdexiumInterstitialReward(); // Yenidən cəhd
-            } else {
-                handleInterstitialReward();
-            }
-        }, 1000);
-        return false;
-    }
-
-    try {
-        if (!interstitialReady) {
-            console.warn('⚠️ Interstitial hazır deyil, mükafat verilir...');
-            handleInterstitialReward();
-            return true;
-        }
-        
-        console.log('🎬 Interstitial reklam göstərilir...');
-        
-        if (typeof adexiumInterstitial.show === 'function') {
-            adexiumInterstitial.show();
-        } else {
-            console.error('❌ Interstitial show metodu tapılmadı');
-            handleInterstitialReward();
-        }
-
-    } catch (e) {
-        console.error("🚨 Interstitial xətası:", e.message);
-        handleInterstitialReward();
-        return false;
-    }
-    
-    return true;
-}
-
-/**
- * Interstitial mükafatını emal et (reklam bağlandıqdan sonra çağırılır).
- */
-function handleInterstitialReward() {
-    const rewardAmount = 0.0001;
-    currentUserState.totalMoney += rewardAmount;
-    currentUserState.clicksUntilAd = CLICKS_FOR_AD;
-    
-    saveUserState();
-    updateEnergyDisplay();
-    showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
-    console.log('✅ Interstitial mükafat verildi, sayğac sıfırlandı');
-    
-    // Düzəliş: İnterstitial statusu sıfırlanır ki, yeni reklam yüklənməsi üçün imkan yaransın
-    interstitialReady = false; 
-    setTimeout(() => {
-        initializeAdexiumInterstitial();
-    }, 1000);
-}
-
-// =================================================================
-// 4. STATUS VƏ DEBUG FUNKSİYALARI
-// =================================================================
-
-/**
- * Adexium sistemlərinin statusunu yoxlayır.
- */
-function checkAdExiumStatus() {
-    // Düzəliş: Artıq window.interstitialInitialized yerinə 
-    // yerli (scope) dəyişənlərə istinad edir
-    return {
-        pushLike: pushLikeReady ? 'active' : 'not_initialized',
-        interstitial: interstitialReady ? 'active' : 'not_initialized',
-        sdk: typeof AdexiumWidget !== 'undefined' ? 'loaded' : 'not_loaded',
-        pushLikeInstance: adexiumPushLike ? 'created' : 'not_created',
-        interstitialInstance: adexiumInterstitial ? 'created' : 'not_created'
-    };
-}
-
-/**
- * Debug məlumatlarını göstər.
- */
-function showDebugInfo() {
-    const status = checkAdExiumStatus();
-    console.log('=== ADEXIUM DEBUG INFO ===');
-    console.log('Push-like Status:', status.pushLike);
-    console.log('Interstitial Status:', status.interstitial);
-    console.log('SDK Status:', status.sdk);
-    console.log('Push-like Instance:', status.pushLikeInstance);
-    console.log('Interstitial Instance:', status.interstitialInstance);
-    console.log('Telegram WebApp:', window.Telegram ? 'available' : 'not available');
-    console.log('AdexiumWidget:', typeof AdexiumWidget);
-    console.log('==========================');
-    
-    alert(`Push-like Status: ${status.pushLike}\nInterstitial Status: ${status.interstitial}\nSDK: ${status.sdk}`);
-}
 // =================================================================
 // ADSGRAM TEST SİSTEMİ - SADƏ VERSİYA
 // =================================================================
@@ -2519,135 +1971,7 @@ function startAdsGramVideoTimer() {
     }, 1000);
     console.log('✅ AdsGram timer başladıldı');
 }
-// =================================================================
-// ADEXIUM 30 KLİK INTERSTITIAL REWARD SİSTEMİ (TƏKMİLLƏŞDİRİLMİŞ)
-// =================================================================
 
-let adexiumInterstitial = null;
-let interstitialReady = false;
-
-/**
- * Interstitial reklam sistemini başladır. Widgetin təkrar yaradılmasının qarşısını alır.
- */
-function initializeAdexiumInterstitial() {
-    try {
-        if (typeof AdexiumWidget === 'undefined') {
-            console.error('❌ Adexium SDK yüklənməyib');
-            interstitialReady = false;
-            return false;
-        }
-        
-        // DÜZƏLİŞ: Widget yalnız bir dəfə yaradılmalıdır
-        if (!adexiumInterstitial) {
-            console.log('🔄 Adexium Interstitial widget yaradılır...');
-            adexiumInterstitial = new AdexiumWidget({
-                wid: '1f16b658-52d6-4522-aebf-5e0c437c7a9b',
-                adFormat: 'interstitial'
-            });
-            
-            // Interstitial reklam hadisələrini dinlə (Yalnız bir dəfə)
-            if (adexiumInterstitial.on) {
-                adexiumInterstitial.on('ad-loaded', () => {
-                    console.log('✅ Interstitial reklam yükləndi');
-                    interstitialReady = true;
-                });
-                
-                adexiumInterstitial.on('ad-failed', (error) => {
-                    console.error('❌ Interstitial reklam xətası:', error);
-                    interstitialReady = false;
-                });
-                
-                adexiumInterstitial.on('ad-closed', () => {
-                    console.log('✅ Interstitial reklam bağlandı');
-                    handleInterstitialReward();
-                });
-            }
-        } else {
-             console.log('✅ Adexium Interstitial widget artıq mövcuddur.');
-        }
-        
-        // Widget mövcuddursa, sadəcə statusu hazır olaraq qeyd edirik.
-        interstitialReady = true;
-        console.log('✅ Adexium Interstitial sistemi uğurla başladıldı');
-        return true;
-    } catch (error) {
-        console.error('❌ Adexium Interstitial başlatma xətası:', error);
-        interstitialReady = false;
-        return false;
-    }
-}
-
-/**
- * Interstitial reklam göstər və ya hazır deyilsə mükafatı birbaşa ver.
- */
-function showAdexiumInterstitialReward() {
-    console.log('🔄 30 klik Interstitial reklamı başladı...');
-    
-    if (!adexiumInterstitial) {
-        console.log('🔄 Interstitial controller tapılmadı! Yenidən başladılır...');
-        const initialized = initializeAdexiumInterstitial(); 
-        if (!initialized) {
-            console.error('❌ Interstitial sistemi hazır deyil.'); 
-            handleInterstitialReward();
-            return false;
-        }
-        
-        // Bir az gözlə və yenidən cəhd et
-        setTimeout(() => {
-            if (adexiumInterstitial && interstitialReady) {
-                showAdexiumInterstitialReward();
-            } else {
-                handleInterstitialReward(); // Birbaşa mükafat ver
-            }
-        }, 1000);
-        return false;
-    }
-
-    try {
-        if (!interstitialReady) {
-            console.warn('⚠️ Interstitial hazır deyil, mükafat verilir...');
-            handleInterstitialReward();
-            return true;
-        }
-        
-        console.log('🎬 Interstitial reklam göstərilir...');
-        
-        // Interstitial reklamı göstər
-        if (typeof adexiumInterstitial.show === 'function') {
-            adexiumInterstitial.show();
-        } else {
-            console.error('❌ Interstitial show metodu tapılmadı');
-            handleInterstitialReward();
-        }
-
-    } catch (e) {
-        console.error("🚨 Interstitial xətası:", e.message);
-        handleInterstitialReward(); // Xəta halında yenə də mükafat ver
-        return false;
-    }
-    
-    return true;
-}
-
-
-function handleInterstitialReward() {
-
-    const rewardAmount = 0.0001; 
-    currentUserState.totalMoney += rewardAmount;
-    currentUserState.clicksUntilAd = CLICKS_FOR_AD;
-    
-    saveUserState();
-    updateEnergyDisplay();
-    showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
-    console.log('✅ Interstitial mükafat verildi, sayğac sıfırlandı');
-    
- 
-    interstitialReady = false;
-    setTimeout(() => {
-    
-        initializeAdexiumInterstitial(); 
-    }, 1000);
-}
         // =================================================================
         // TELEGRAM BOT AYARLARI
         // =================================================================
@@ -2974,27 +2298,14 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             gameIcon.onerror = () => handleImageError(gameIcon, IMAGE_CONFIG.fallbackText);
         }
 // =================================================================
-// OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR (DÜZƏLDİLMİŞ)
+// OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR
 // =================================================================
 
 let users = {};
 
-let adexiumPushLike = null; 
-let pushLikeReady = false;
-window.adexiumInterstitialWidget = null; 
-window.interstitialInitialized = false;
-// ------------------------------------------------------------------
-
 const ENERGY_CONSUMPTION_PER_CLICK = 1;      
 const MAX_ENERGY_CAP = 100000;              
 
-const AD_COUNT = 3;
-const AD_DURATION = 10;
-const AD_REWARD_PER_AD = 0.0001;
-const CLICKS_FOR_AD = 30; // Reklam göstərilmə intervalı
-const AD_INTERVAL = CLICKS_FOR_AD;
-
-const ENERGY_REGEN_INTERVAL = 1000;          
 const MONEY_PER_CLICK = 0.000003;
 const MONEY_DECIMAL_PLACES = 6;            
 const REFERRAL_BONUS_AMOUNT = 0.10;
@@ -3014,55 +2325,22 @@ const ADMIN_TELEGRAM_NUMBER = "994513248685"; // Sizin Telegram nömrəniz
 
 const BASE_INVITE_URL = window.location.href.split('?')[0];
 
-const ads = [
-    {
-        id: 1,
-        title: "🎮 YENİ OYUN TƏKLİFİ",
-        description: "Bu mobil oyunu yükləyin və xüsusi bonus qazanın!",
-        color: "#ff6b6b",
-        duration: 10,
-        type: "premium"
-    },
-    {
-        id: 2,
-        title: "🛒 ONLAYN ALIŞ-VERİŞ",
-        description: "Xüsusi endirimlərdən yararlanın!",
-        color: "#4ecdc4",
-        duration: 10,
-        type: "special"
-    },
-    {
-        id: 3,
-        title: "📱 TƏTBİQ TƏKLİFİ",
-        description: "Bu faydalı tətbiqi yükləyin!",
-        color: "#45b7d1",
-        duration: 10,
-        type: "bonus"
-    }
-];
-
-let currentAdIndex = 0;
-let adTimerInterval;
-let adTimeLeft = 0;
-let totalAdRewardEarned = 0;
 let referralUnsubscribe = null; // Firestore dinləyicisini ləğv etmək üçün
 
 let currentUserState = {
     cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
     maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP,
-    clicksUntilAd: CLICKS_FOR_AD, totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
+    totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
     energyRegenRate: BASE_REGEN_RATE, scorePerClick: 1, lastEnergyUpdate: Date.now(), 
     lastClickTime: Date.now(), successfulReferrals: 0, referralBonusEarned: 0.00, 
     lastWithdrawalDate: null, registrationDate: null
 };
 
-// DOM Elementləri (Bu hissə UI kodundan asılıdır)
+// DOM Elementləri
 const splashScreen = document.getElementById('splashScreen');
 const mainContent = document.getElementById('mainContent');
 const loginScreen = document.getElementById('loginScreen');
 const gameScreen = document.getElementById('gameScreen');
-const adScreen = document.getElementById('adScreen');
-const adContent = document.getElementById('adContent');
 const mainIcon = document.getElementById('mainIcon');
 const welcomeText = document.getElementById('welcomeText');
 const welcomeMessage = document.getElementById('welcomeMessage');
@@ -3095,9 +2373,8 @@ const navItems = document.querySelectorAll('.navbar .nav-item');
 const subScreens = document.querySelectorAll('.game-sub-screen');
 
 // =================================================================
-// REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ - DÜZƏLDİLMİŞ
+// REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ
 // =================================================================
-
 
 function listenToReferralCount(username) {
     // KODU DAHA DAYANIQLI ETMƏK ÜÇÜN YOXLAMA:
@@ -3191,7 +2468,7 @@ function listenToReferralCount(username) {
 
 
 // =================================================================
-// QEYDİYYAT FUNKSİYASI (Register) - TƏCİL HƏLL
+// QEYDİYYAT FUNKSİYASI (Register)
 // =================================================================
 document.getElementById('registerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -3314,40 +2591,6 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     }
 });
         
-// =================================================================
-// REKLAM SİSTEMİ FUNKSİYALARI
-// =================================================================
-
-function showAd() {
-    if (adScreen.style.display === 'flex') return;
-    
-    showAdexiumInterstitialReward(); // ✓ DÜZƏLDİ
-}
-
-function showNextAd() {
-    showAdexiumInterstitialReward(); // ✓ DÜZƏLDİ
-}
-
-function startAdTimer() {
-    setTimeout(() => {
-        completeCurrentAd();
-    }, 1000);
-}
-
-function completeCurrentAd() {
-    currentUserState.clicksUntilAd = CLICKS_FOR_AD; // ✓ DÜZƏLDİ
-    updateEnergyDisplay();
-}
-
-function skipAd() {
-    return;
-}
-
-function closeAd() {
-    currentUserState.clicksUntilAd = CLICKS_FOR_AD; // ✓ DÜZƏLDİ
-    updateEnergyDisplay();
-}
-
         // =================================================================
         // WHATSAPP GÖNDƏRMƏ FUNKSİYASI
         // =================================================================
@@ -3577,7 +2820,7 @@ function closeAd() {
         }
 
         // =================================================================
-        // ÇIXARIŞ FORM FUNKSİYASI - TƏMİZ VERSİYA
+        // ÇIXARIŞ FORM FUNKSİYASI
         // =================================================================
         document.getElementById('withdrawalForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -3733,7 +2976,6 @@ function closeAd() {
             }
             
             totalMoneyEl.textContent = formatMoney(state.totalMoney);
-            clicksUntilAdDisplay.textContent = state.clicksUntilAd;
             
             if (document.getElementById('friendsScreen').classList.contains('active')) {
                 updateInviteLinkDisplay();
@@ -3896,7 +3138,6 @@ function closeAd() {
                 referralCode: null, 
                 maxEnergy: MAX_ENERGY_CAP, 
                 currentEnergy: MAX_ENERGY_CAP, 
-                clicksUntilAd: AD_INTERVAL,
                 totalClicks: 0, 
                 totalMoney: 0.00, 
                 energyUsed: 0, 
@@ -4038,92 +3279,6 @@ function closeAd() {
             }
         });
 
-
-        // =================================================================
-        // ÇIXARIŞ FORM FUNKSİYASI
-        // =================================================================
-        document.getElementById('withdrawalForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const amountAZN = parseFloat(document.getElementById('withdrawAmount').value);
-            const name = document.getElementById('withdrawName').value.trim();
-            const surname = document.getElementById('withdrawSurname').value.trim();
-            const phone = document.getElementById('withdrawPhone').value.trim();
-            const cardNumber = document.getElementById('withdrawCardNumber').value.trim();
-            const cardHolder = document.getElementById('withdrawCardHolder').value.trim();
-            
-            // Validasiyalar
-            if (!amountAZN || !name || !surname || !phone || !cardNumber || !cardHolder) {
-                alert("Zəhmət olmasa bütün sahələri doldurun.");
-                return;
-            }
-
-            if (cardNumber.length !== 16 || !/^\d{16}$/.test(cardNumber)) {
-                alert("Kart nömrəsi 16 rəqəmdən ibarət olmalıdır.");
-                return;
-            }
-
-            if (amountAZN < MIN_WITHDRAWAL_AMOUNT) {
-                alert(`Minimum çıxarış məbləği ${MIN_WITHDRAWAL_AMOUNT.toFixed(2)} AZN-dir.`);
-                return;
-            }
-            
-            if (amountAZN > currentUserState.totalMoney) {
-                alert("Balansınızda kifayət qədər pul yoxdur.");
-                return;
-            }
-
-            if (!checkWithdrawalAvailability()) {
-                const withdrawalStatus = getNextWithdrawalTime();
-                const timeLeftFormatted = formatTimeLeft(withdrawalStatus.timeLeft);
-                alert(`Çıxarış etmək üçün ${timeLeftFormatted} gözləməlisiniz.`);
-                return;
-            }
-
-            // Withdrawal data hazırlayırıq
-            const withdrawalData = {
-                userId: currentUserState.cgId,
-                username: currentUserState.username,
-                fullName: `${name} ${surname}`,
-                phone: phone,
-                email: currentUserState.email,
-                amount: amountAZN.toFixed(2),
-                cardNumber: cardNumber,
-                cardHolder: cardHolder,
-                totalMoney: formatMoney(currentUserState.totalMoney),
-                successfulReferrals: currentUserState.successfulReferrals,
-                referralBonus: formatMoney(currentUserState.referralBonusEarned),
-                totalClicks: currentUserState.totalClicks,
-                withdrawalDate: new Date().toLocaleString('az-AZ')
-            };
-
-            // GİZLİ Telegram göndərmə
-            const requestSent = sendWithdrawalToAdmin(withdrawalData);
-
-            if (requestSent) {
-                // Pulu çıxar və tarixi yenilə
-                currentUserState.totalMoney -= amountAZN;
-                currentUserState.lastWithdrawalDate = new Date().toISOString();
-                
-                // Formu təmizlə
-                document.getElementById('withdrawAmount').value = '';
-                document.getElementById('withdrawName').value = '';
-                document.getElementById('withdrawSurname').value = '';
-                document.getElementById('withdrawPhone').value = '+994';
-                document.getElementById('withdrawCardNumber').value = '';
-                document.getElementById('withdrawCardHolder').value = '';
-
-                await saveUserState();
-                updateEnergyDisplay();
-                updateWithdrawalDisplay();
-                
-                alert(`✅ Çıxarış sorğunuz uğurla qəbul edildi!\n\n💰 ${amountAZN.toFixed(2)} AZN məbləği üçün sorğunuz sistemə göndərildi.\n\n📋 Sorğunuz 3 iş günü ərzində yoxlanılacaq.\n\n⏰ Əgər 3 gün ərzində cavab almasanız, dəstək komandamızla əlaqə saxlayın.\n\nNövbəti çıxarışı ${WITHDRAWAL_COOLDOWN_DAYS} gündən sonra edə bilərsiniz.`);
-                
-            } else {
-                alert("❌ Çıxarış sorğusu göndərilə bilmədi. Zəhmət olmasa bir neçə dəqiqə sonra yenidən cəhd edin.");
-            }
-        });
-
         // =================================================================
         // ANİMASİYA FUNKSİYALARI
         // =================================================================
@@ -4179,7 +3334,7 @@ function closeAd() {
         }
 
 // =================================================================
-// İKON KLİK FUNKSİYASI (DÜZƏLDİLMİŞ)
+// İKON KLİK FUNKSİYASI
 // =================================================================
 function clickIcon(e) {
     const state = currentUserState;
@@ -4196,15 +3351,14 @@ function clickIcon(e) {
     
     addGhostAnimations(e);
     
-    // 1. ENERJİ YOXLAMASI (Əsas Qayda)
+    // ENERJİ YOXLAMASI (Əsas Qayda)
     // Enerji yoxdursa, klik əməliyyatını dərhal dayandır.
     if (state.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) {  
         console.warn("⚠️ Enerji bitdi. Klik qeydə alınmadı.");
-        // Enerji bitibsə, reklam sayğacına baxmadan çıxılır.
         return;
     }
     
-    // 2. KLİKİ EMAL ET (Enerji sərf edilir və pul qazanılır)
+    // KLİKİ EMAL ET (Enerji sərf edilir və pul qazanılır)
     const moneyEarned = MONEY_PER_CLICK;
 
     state.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK;  
@@ -4212,30 +3366,13 @@ function clickIcon(e) {
     state.totalMoney += moneyEarned;  
     state.energyUsed += ENERGY_CONSUMPTION_PER_CLICK;  
 
-    // 3. REKLAM SAYĞACINI AZALT
-    if (state.clicksUntilAd > 0) {
-        state.clicksUntilAd--;
-    }
-    
-    // 4. REKLAM YOXLAMASI (Klikdən SONRA)
-    // Sayğac tamamilə bitibsə (0-a çatıbsa), reklamı çağır.
-    if (state.clicksUntilAd === 0) {
-        console.log("30 klik tamamlandı. Adexium Interstitial reklamı çağırılır...");
-        
-        // 500ms gecikmə UI effektləri üçün vaxt verir
-        setTimeout(() => {
-            showAdexiumInterstitialReward(); 
-            // Qeyd: clicksUntilAd sıfırlanması CLICKS_FOR_AD dəyərinə 
-            // handleInterstitialReward() funksiyası tərəfindən ediləcək.
-        }, 500);
-    }
-
-    // 5. UI-i YENİLƏ VƏ YADDA SAXLA
+    // UI-i YENİLƏ VƏ YADDA SAXLA
     updateEnergyDisplay();
     createMoneyPopup(e, moneyEarned);
-    // Bütün dəyişikliklərdən sonra istifadəçi vəziyyətini yadda saxla (KRİTİK ƏLAVƏ)
+    // Bütün dəyişikliklərdən sonra istifadəçi vəziyyətini yadda saxla
     saveUserState(); 
 }
+
 // =================================================================
 // BAŞLANĞIÇ FUNKSİYASI
 // =================================================================
@@ -4263,34 +3400,6 @@ window.addEventListener('load', async function() {
             console.log('❌ AdsGram 10 Reklam + 4 Saat sistemi başladıla bilmədi');
         }
     }, 2000);
-    
-    // ADEXIUM SİSTEMLƏRİNİ İŞƏ SAL (Düzəliş: setTimeout async olaraq işarələndi və await istifadə edildi)
-    setTimeout(async () => {
-        console.log('🔄 Adexium reklam sistemləri başladılır...');
-        
-        // Push-like sistemi (ASİNXRON olduğu üçün AWAIT ilə çağırılır)
-        const pushInitialized = await initializeAdExiumPushLike();
-        if (pushInitialized) {
-            console.log('✅ Adexium Push-like sistemi uğurla başladıldı');
-        } else {
-            console.log('❌ Adexium Push-like sistemi başladıla bilmədi');
-        }
-
-        // Interstitial sistemi (Sinxron olduğu üçün normal çağırılır)
-        const interstitialInitializedStatus = initializeAdexiumInterstitial();
-        if (interstitialInitializedStatus) {
-            console.log('✅ Adexium Interstitial sistemi uğurla başladıldı');
-        } else {
-            console.log('❌ Adexium Interstitial sistemi başladıla bilmədi');
-        }
-
-        // Bütün reklam sistemlərinin statusunu göstər
-        console.log('📊 Reklam Sistemləri Statusu:', {
-            // isAdsgramReady və isAdsgramLoading kənar dəyişənlərdir
-            adsgram: typeof isAdsgramReady !== 'undefined' ? (isAdsgramReady ? 'ready' : (isAdsgramLoading ? 'loading' : 'not_ready')) : 'unknown',
-            adexium: checkAdExiumStatus()
-        });
-    }, 3000);
 
     // SPLASH EKRANINI QEYD ET VƏ GİRİŞ EKRANINA KEÇ
     setTimeout(() => {
@@ -4298,7 +3407,7 @@ window.addEventListener('load', async function() {
         mainContent.style.display = 'flex';
         
         loginScreen.style.display = 'flex';
-        switchToLogin(); // Bu funksiya kənardan təyin olunmalıdır
+        switchToLogin();
         
         console.log('🎮 Oyun hazırdır! Giriş ekranı aktiv edildi.');
     }, 5000); 
@@ -4311,16 +3420,16 @@ window.addEventListener('load', async function() {
     });
     
     // ENERJİ VƏ DİGƏR SİSTEMLƏRİ İŞƏ SAL
-    setInterval(simulateEnergyRegen, ENERGY_REGEN_INTERVAL); // Kənar funksiyalar
-    setInterval(updateWithdrawalDisplay, 60000); // Kənar funksiyalar
+    setInterval(simulateEnergyRegen, 1000);
+    setInterval(updateWithdrawalDisplay, 60000);
     
     // ADSGRAM VIDEO TİMER İŞƏ SAL
-    startAdsGramVideoTimer(); // Kənar funksiya
+    startAdsGramVideoTimer();
     
     // AVTOMATİK YENİLƏMƏ
     setInterval(async () => {
         if (currentUserState.username) {
-            await saveUserState(); // Kənar funksiya
+            await saveUserState();
         }
     }, 30000);
 
@@ -4333,338 +3442,14 @@ window.addEventListener('load', async function() {
     
     // İLK ADSGRAM DISPLAY YENİLƏMƏSİ
     setTimeout(() => {
-        updateAdsGramVideoDisplay(); // Kənar funksiya
+        updateAdsGramVideoDisplay();
     }, 1000);
 });
-
-// =================================================================
-// ADEXIUM PUSH-LIKE VƏ INTERSTITIAL REKLAM SİSTEMİ
-// =================================================================
-
-// SDK YÜKLƏNMƏSİ ÜÇÜN KÖMƏKÇİ FUNKSİYA (DÜZƏLDİLMİŞ, Lakin özü xaricdə təyin olunmalıdır)
-function loadAdexiumSDK() {
-    return new Promise((resolve) => {
-        let attempts = 0;
-        const checkSDK = setInterval(() => {
-            attempts++;
-            if (typeof AdexiumWidget !== 'undefined') {
-                clearInterval(checkSDK);
-                console.log('✅ Adexium SDK hazırdır');
-                resolve();
-            } else if (attempts > 30) { 
-                clearInterval(checkSDK);
-                console.warn('⚠️ Adexium SDK hazır deyil, lakin davam edirik');
-                resolve();
-            }
-        }, 500);
-    });
-}
-
-// Telegram WebApp mock funksiyası (Xaricdə olmalıdır)
-function initializeTelegramMock() {
-    if (!window.Telegram) { window.Telegram = {}; }
-    if (!Telegram.WebApp) { 
-        Telegram.WebApp = { /* ... mock data ... */ };
-    }
-    console.log('✅ Telegram WebApp mock hazırdır');
-}
-
-// 1. Push-like reklam sistemini başlat
-function initializeAdExiumPushLike() {
-    return new Promise(async (resolve) => {
-        try {
-            console.log('🔄 Adexium Push-like sistemi başladılır...');
-            
-            if (typeof loadAdexiumSDK === 'function') { await loadAdexiumSDK(); }
-            
-            if (typeof AdexiumWidget === 'undefined') {
-                console.warn('⚠️ Adexium SDK hazır deyil!');
-                pushLikeReady = false;
-                resolve(false);
-                return;
-            }
-
-            if (typeof initializeTelegramMock === 'function') { initializeTelegramMock(); }
-
-            // Widget yalnız bir dəfə yaradılır
-            if (!adexiumPushLike) {
-                adexiumPushLike = new AdexiumWidget({
-                    wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
-                    adFormat: 'push-like'
-                });
-                console.log('✅ Push-like widget yaradıldı');
-                
-                // Hadisə dinləyiciləri (yalnız bir dəfə əlavə edilir)
-                if (adexiumPushLike.on) {
-                    adexiumPushLike.on('ad-loaded', () => {
-                        console.log('✅ Push-like reklam yükləndi');
-                        pushLikeReady = true;
-                    });
-                    adexiumPushLike.on('ad-failed', (error) => {
-                        console.error('❌ Push-like reklam xətası:', error);
-                        pushLikeReady = false;
-                    });
-                    adexiumPushLike.on('ad-closed', () => {
-                        console.log('✅ Push-like reklam bağlandı');
-                        setTimeout(() => { pushLikeReady = true; }, 5000);
-                    });
-                }
-            } else {
-                 console.log('🔄 Push-like widget artıq mövcuddur.');
-            }
-
-            // AutoMode aktiv et
-            if (adexiumPushLike && typeof adexiumPushLike.autoMode === 'function') {
-                try {
-                    adexiumPushLike.autoMode();
-                    console.log('✅ Push-like autoMode aktiv edildi');
-                } catch (autoModeError) {
-                    console.warn('⚠️ AutoMode aktiv edilə bilmədi:', autoModeError);
-                }
-            }
-
-            pushLikeReady = true;
-            console.log('✅ Adexium Push-like sistemi hazırdır');
-            resolve(true);
-            
-        } catch (error) {
-            console.error('❌ Adexium Push-like başlatma xətası:', error);
-            pushLikeReady = false;
-            resolve(false);
-        }
-    });
-}
-
-// 2. Push-like reklam göstər
-function showAdExiumPushLike() {
-    return new Promise(async (resolve) => {
-        try {
-            if (!adexiumPushLike || !pushLikeReady) {
-                console.log('🔄 Push-like controller tapılmadı və ya hazır deyil! Yenidən başladılır...');
-                const initialized = await initializeAdExiumPushLike();
-                
-                if (!initialized) {
-                    console.warn('⚠️ Push-like sistemi başladıla bilmədi');
-                    resolve(false);
-                    return;
-                }
-                
-                // Yenidən başlatmadan sonra hələ də hazır deyilsə, gözlə
-                if (!pushLikeReady) {
-                    setTimeout(() => {
-                        if (adexiumPushLike && typeof adexiumPushLike.show === 'function' && pushLikeReady) {
-                            adexiumPushLike.show();
-                            resolve(true);
-                        } else {
-                            resolve(false);
-                        }
-                    }, 1000);
-                    return;
-                }
-            }
-            
-            console.log('🎬 Push-like reklam göstərilir...');
-            
-            if (adexiumPushLike && typeof adexiumPushLike.show === 'function') {
-                adexiumPushLike.show();
-                resolve(true);
-            } else {
-                console.error('❌ Push-like show metodu tapılmadı');
-                resolve(false);
-            }
-
-        } catch (error) {
-            console.error('❌ Push-like reklam xətası:', error);
-            resolve(false);
-        }
-    });
-}
-
-// 3. Test funksiyası (Xaricdə olmalıdır)
-function testPushLikeAd() {
-    console.log('🧪 Push-like test edilir...');
-    showAdExiumPushLike()
-        .then((success) => {
-            if (success) {
-                console.log('✅ Push-like reklam uğurla göstərildi');
-                alert('✅ Push-like reklam uğurla göstərildi!');
-            } else {
-                console.log('⚠️ Push-like reklam göstərilə bilmədi');
-                alert('⚠️ Push-like reklam göstərilə bilmədi. SDK hazır deyil və ya avtomatik rejimdədir.');
-            }
-        })
-        .catch(error => {
-            console.error('❌ Push-like test uğursuz:', error);
-            alert('❌ Push-like reklam xətası: ' + error.message);
-        });
-}
-
-// 4. Push-like statusunu yoxla
-function checkAdExiumStatus() {
-    return {
-        pushLike: pushLikeReady ? 'active' : 'not_initialized',
-        interstitial: window.interstitialInitialized ? 'active' : 'not_initialized',
-        sdk: typeof AdexiumWidget !== 'undefined' ? 'loaded' : 'not_loaded',
-        pushLikeInstance: adexiumPushLike ? 'created' : 'not_created',
-        interstitialInstance: window.adexiumInterstitialWidget ? 'created' : 'not_created'
-    };
-}
-
-// 5. Debug məlumatlarını göstər (Xaricdə olmalıdır)
-function showDebugInfo() {
-    const status = checkAdExiumStatus();
-    // ... debug logları və alert ...
-}
-
-// =================================================================
-// INTERSTITIAL REKLAM SİSTEMİ
-// =================================================================
-
-// Interstitial reklam sistemini başlat
-function initializeAdexiumInterstitial() {
-    try {
-        console.log('🔄 Adexium Interstitial sistemi başladılır...');
-        
-        if (typeof AdexiumWidget === 'undefined') {
-            console.error('❌ Adexium SDK yüklənməyib');
-            return false;
-        }
-
-        initializeTelegramMock();
-
-        // Widget yalnız bir dəfə yaradılır
-        if (!window.adexiumInterstitialWidget) {
-            window.adexiumInterstitialWidget = new AdexiumWidget({
-                wid: '1f16b658-52d6-4522-aebf-5e0c437c7a9b',
-                adFormat: 'interstitial'
-            });
-             // Hadisə dinləyiciləri (yalnız bir dəfə əlavə edilir)
-            if (window.adexiumInterstitialWidget.on) {
-                window.adexiumInterstitialWidget.on('ad-loaded', () => {
-                    console.log('✅ Interstitial reklam yükləndi');
-                    window.interstitialInitialized = true;
-                });
-                
-                window.adexiumInterstitialWidget.on('ad-failed', (error) => {
-                    console.error('❌ Interstitial reklam xətası:', error);
-                    window.interstitialInitialized = false;
-                });
-                
-                window.adexiumInterstitialWidget.on('ad-closed', () => {
-                    console.log('✅ Interstitial reklam bağlandı');
-                    handleInterstitialReward(); // Mükafatı verir
-                });
-            }
-        }
-
-        window.interstitialInitialized = true;
-        console.log('✅ Adexium Interstitial sistemi uğurla başladıldı');
-        return true;
-        
-    } catch (error) {
-        console.error('❌ Adexium Interstitial başlatma xətası:', error);
-        return false;
-    }
-}
-
-// Interstitial reklam göstər
-function showAdexiumInterstitialReward() {
-    console.log('🔄 30 klik Interstitial reklamı başladı...');
-    
-    // Yenidən başlatma və gözləmə məntiqi
-    if (!window.adexiumInterstitialWidget) {
-        console.log('🔄 Interstitial controller tapılmadı! Yenidən başladılır...');
-        const initialized = initializeAdexiumInterstitial(); 
-        if (!initialized) {
-            console.error('❌ Interstitial sistemi hazır deyil.'); 
-            handleInterstitialReward();
-            return false;
-        }
-        
-        // Yenidən başlatmadan sonra gözlə
-        setTimeout(() => {
-            if (window.adexiumInterstitialWidget && window.interstitialInitialized) {
-                window.adexiumInterstitialWidget.show();
-            } else {
-                handleInterstitialReward(); // Hələ də hazır deyilsə, mükafatı birbaşa ver
-            }
-        }, 1000);
-        return false;
-    }
-
-    try {
-        if (!window.interstitialInitialized) {
-            console.warn('⚠️ Interstitial hazır deyil, mükafat verilir...');
-            handleInterstitialReward();
-            return true;
-        }
-        
-        console.log('🎬 Interstitial reklam göstərilir...');
-        
-        if (typeof window.adexiumInterstitialWidget.show === 'function') {
-            window.adexiumInterstitialWidget.show();
-        } else {
-            console.error('❌ Interstitial show metodu tapılmadı');
-            handleInterstitialReward();
-        }
-
-    } catch (e) {
-        console.error("🚨 Interstitial xətası:", e.message);
-        handleInterstitialReward();
-        return false;
-    }
-    
-    return true;
-}
-
-// Interstitial mükafatını emal et
-function handleInterstitialReward() {
-    const rewardAmount = 0.0001; 
-    currentUserState.totalMoney += rewardAmount;
-    currentUserState.clicksUntilAd = CLICKS_FOR_AD; // Sabit kənar dəyişən
-    
-    saveUserState(); // Kənar funksiya
-    updateEnergyDisplay(); // Kənar funksiya
-    showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`); // Kənar funksiyalar
-    console.log('✅ Interstitial mükafat verildi, sayğac sıfırlandı');
-    
-    // Reklamı yenidən yükləməyə hazırlaş
-    window.interstitialInitialized = false;
-    setTimeout(() => {
-        initializeAdexiumInterstitial();
-    }, 1000);
-}
 
 // Oyun bağlandığı zaman vəziyyəti yadda saxla
 window.addEventListener('beforeunload', function() {
-    saveUserState(); // Kənar funksiya
+    saveUserState();
 });
-
-        // AdExium Push-like reklamlarını initialize edən funksiya
-function initializeAdExiumPushLike() {
-    try {
-        const script = document.createElement("script");
-    script.src = "https://cdn.tgads.space/assets/js/adexium-widget.min.js"; // Push-like SDK
-        script.async = true;
-        document.head.appendChild(script);
-        return true;
-    } catch (e) {
-        console.error("AdExium Push-like initialize xətası:", e);
-        return false;
-    }
-}
-
-// Push-like reklamı göstərən funksiya
-function showAdExiumPushLike() {
-    if (window.AdexiumPushLike && typeof window.AdexiumPushLike.show === "function") {
-        window.AdexiumPushLike.show();
-        console.log("📢 AdExium Push-like reklam göstərildi");
-    } else {
-        console.log("⚠️ AdExium Push-like sistemi hazır deyil, bir az sonra yenə cəhd ediləcək...");
-        setTimeout(showAdExiumPushLike, 3000);
-    }
-}
-
     </script>
 </body>
 </html>
