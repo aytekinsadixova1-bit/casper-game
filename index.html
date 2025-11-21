@@ -2962,10 +2962,17 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             gameIcon.onerror = () => handleImageError(gameIcon, IMAGE_CONFIG.fallbackText);
         }
 // =================================================================
-// OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR
+// OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR (DÜZƏLDİLMİŞ)
 // =================================================================
 
 let users = {};
+
+let adexiumPushLike = null; 
+let pushLikeReady = false;
+window.adexiumInterstitialWidget = null; 
+window.interstitialInitialized = false;
+// ------------------------------------------------------------------
+
 const ENERGY_CONSUMPTION_PER_CLICK = 1;      
 const MAX_ENERGY_CAP = 100000;              
 
@@ -2977,7 +2984,7 @@ const AD_INTERVAL = CLICKS_FOR_AD;
 
 const ENERGY_REGEN_INTERVAL = 1000;          
 const MONEY_PER_CLICK = 0.000003;
-const MONEY_DECIMAL_PLACES = 6;          
+const MONEY_DECIMAL_PLACES = 6;            
 const REFERRAL_BONUS_AMOUNT = 0.10;
 
 const HOURS_FOR_FULL_CHARGE = 24;
@@ -3079,11 +3086,7 @@ const subScreens = document.querySelectorAll('.game-sub-screen');
 // REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ - DÜZƏLDİLMİŞ
 // =================================================================
 
-/**
- * İstifadəçinin real-time referal sayını və balansını dinləyir.
- * Əvvəlki dinləyicini dayandırır (unsubscribe) ki, yaddaş sızması olmasın.
- * @param {string} username - İstifadəçinin unikal adı
- */
+
 function listenToReferralCount(username) {
     // KODU DAHA DAYANIQLI ETMƏK ÜÇÜN YOXLAMA:
     if (typeof db === 'undefined' || !db.collection) {
