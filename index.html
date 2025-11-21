@@ -4328,6 +4328,28 @@ function loadAdexiumSDK() {
 }
 
 // =================================================================
+// SDK YÜKLƏNMƏSİ ÜÇÜN KÖMƏKÇİ FUNKSİYA
+// =================================================================
+function loadAdexiumSDK() {
+    return new Promise((resolve) => {
+        // SDK artıq head-də var, sadəcə gözlə
+        let attempts = 0;
+        const checkSDK = setInterval(() => {
+            attempts++;
+            if (typeof AdexiumWidget !== 'undefined') {
+                clearInterval(checkSDK);
+                console.log('✅ SDK hazırdır');
+                resolve();
+            } else if (attempts > 30) { // 15 saniyə
+                clearInterval(checkSDK);
+                console.warn('⚠️ SDK hazır deyil, lakin davam edirik');
+                resolve(); // Xəta vermə, sadəcə davam et
+            }
+        }, 500);
+    });
+}
+
+// =================================================================
 // YENİ PUSH-LIKE REKLAM SİSTEMİ
 // =================================================================
 
@@ -4335,29 +4357,48 @@ let adexiumPushLike = null;
 let pushLikeReady = false;
 
 function initializeAdExiumPushLike() {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve) => {
         try {
             console.log('🔄 Adexium Push-like sistemi başladılır...');
             
+            // SDK-nı gözlə
             await loadAdexiumSDK();
             
             if (typeof AdexiumWidget === 'undefined') {
-                throw new Error('❌ Adexium SDK yüklənməyib');
+                console.warn('⚠️ Adexium SDK hazır deyil, lakin davam edirik');
+                pushLikeReady = false;
+                resolve(false);
+                return;
             }
 
+            console.log('✅ SDK hazırdır, widget yaradılır...');
             initializeTelegramMock();
 
-            adexiumPushLike = new AdexiumWidget({
-                wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
-                adFormat: 'push-like'
-            });
-
-            if (typeof adexiumPushLike.autoMode === 'function') {
-                adexiumPushLike.autoMode();
-                console.log('✅ Push-like autoMode aktiv edildi');
+            try {
+                adexiumPushLike = new AdexiumWidget({
+                    wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
+                    adFormat: 'push-like'
+                });
+                console.log('✅ Push-like widget yaradıldı');
+            } catch (widgetError) {
+                console.error('❌ Widget yaradılma xətası:', widgetError);
+                pushLikeReady = false;
+                resolve(false);
+                return;
             }
 
-            if (adexiumPushLike.on) {
+            // AutoMode aktiv et
+            if (adexiumPushLike && typeof adexiumPushLike.autoMode === 'function') {
+                try {
+                    adexiumPushLike.autoMode();
+                    console.log('✅ Push-like autoMode aktiv edildi');
+                } catch (autoModeError) {
+                    console.warn('⚠️ AutoMode aktiv edilə bilmədi:', autoModeError);
+                }
+            }
+
+            // Hadisə dinləyiciləri
+            if (adexiumPushLike && adexiumPushLike.on) {
                 adexiumPushLike.on('ad-loaded', () => {
                     console.log('✅ Push-like reklam yükləndi');
                     pushLikeReady = true;
@@ -4374,66 +4415,74 @@ function initializeAdExiumPushLike() {
                         pushLikeReady = true;
                     }, 5000);
                 });
-                
-                adexiumPushLike.on('ad-opened', () => {
-                    console.log('✅ Push-like reklam açıldı');
-                });
             }
 
             pushLikeReady = true;
-            console.log('✅ Adexium Push-like sistemi uğurla başladıldı');
+            console.log('✅ Adexium Push-like sistemi hazırdır');
             resolve(true);
             
         } catch (error) {
             console.error('❌ Adexium Push-like başlatma xətası:', error);
             pushLikeReady = false;
-            reject(error);
+            resolve(false);
         }
     });
 }
 
 // Push-like reklam göstər
 function showAdExiumPushLike() {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve) => {
         try {
             if (!adexiumPushLike) {
                 console.log('🔄 Push-like controller tapılmadı! Yenidən başladılır...');
-                await initializeAdExiumPushLike();
+                const initialized = await initializeAdExiumPushLike();
+                if (!initialized) {
+                    console.warn('⚠️ Push-like sistemi başladıla bilmədi');
+                    resolve(false);
+                    return;
+                }
             }
 
             if (!pushLikeReady) {
                 console.warn('⚠️ Push-like hazır deyil');
-                reject(new Error('Push-like hazır deyil'));
+                resolve(false);
                 return;
             }
             
             console.log('🎬 Push-like reklam göstərilir...');
             
-            if (typeof adexiumPushLike.show === 'function') {
+            if (adexiumPushLike && typeof adexiumPushLike.show === 'function') {
                 adexiumPushLike.show();
                 resolve(true);
             } else {
                 console.error('❌ Push-like show metodu tapılmadı');
-                reject(new Error('Show metodu tapılmadı'));
+                resolve(false);
             }
 
         } catch (error) {
             console.error('❌ Push-like reklam xətası:', error);
-            reject(error);
+            resolve(false);
         }
     });
 }
 
 // Test funksiyası - push-like reklamını test etmək üçün
 function testPushLikeAd() {
+    console.log('🧪 Push-like test edilir...');
+    
     showAdExiumPushLike()
-        .then(() => {
-            console.log('✅ Push-like reklam uğurla göstərildi');
-            alert('✅ Push-like reklam uğurla göstərildi!');
+        .then((success) => {
+            if (success) {
+                console.log('✅ Push-like reklam uğurla göstərildi');
+                alert('✅ Push-like reklam uğurla göstərildi!');
+            } else {
+                console.log('⚠️ Push-like reklam göstərilə bilmədi');
+                alert('⚠️ Push-like reklam göstərilə bilmədi. SDK hazır deyil.');
+            }
         })
         .catch(error => {
             console.error('❌ Push-like test uğursuz:', error);
-            alert('❌ Push-like reklam göstərilə bilmədi: ' + error.message);
+            alert('❌ Push-like reklam xətası: ' + error.message);
         });
 }
 
@@ -4461,7 +4510,6 @@ function showDebugInfo() {
     
     alert(`Push-like Status: ${status.pushLike}\nSDK: ${status.sdk}\nInstance: ${status.pushLikeInstance}`);
 }
-
 // =================================================================
 // INTERSTITIAL REKLAM SİSTEMİ
 // =================================================================
