@@ -1957,7 +1957,7 @@ function initializeTelegramMock() {
     console.log('✅ Telegram WebApp mock hazırdır');
 }
 
-// Push-like reklam sistemini başlat
+// Push-like reklam sistemini başlat (DÜZƏLDİLMİŞ VERSİYA)
 function initializeAdExiumPushLike() {
     try {
         console.log('🔄 Adexium Push-like sistemi başladılır...');
@@ -2004,11 +2004,12 @@ function initializeAdExiumPushLike() {
         
     } catch (error) {
         console.error('❌ Adexium Push-like başlatma xətası:', error);
+        window.pushLikeInitialized = false; // Düzəliş: Xəta halında statusu false et
         return false;
     }
 }
 
-// Interstitial reklam sistemini başlat
+// Interstitial reklam sistemini başlat (DÜZƏLDİLMİŞ VERSİYA)
 function initializeAdexiumInterstitial() {
     try {
         console.log('🔄 Adexium Interstitial sistemi başladılır...');
@@ -2031,7 +2032,7 @@ function initializeAdexiumInterstitial() {
         if (window.adexiumInterstitialWidget.on) {
             window.adexiumInterstitialWidget.on('ad-loaded', () => {
                 console.log('✅ Interstitial reklam yükləndi');
-                window.interstitialInitialized = true;
+                // SİLİNDİ: window.interstitialInitialized = true; - Yalnız bir dəfə funksiyanın sonunda true olmalıdır
             });
             
             window.adexiumInterstitialWidget.on('ad-failed', (error) => {
@@ -2045,12 +2046,13 @@ function initializeAdexiumInterstitial() {
             });
         }
 
-        window.interstitialInitialized = true;
+        window.interstitialInitialized = true; // Əsas başlatma uğurlu olduqda true
         console.log('✅ Adexium Interstitial sistemi uğurla başladıldı');
         return true;
         
     } catch (error) {
         console.error('❌ Adexium Interstitial başlatma xətası:', error);
+        window.interstitialInitialized = false; // Düzəliş: Xəta halında statusu false et
         return false;
     }
 }
@@ -2061,9 +2063,9 @@ function showAdexiumInterstitialReward() {
     
     if (!window.adexiumInterstitialWidget) {
         console.log('🔄 Interstitial controller tapılmadı! Yenidən başladılır...');
-        const initialized = initializeAdexiumInterstitial(); 
+        const initialized = initializeAdexiumInterstitial();
         if (!initialized) {
-            console.error('❌ Interstitial sistemi hazır deyil.'); 
+            console.error('❌ Interstitial sistemi hazır deyil.');
             // Sistem hazır deyilsə, birbaşa mükafat ver
             handleInterstitialReward();
             return false;
@@ -2108,7 +2110,7 @@ function showAdexiumInterstitialReward() {
 
 // Interstitial mükafatını emal et
 function handleInterstitialReward() {
-    const rewardAmount = 0.0001; 
+    const rewardAmount = 0.0001;
     currentUserState.totalMoney += rewardAmount;
     currentUserState.clicksUntilAd = CLICKS_FOR_AD;
     
@@ -2152,11 +2154,13 @@ function showAdExiumPushLike() {
     }
 }
 // =================================================================
-// ADSGRAM 45 DƏQİQƏ REWARD VIDEO SİSTEMİ - SADƏLƏŞDİRİLMİŞ
+// ADSGRAM 45 DƏQİQƏ REWARD VIDEO SİSTEMİ - YENİLƏNMİŞ
 // =================================================================
 
 let AdsgramVideoController = null;
 let adsgramVideoTimer = 0;
+let isAdsgramLoading = false;
+let isAdsgramReady = false;
 const ADSGRAM_REWARD_AMOUNT = 0.001;
 const ADSGRAM_COOLDOWN_MS = 45 * 60 * 1000; // 45 dəqiqə
 
@@ -2178,16 +2182,34 @@ function setAdsgramData(data) {
 function initializeAdsGramVideo() {
     try {
         if (window.Adsgram) {
-            AdsgramVideoController = window.Adsgram.init({ blockId: "17963" });
+            console.log('🔄 AdsGram SDK başladılır...');
+            isAdsgramLoading = true;
+            
+            AdsgramVideoController = window.Adsgram.init({ 
+                blockId: "17963",
+                onReady: function() {
+                    console.log('✅ AdsGram hazırdır!');
+                    isAdsgramReady = true;
+                    isAdsgramLoading = false;
+                    updateAdsGramVideoDisplay();
+                },
+                onError: function(error) {
+                    console.error('❌ AdsGram xətası:', error);
+                    isAdsgramLoading = false;
+                    isAdsgramReady = false;
+                }
+            });
+            
             console.log('✅ AdsGram 45 dəqiqə Reward Video sistemi uğurla başladıldı');
-            updateAdsGramVideoDisplay(); // Display-i dərhal yenilə
             return true;
         } else {
             console.log('❌ AdsGram SDK yüklənməyib');
+            isAdsgramLoading = false;
             return false;
         }
     } catch (error) {
         console.error('❌ AdsGram Video başlatma xətası:', error);
+        isAdsgramLoading = false;
         return false;
     }
 }
@@ -2214,6 +2236,7 @@ function getRemainingTime() {
 
 // Reward video göstərmək
 function showAdsGram45MinRewardVideo() {
+    // Əvvəlcə reklamın hazır olub-olmadığını yoxla
     if (!canShowAdsGramReward()) {
         const remaining = getRemainingTime();
         if (remaining > 0) {
@@ -2225,25 +2248,58 @@ function showAdsGram45MinRewardVideo() {
         return false;
     }
 
-    if (!AdsgramVideoController) {
+    // AdsGram hazır deyilsə, başlat
+    if (!AdsgramVideoController || !isAdsgramReady) {
+        console.log('🔄 AdsGram hazır deyil, başladılır...');
+        
+        if (isAdsgramLoading) {
+            alert('⏳ Reklam hələ yüklənir. Zəhmət olmasa bir neçə saniyə gözləyin.');
+            return false;
+        }
+        
         const initialized = initializeAdsGramVideo();
         if (!initialized) {
             alert('❌ Reklam sistemi hazır deyil. Yenidən cəhd edin.');
             return false;
         }
+        
+        // Bir az gözlə və yenidən cəhd et
+        setTimeout(() => {
+            if (isAdsgramReady) {
+                showAdsGram45MinRewardVideo();
+            } else {
+                alert('⏳ Reklam hələ yüklənir. Bir dəqiqə sonra yenidən cəhd edin.');
+            }
+        }, 2000);
+        
+        return false;
     }
 
-    AdsgramVideoController.show()
-        .then((result) => {
-            console.log('✅ AdsGram video tamamlandı!', result);
-            handleAdsGramVideoReward();
-        })
-        .catch((error) => {
-            console.error('❌ AdsGram video xətası:', error);
-            alert('❌ Reklam göstərilərkən xəta baş verdi.');
-        });
-
-    return true;
+    // Reklamı göstər
+    try {
+        console.log('🎬 AdsGram reklamı göstərilir...');
+        AdsgramVideoController.show()
+            .then((result) => {
+                console.log('✅ AdsGram video tamamlandı!', result);
+                handleAdsGramVideoReward();
+            })
+            .catch((error) => {
+                console.error('❌ AdsGram video xətası:', error);
+                
+                // Xüsusi xəta mesajları
+                if (error.state === 'load') {
+                    alert('❌ Reklam hələ yüklənməyib. Bir neçə saniyə sonra yenidən cəhd edin.');
+                } else {
+                    alert('❌ Reklam göstərilərkən xəta baş verdi. Yenidən cəhd edin.');
+                }
+            });
+            
+        return true;
+    } catch (error) {
+        console.error('❌ AdsGram göndərmə xətası:', error);
+        alert('❌ Reklam sistemi xətası. Yenidən cəhd edin.');
+        return false;
+    }
 }
 
 // Video mükafatını emal et
@@ -2268,8 +2324,62 @@ function handleAdsGramVideoReward() {
     // UI yenilə
     updateAdsGramVideoDisplay();
     
-    // Timer başlat
-    startAdsGramVideoTimer();
+    // AdsGram statusunu yenidən qur
+    isAdsgramReady = false;
+    setTimeout(() => {
+        initializeAdsGramVideo();
+    }, 5000);
+}
+
+// UI display-i yeniləmək
+function updateAdsGramVideoDisplay() {
+    try {
+        const adsgramData = getAdsgramData();
+        const now = Date.now();
+        const remaining = getRemainingTime();
+        
+        const timerElement = document.getElementById('adsgram45MinTimer');
+        const buttonElement = document.getElementById('adsgram45MinButton');
+        
+        // Elementlərin mövcud olduğunu yoxla
+        if (!timerElement || !buttonElement) {
+            return;
+        }
+        
+        // Reklam hazırdırsa
+        if (remaining <= 0) {
+            if (isAdsgramReady) {
+                timerElement.textContent = "Hazır!";
+                timerElement.style.color = "#00b894";
+                buttonElement.disabled = false;
+                buttonElement.style.opacity = "1";
+                buttonElement.innerHTML = "🎬 Video İzlə & 0.001 AZN Qazan!";
+            } else if (isAdsgramLoading) {
+                timerElement.textContent = "Yüklənir...";
+                timerElement.style.color = "#ffa502";
+                buttonElement.disabled = true;
+                buttonElement.style.opacity = "0.6";
+                buttonElement.innerHTML = "⏳ Reklam Yüklənir...";
+            } else {
+                timerElement.textContent = "Hazırlanır...";
+                timerElement.style.color = "#ffa502";
+                buttonElement.disabled = false;
+                buttonElement.style.opacity = "1";
+                buttonElement.innerHTML = "🎬 Video İzlə & 0.001 AZN Qazan!";
+            }
+        } else {
+            // Vaxtı formatla
+            const minutes = Math.floor(remaining / 60000);
+            const seconds = Math.floor((remaining % 60000) / 1000);
+            timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            timerElement.style.color = "#ff6b6b";
+            buttonElement.disabled = true;
+            buttonElement.style.opacity = "0.6";
+            buttonElement.innerHTML = `⏳ ${minutes}:${seconds.toString().padStart(2, '0')} Sonra`;
+        }
+    } catch (error) {
+        console.error('AdsGram display yeniləmə xətası:', error);
+    }
 }
 
 // Timer-i başlatmaq
@@ -2282,42 +2392,6 @@ function startAdsGramVideoTimer() {
     window.adsgramTimerInterval = setInterval(() => {
         updateAdsGramVideoDisplay();
     }, 1000);
-}
-
-// UI display-i yeniləmək - XƏTA DÜZƏLDİLMİŞ VERSİYA
-function updateAdsGramVideoDisplay() {
-    try {
-        const adsgramData = getAdsgramData();
-        const now = Date.now();
-        const remaining = getRemainingTime();
-        
-        const timerElement = document.getElementById('adsgram45MinTimer');
-        const buttonElement = document.getElementById('adsgram45MinButton');
-        
-        // Elementlərin mövcud olduğunu yoxla
-        if (!timerElement || !buttonElement) {
-            return; // Elementlər tapılmadı - səssizcə çıx
-        }
-        
-        // Reklam hazırdırsa
-        if (remaining <= 0) {
-            timerElement.textContent = "Hazır!";
-            timerElement.style.color = "#00b894";
-            buttonElement.disabled = false;
-            buttonElement.style.opacity = "1";
-        } else {
-            // Vaxtı formatla
-            const minutes = Math.floor(remaining / 60000);
-            const seconds = Math.floor((remaining % 60000) / 1000);
-            timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            timerElement.style.color = "#ff6b6b";
-            buttonElement.disabled = true;
-            buttonElement.style.opacity = "0.6";
-        }
-    } catch (error) {
-        console.error('AdsGram display yeniləmə xətası:', error);
-        // Xəta baş verərsə, səssizcə davam et
-    }
 }
         
 // =================================================================
@@ -2762,125 +2836,127 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
         }
 
         // =================================================================
-        // OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR
-        // =================================================================
+// OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR
+// =================================================================
 
-        let users = {};
-        const ENERGY_CONSUMPTION_PER_CLICK = 1;     
-        const MAX_ENERGY_CAP = 100000;              
+let users = {};
+const ENERGY_CONSUMPTION_PER_CLICK = 1;     
+const MAX_ENERGY_CAP = 100000;              
 
-        const AD_COUNT = 3;
-        const AD_DURATION = 10;
-        const AD_REWARD_PER_AD = 0.0001;
-        const CLICKS_FOR_AD = 30; // AD_INTERVAL yerinə CLICKS_FOR_AD istifadə edin
+const AD_COUNT = 3;
+const AD_DURATION = 10;
+const AD_REWARD_PER_AD = 0.0001;
+const CLICKS_FOR_AD = 30; // AD_INTERVAL yerinə CLICKS_FOR_AD istifadə edin
+const AD_INTERVAL = CLICKS_FOR_AD; // ƏLAVƏ EDİLDİ
 
-        const ENERGY_REGEN_INTERVAL = 1000;         
-        const MONEY_PER_CLICK = 0.000003;
-        const MONEY_DECIMAL_PLACES = 6;         
-        const REFERRAL_BONUS_AMOUNT = 0.10;
+const ENERGY_REGEN_INTERVAL = 1000;         
+const MONEY_PER_CLICK = 0.000003;
+const MONEY_DECIMAL_PLACES = 6;         
+const REFERRAL_BONUS_AMOUNT = 0.10;
 
-        const HOURS_FOR_FULL_CHARGE = 24;
-        const SECONDS_FOR_FULL_CHARGE = HOURS_FOR_FULL_CHARGE * 60 * 60;
-        const ENERGY_REGEN_PER_SECOND = MAX_ENERGY_CAP / SECONDS_FOR_FULL_CHARGE;
+const HOURS_FOR_FULL_CHARGE = 24;
+const SECONDS_FOR_FULL_CHARGE = HOURS_FOR_FULL_CHARGE * 60 * 60;
+const ENERGY_REGEN_PER_SECOND = MAX_ENERGY_CAP / SECONDS_FOR_FULL_CHARGE;
 
-        const BASE_REGEN_RATE = 1000 / 60; 
-        const REFERRAL_BONUS_LIMIT = 10; // MAKSİMUM 10 DƏVƏT
+const BASE_REGEN_RATE = 1000 / 60; 
+const REFERRAL_BONUS_LIMIT = 10; // MAKSİMUM 10 DƏVƏT
 
-        // YENİ: MINIMUM ÇIXARIŞ MƏBLƏĞİ 3.00 AZN
-        const MIN_WITHDRAWAL_AMOUNT = 3.00;
-        const WITHDRAWAL_COOLDOWN_DAYS = 10;
-        const MAX_WITHDRAWAL_AMOUNT = 1000.00;
-        const ADMIN_TELEGRAM_NUMBER = "994513248685"; // Sizin Telegram nömrəniz
+// YENİ: MINIMUM ÇIXARIŞ MƏBLƏĞİ 3.00 AZN
+const MIN_WITHDRAWAL_AMOUNT = 3.00;
+const WITHDRAWAL_COOLDOWN_DAYS = 10;
+const MAX_WITHDRAWAL_AMOUNT = 1000.00;
+const ADMIN_TELEGRAM_NUMBER = "994513248685"; // Sizin Telegram nömrəniz
 
-        const BASE_INVITE_URL = window.location.href.split('?')[0];
+const BASE_INVITE_URL = window.location.href.split('?')[0];
 
-        const ads = [
-            {
-                id: 1,
-                title: "🎮 YENİ OYUN TƏKLİFİ",
-                description: "Bu mobil oyunu yükləyin və xüsusi bonus qazanın!",
-                color: "#ff6b6b",
-                duration: 10,
-                type: "premium"
-            },
-            {
-                id: 2,
-                title: "🛒 ONLAYN ALIŞ-VERİŞ",
-                description: "Xüsusi endirimlərdən yararlanın!",
-                color: "#4ecdc4",
-                duration: 10,
-                type: "special"
-            },
-            {
-                id: 3,
-                title: "📱 TƏTBİQ TƏKLİFİ",
-                description: "Bu faydalı tətbiqi yükləyin!",
-                color: "#45b7d1",
-                duration: 10,
-                type: "bonus"
-            }
-        ];
+const ads = [
+    {
+        id: 1,
+        title: "🎮 YENİ OYUN TƏKLİFİ",
+        description: "Bu mobil oyunu yükləyin və xüsusi bonus qazanın!",
+        color: "#ff6b6b",
+        duration: 10,
+        type: "premium"
+    },
+    {
+        id: 2,
+        title: "🛒 ONLAYN ALIŞ-VERİŞ",
+        description: "Xüsusi endirimlərdən yararlanın!",
+        color: "#4ecdc4",
+        duration: 10,
+        type: "special"
+    },
+    {
+        id: 3,
+        title: "📱 TƏTBİQ TƏKLİFİ",
+        description: "Bu faydalı tətbiqi yükləyin!",
+        color: "#45b7d1",
+        duration: 10,
+        type: "bonus"
+    }
+];
 
-        let currentAdIndex = 0;
-        let adTimerInterval;
-        let adTimeLeft = 0;
-        let totalAdRewardEarned = 0;
+let currentAdIndex = 0;
+let adTimerInterval;
+let adTimeLeft = 0;
+let totalAdRewardEarned = 0;
+let referralUnsubscribe = null; // ƏLAVƏ EDİLDİ
 
-        let currentUserState = {
-            cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
-            maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP,
-            clicksUntilAd: CLICKS_FOR_AD, totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
-            energyRegenRate: BASE_REGEN_RATE, scorePerClick: 1, lastEnergyUpdate: Date.now(), 
-            lastClickTime: Date.now(), successfulReferrals: 0, referralBonusEarned: 0.00, 
-            lastWithdrawalDate: null, registrationDate: null
-        };
+let currentUserState = {
+    cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
+    maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP,
+    clicksUntilAd: CLICKS_FOR_AD, totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
+    energyRegenRate: BASE_REGEN_RATE, scorePerClick: 1, lastEnergyUpdate: Date.now(), 
+    lastClickTime: Date.now(), successfulReferrals: 0, referralBonusEarned: 0.00, 
+    lastWithdrawalDate: null, registrationDate: null
+};
 
-        // DOM Elementləri
-        const splashScreen = document.getElementById('splashScreen');
-        const mainContent = document.getElementById('mainContent');
-        const loginScreen = document.getElementById('loginScreen');
-        const gameScreen = document.getElementById('gameScreen');
-        const adScreen = document.getElementById('adScreen');
-        const adContent = document.getElementById('adContent');
-        const mainIcon = document.getElementById('mainIcon');
-        const welcomeText = document.getElementById('welcomeText');
-        const welcomeMessage = document.getElementById('welcomeMessage');
-        const personalWelcomeText = document.getElementById('personalWelcomeText');
-        const inviteLinkDisplay = document.getElementById('inviteLinkDisplay');
-        const withdrawalUserIdDisplay = document.getElementById('withdrawalUserIdDisplay');
+// DOM Elementləri
+const splashScreen = document.getElementById('splashScreen');
+const mainContent = document.getElementById('mainContent');
+const loginScreen = document.getElementById('loginScreen');
+const gameScreen = document.getElementById('gameScreen');
+const adScreen = document.getElementById('adScreen');
+const adContent = document.getElementById('adContent');
+const mainIcon = document.getElementById('mainIcon');
+const welcomeText = document.getElementById('welcomeText');
+const welcomeMessage = document.getElementById('welcomeMessage');
+const personalWelcomeText = document.getElementById('personalWelcomeText');
+const inviteLinkDisplay = document.getElementById('inviteLinkDisplay');
+const withdrawalUserIdDisplay = document.getElementById('withdrawalUserIdDisplay');
 
-        const energyFillEl = document.getElementById('energyFill');
-        const energyTextEl = document.getElementById('energyText');
-        const totalMoneyEl = document.getElementById('totalMoney'); 
-        const clicksUntilAdDisplay = document.getElementById('clicksUntilAdDisplay');
+const energyFillEl = document.getElementById('energyFill');
+const energyTextEl = document.getElementById('energyText');
+const totalMoneyEl = document.getElementById('totalMoney'); 
+const clicksUntilAdDisplay = document.getElementById('clicksUntilAdDisplay');
 
-        const profileCGIDEl = document.getElementById('profileCGID');
-        const profileUsernameEl = document.getElementById('profileUsername');
-        const profileFullNameEl = document.getElementById('profileFullName');
-        const profilePhoneEl = document.getElementById('profilePhone');
-        const profileEmailEl = document.getElementById('profileEmail');
-        const profileMoneyEl = document.getElementById('profileMoney');
-        const profileReferralCodeEl = document.getElementById('profileReferralCode');
+const profileCGIDEl = document.getElementById('profileCGID');
+const profileUsernameEl = document.getElementById('profileUsername');
+const profileFullNameEl = document.getElementById('profileFullName');
+const profilePhoneEl = document.getElementById('profilePhone');
+const profileEmailEl = document.getElementById('profileEmail');
+const profileMoneyEl = document.getElementById('profileMoney');
+const profileReferralCodeEl = document.getElementById('profileReferralCode');
 
-        const availableMoneyEl = document.getElementById('availableMoney');
-        const successfulReferralsEl = document.getElementById('successfulReferrals');
-        const referralBonusTotalEl = document.getElementById('referralBonusTotal');
-        const referralLimitEl = document.getElementById('referralLimit');
-        const nextWithdrawalTimeEl = document.getElementById('nextWithdrawalTime');
-        const withdrawalTimerInfoEl = document.getElementById('withdrawalTimerInfo');
-        const withdrawSubmitBtn = document.getElementById('withdrawSubmitBtn');
+const availableMoneyEl = document.getElementById('availableMoney');
+const successfulReferralsEl = document.getElementById('successfulReferrals');
+const referralBonusTotalEl = document.getElementById('referralBonusTotal');
+const referralLimitEl = document.getElementById('referralLimit');
+const nextWithdrawalTimeEl = document.getElementById('nextWithdrawalTime');
+const withdrawalTimerInfoEl = document.getElementById('withdrawalTimerInfo');
+const withdrawSubmitBtn = document.getElementById('withdrawSubmitBtn');
 
-        const navItems = document.querySelectorAll('.navbar .nav-item');
-        const subScreens = document.querySelectorAll('.game-sub-screen');
+const navItems = document.querySelectorAll('.navbar .nav-item');
+const subScreens = document.querySelectorAll('.game-sub-screen');
 
-
- // =================================================================
+// =================================================================
 // REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ - DÜZƏLDİLMİŞ
 // =================================================================
 function listenToReferralCount(username) {
     // Əvvəlcə referralUnsubscribe dəyişəninin olub-olmadığını yoxla
-    if (typeof referralUnsubscribe !== 'undefined' && referralUnsubscribe) {
+    if (referralUnsubscribe) {
         referralUnsubscribe();
+        referralUnsubscribe = null;
     }
 
     const userRef = db.collection('users').doc(username);
@@ -4026,35 +4102,34 @@ window.addEventListener('load', async function() {
 
     // ADSGRAM 45 DƏQİQƏ REWARD VIDEO İŞƏ SAL
     setTimeout(() => {
+        console.log('🔄 AdsGram sistemi başladılır...');
         const adsgramVideoInitialized = initializeAdsGramVideo();
         if (adsgramVideoInitialized) {
-            console.log('✅ AdsGram 45 dəqiqə Reward Video sistemi uğurla başladıldı');
+            console.log('✅ AdsGram 45 dəqiqə Reward Video sistemi başladıldı');
         } else {
             console.log('❌ AdsGram 45 dəqiqə Reward Video sistemi başladıla bilmədi');
         }
-    }, 2000);
+    }, 3000);
     
-    // ADEXIUM PUSH-LIKE VƏ INTERSTITIAL SİSTEMLƏRİNİ İŞƏ SAL
+    // ADEXIUM SİSTEMLƏRİNİ İŞƏ SAL
     setTimeout(() => {
         // Push-like sistemi
         const pushInitialized = initializeAdExiumPushLike();
         if (pushInitialized) {
             console.log('✅ Adexium Push-like sistemi uğurla başladıldı');
-        } else {
-            console.log('❌ Adexium Push-like sistemi başladıla bilmədi');
         }
 
         // Interstitial sistemi
         const interstitialInitialized = initializeAdexiumInterstitial();
         if (interstitialInitialized) {
             console.log('✅ Adexium Interstitial sistemi uğurla başladıldı');
-        } else {
-            console.log('❌ Adexium Interstitial sistemi başladıla bilmədi');
         }
 
-        // Statusu göstər
-        console.log('📊 Reklam Sistemləri Statusu:', checkAdExiumStatus());
-    }, 3000);
+        console.log('📊 Reklam Sistemləri Statusu:', {
+            adsgram: isAdsgramReady ? 'ready' : (isAdsgramLoading ? 'loading' : 'not_ready'),
+            adexium: checkAdExiumStatus()
+        });
+    }, 5000);
 
     const img = document.getElementById('clickImage');
     img.classList.add('wind-animation', 'floating-ghost');
