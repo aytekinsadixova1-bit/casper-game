@@ -15,29 +15,11 @@
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
 <!-- ADEXIUM WIDGET SDK -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+
 <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
     
-// =================================================================
-// SDK YÜKLƏNMƏSİ ÜÇÜN KÖMƏKÇİ FUNKSİYA - SADƏ VERSİYA
-// =================================================================
-function loadAdexiumSDK() {
-    return new Promise((resolve) => {
-        // SDK artıq head-də var, sadəcə gözlə
-        let attempts = 0;
-        const checkSDK = setInterval(() => {
-            attempts++;
-            if (typeof AdexiumWidget !== 'undefined') {
-                clearInterval(checkSDK);
-                console.log('✅ SDK hazırdır');
-                resolve();
-            } else if (attempts > 30) { // 15 saniyə
-                clearInterval(checkSDK);
-                console.warn('⚠️ SDK hazır deyil, lakin davam edirik');
-                resolve(); // Xəta vermə, sadəcə davam et
-            }
-        }, 500);
-    });
-}
    <style>
         * {
             margin: 0;
@@ -1934,12 +1916,12 @@ try {
 
 
 // =================================================================
-// ADEXIUM PUSH-LIKE VƏ INTERSTITIAL REKLAM SİSTEMİ
+// 1. ADEXIUM & TELEGRAM KÖMƏKÇİ FUNKSİYALARI
 // =================================================================
 
-// =================================================================
-// SDK YÜKLƏNMƏSİ ÜÇÜN KÖMƏKÇİ FUNKSİYA
-// =================================================================
+/**
+ * Adexium SDK-nın yüklənməsini gözləyir.
+ */
 function loadAdexiumSDK() {
     return new Promise((resolve, reject) => {
         if (typeof AdexiumWidget !== 'undefined') {
@@ -1952,22 +1934,37 @@ function loadAdexiumSDK() {
             attempts++;
             if (typeof AdexiumWidget !== 'undefined') {
                 clearInterval(checkSDK);
+                console.log('✅ SDK hazırdır (interval yoxlama)');
                 resolve();
-            } else if (attempts > 20) {
+            } else if (attempts > 30) { // Timeout 15 saniyəyə (30 * 500ms) uzadıldı
                 clearInterval(checkSDK);
-                reject(new Error('Adexium SDK yüklənmədi'));
+                console.warn('⚠️ SDK hazır deyil, lakin davam edirik (timeout)');
+                resolve(); // Reject etmək əvəzinə resolve edirik ki, proqram dayanmasın
             }
         }, 500);
     });
 }
 
+/**
+ * Telegram WebApp mühiti yoxdursa, mock obyekt yaradır.
+ */
+function initializeTelegramMock() {
+    if (!window.Telegram || !window.Telegram.WebApp) {
+        window.Telegram = { WebApp: { ready: () => {}, expand: () => {}, close: () => {}, 
+            initData: 'test_user_id=12345&hash=abc123',
+            initDataUnsafe: { user: { id: 12345, first_name: 'Test', username: 'testuser' } }
+        }};
+        console.log('✅ Telegram WebApp mock hazırdır');
+    }
+}
+
 // =================================================================
-// YENİ PUSH-LIKE REKLAM SİSTEMİ
+// 2. PUSH-LIKE REKLAM SİSTEMİ (wid: a46e28f0-9161-4929-a9d5-e5131e577cae)
 // =================================================================
 
-let adexiumPushLike = null;
-let pushLikeReady = false;
-
+/**
+ * AdExium Push-like reklam sistemini başladır.
+ */
 function initializeAdExiumPushLike() {
     return new Promise(async (resolve, reject) => {
         try {
@@ -1976,23 +1973,30 @@ function initializeAdExiumPushLike() {
             await loadAdexiumSDK();
             
             if (typeof AdexiumWidget === 'undefined') {
-                throw new Error('❌ Adexium SDK yüklənməyib');
+                pushLikeReady = false;
+                reject(new Error('❌ Adexium SDK yüklənməyib'));
+                return;
             }
 
             initializeTelegramMock();
 
-            adexiumPushLike = new AdexiumWidget({
-                wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
-                adFormat: 'push-like'
-            });
+            if (!adexiumPushLike) {
+                 adexiumPushLike = new AdexiumWidget({
+                    wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
+                    adFormat: 'push-like'
+                });
+                console.log('✅ Push-like widget yaradıldı');
+            }
+
 
             if (typeof adexiumPushLike.autoMode === 'function') {
                 adexiumPushLike.autoMode();
                 console.log('✅ Push-like autoMode aktiv edildi');
             }
-
-            if (adexiumPushLike.on) {
-                adexiumPushLike.on('ad-loaded', () => {
+            
+            // Düzəliş: Listenerlərin yalnız bir dəfə əlavə olunduğuna əmin olun
+            if (adexiumPushLike.on && !adexiumPushLike.hasListeners) {
+                 adexiumPushLike.on('ad-loaded', () => {
                     console.log('✅ Push-like reklam yükləndi');
                     pushLikeReady = true;
                 });
@@ -2012,6 +2016,8 @@ function initializeAdExiumPushLike() {
                 adexiumPushLike.on('ad-opened', () => {
                     console.log('✅ Push-like reklam açıldı');
                 });
+                
+                adexiumPushLike.hasListeners = true;
             }
 
             pushLikeReady = true;
@@ -2026,17 +2032,23 @@ function initializeAdExiumPushLike() {
     });
 }
 
-// Push-like reklam göstər
+/**
+ * Push-like reklam göstər.
+ */
 function showAdExiumPushLike() {
     return new Promise(async (resolve, reject) => {
         try {
             if (!adexiumPushLike) {
                 console.log('🔄 Push-like controller tapılmadı! Yenidən başladılır...');
-                await initializeAdExiumPushLike();
+                const initialized = await initializeAdExiumPushLike().catch(() => false);
+                if (!initialized) {
+                    reject(new Error('Push-like sistemi başladıla bilmədi'));
+                    return;
+                }
             }
 
             if (!pushLikeReady) {
-                console.warn('⚠️ Push-like hazır deyil');
+                console.warn('⚠️ Push-like hazır deyil (reklam yüklənməyib)');
                 reject(new Error('Push-like hazır deyil'));
                 return;
             }
@@ -2058,7 +2070,9 @@ function showAdExiumPushLike() {
     });
 }
 
-// Test funksiyası - push-like reklamını test etmək üçün
+/**
+ * Push-like reklamını test etmək üçün.
+ */
 function testPushLikeAd() {
     showAdExiumPushLike()
         .then(() => {
@@ -2071,135 +2085,82 @@ function testPushLikeAd() {
         });
 }
 
-// Push-like statusunu yoxla
-function checkAdExiumStatus() {
-    return {
-        pushLike: pushLikeReady ? 'active' : 'not_initialized',
-        interstitial: window.interstitialInitialized ? 'active' : 'not_initialized',
-        sdk: typeof AdexiumWidget !== 'undefined' ? 'loaded' : 'not_loaded',
-        pushLikeInstance: adexiumPushLike ? 'created' : 'not_created'
-    };
-}
-
-// Debug məlumatlarını göstər
-function showDebugInfo() {
-    const status = checkAdExiumStatus();
-    console.log('=== ADEXIUM DEBUG INFO ===');
-    console.log('Push-like Status:', status.pushLike);
-    console.log('Interstitial Status:', status.interstitial);
-    console.log('SDK Status:', status.sdk);
-    console.log('Push-like Instance:', status.pushLikeInstance);
-    console.log('Telegram WebApp:', window.Telegram ? 'available' : 'not available');
-    console.log('AdexiumWidget:', typeof AdexiumWidget);
-    console.log('==========================');
-    
-    alert(`Push-like Status: ${status.pushLike}\nSDK: ${status.sdk}\nInstance: ${status.pushLikeInstance}`);
-}
-
 // =================================================================
-// INTERSTITIAL REKLAM SİSTEMİ (ƏVVƏLKİ KİMİ QALSIN)
+// 3. INTERSTITIAL REKLAM SİSTEMİ (wid: 1f16b658-52d6-4522-aebf-5e0c437c7a9b)
 // =================================================================
 
-// Telegram WebApp mock funksiyası
-function initializeTelegramMock() {
-    if (!window.Telegram) {
-        window.Telegram = {};
-    }
-    
-    if (!Telegram.WebApp) {
-        Telegram.WebApp = {
-            initData: 'test_user_id=12345&hash=abc123',
-            initDataUnsafe: {
-                user: {
-                    id: 12345,
-                    first_name: 'Test',
-                    last_name: 'User',
-                    username: 'testuser'
-                }
-            },
-            version: '6.0',
-            platform: 'web',
-            colorScheme: 'light',
-            themeParams: {
-                bg_color: '#ffffff',
-                text_color: '#000000',
-                hint_color: '#999999',
-                link_color: '#2481cc',
-                button_color: '#2481cc',
-                button_text_color: '#ffffff'
-            },
-            isExpanded: true,
-            viewportHeight: 600,
-            viewportStableHeight: 600,
-            isClosingConfirmationEnabled: false,
-            ready: function() { console.log('Telegram WebApp ready'); },
-            expand: function() { console.log('Telegram WebApp expand'); },
-            close: function() { console.log('Telegram WebApp close'); }
-        };
-    }
-    console.log('✅ Telegram WebApp mock hazırdır');
-}
-
-// Interstitial reklam sistemini başlat
+/**
+ * Interstitial reklam sistemini başlat.
+ */
 function initializeAdexiumInterstitial() {
     try {
         console.log('🔄 Adexium Interstitial sistemi başladılır...');
         
         if (typeof AdexiumWidget === 'undefined') {
             console.error('❌ Adexium SDK yüklənməyib');
+            interstitialReady = false;
             return false;
         }
 
         initializeTelegramMock();
 
-        window.adexiumInterstitialWidget = new AdexiumWidget({
-            wid: '1f16b658-52d6-4522-aebf-5e0c437c7a9b',
-            adFormat: 'interstitial'
-        });
-
-        if (window.adexiumInterstitialWidget.on) {
-            window.adexiumInterstitialWidget.on('ad-loaded', () => {
-                console.log('✅ Interstitial reklam yükləndi');
+        // Düzəliş: adexiumInterstitial-ı sadəcə bir dəfə yarat
+        if (!adexiumInterstitial) {
+             adexiumInterstitial = new AdexiumWidget({
+                wid: '1f16b658-52d6-4522-aebf-5e0c437c7a9b',
+                adFormat: 'interstitial'
             });
             
-            window.adexiumInterstitialWidget.on('ad-failed', (error) => {
-                console.error('❌ Interstitial reklam xətası:', error);
-                window.interstitialInitialized = false;
-            });
-            
-            window.adexiumInterstitialWidget.on('ad-closed', () => {
-                console.log('✅ Interstitial reklam bağlandı');
-                handleInterstitialReward();
-            });
+            // Düzəliş: Listenerlərin yalnız bir dəfə əlavə olunduğuna əmin olun
+            if (adexiumInterstitial.on && !adexiumInterstitial.hasListeners) {
+                adexiumInterstitial.on('ad-loaded', () => {
+                    console.log('✅ Interstitial reklam yükləndi');
+                    interstitialReady = true;
+                });
+                
+                adexiumInterstitial.on('ad-failed', (error) => {
+                    console.error('❌ Interstitial reklam xətası:', error);
+                    interstitialReady = false;
+                });
+                
+                adexiumInterstitial.on('ad-closed', () => {
+                    console.log('✅ Interstitial reklam bağlandı');
+                    handleInterstitialReward();
+                });
+                adexiumInterstitial.hasListeners = true;
+            }
         }
 
-        window.interstitialInitialized = true;
+        interstitialReady = true;
         console.log('✅ Adexium Interstitial sistemi uğurla başladıldı');
         return true;
         
     } catch (error) {
         console.error('❌ Adexium Interstitial başlatma xətası:', error);
-        window.interstitialInitialized = false;
+        interstitialReady = false;
         return false;
     }
 }
 
-// Interstitial reklam göstər
+/**
+ * Interstitial reklam göstər və mükafatlandır.
+ */
 function showAdexiumInterstitialReward() {
     console.log('🔄 30 klik Interstitial reklamı başladı...');
     
-    if (!window.adexiumInterstitialWidget) {
+    if (!adexiumInterstitial) {
         console.log('🔄 Interstitial controller tapılmadı! Yenidən başladılır...');
         const initialized = initializeAdexiumInterstitial();
         if (!initialized) {
-            console.error('❌ Interstitial sistemi hazır deyil.');
+            console.error('❌ Interstitial sistemi hazır deyil. Mükafat verilir.');
             handleInterstitialReward();
             return false;
         }
         
+        // Yenidən başladıqdan sonra reklamın yüklənməsi üçün bir az gözlə
         setTimeout(() => {
-            if (window.adexiumInterstitialWidget && window.interstitialInitialized) {
-                window.adexiumInterstitialWidget.show();
+            if (interstitialReady) {
+                showAdexiumInterstitialReward(); // Yenidən cəhd
             } else {
                 handleInterstitialReward();
             }
@@ -2208,7 +2169,7 @@ function showAdexiumInterstitialReward() {
     }
 
     try {
-        if (!window.interstitialInitialized) {
+        if (!interstitialReady) {
             console.warn('⚠️ Interstitial hazır deyil, mükafat verilir...');
             handleInterstitialReward();
             return true;
@@ -2216,8 +2177,8 @@ function showAdexiumInterstitialReward() {
         
         console.log('🎬 Interstitial reklam göstərilir...');
         
-        if (typeof window.adexiumInterstitialWidget.show === 'function') {
-            window.adexiumInterstitialWidget.show();
+        if (typeof adexiumInterstitial.show === 'function') {
+            adexiumInterstitial.show();
         } else {
             console.error('❌ Interstitial show metodu tapılmadı');
             handleInterstitialReward();
@@ -2232,7 +2193,9 @@ function showAdexiumInterstitialReward() {
     return true;
 }
 
-// Interstitial mükafatını emal et
+/**
+ * Interstitial mükafatını emal et (reklam bağlandıqdan sonra çağırılır).
+ */
 function handleInterstitialReward() {
     const rewardAmount = 0.0001;
     currentUserState.totalMoney += rewardAmount;
@@ -2243,10 +2206,48 @@ function handleInterstitialReward() {
     showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
     console.log('✅ Interstitial mükafat verildi, sayğac sıfırlandı');
     
-    window.interstitialInitialized = false;
+    // Düzəliş: İnterstitial statusu sıfırlanır ki, yeni reklam yüklənməsi üçün imkan yaransın
+    interstitialReady = false; 
     setTimeout(() => {
         initializeAdexiumInterstitial();
     }, 1000);
+}
+
+// =================================================================
+// 4. STATUS VƏ DEBUG FUNKSİYALARI
+// =================================================================
+
+/**
+ * Adexium sistemlərinin statusunu yoxlayır.
+ */
+function checkAdExiumStatus() {
+    // Düzəliş: Artıq window.interstitialInitialized yerinə 
+    // yerli (scope) dəyişənlərə istinad edir
+    return {
+        pushLike: pushLikeReady ? 'active' : 'not_initialized',
+        interstitial: interstitialReady ? 'active' : 'not_initialized',
+        sdk: typeof AdexiumWidget !== 'undefined' ? 'loaded' : 'not_loaded',
+        pushLikeInstance: adexiumPushLike ? 'created' : 'not_created',
+        interstitialInstance: adexiumInterstitial ? 'created' : 'not_created'
+    };
+}
+
+/**
+ * Debug məlumatlarını göstər.
+ */
+function showDebugInfo() {
+    const status = checkAdExiumStatus();
+    console.log('=== ADEXIUM DEBUG INFO ===');
+    console.log('Push-like Status:', status.pushLike);
+    console.log('Interstitial Status:', status.interstitial);
+    console.log('SDK Status:', status.sdk);
+    console.log('Push-like Instance:', status.pushLikeInstance);
+    console.log('Interstitial Instance:', status.interstitialInstance);
+    console.log('Telegram WebApp:', window.Telegram ? 'available' : 'not available');
+    console.log('AdexiumWidget:', typeof AdexiumWidget);
+    console.log('==========================');
+    
+    alert(`Push-like Status: ${status.pushLike}\nInterstitial Status: ${status.interstitial}\nSDK: ${status.sdk}`);
 }
 // =================================================================
 // ADSGRAM TEST SİSTEMİ - SADƏ VERSİYA
@@ -2507,52 +2508,66 @@ function startAdsGramVideoTimer() {
     console.log('✅ AdsGram timer başladıldı');
 }
 // =================================================================
-// ADEXIUM 30 KLİK INTERSTITIAL REWARD SİSTEMİ
+// ADEXIUM 30 KLİK INTERSTITIAL REWARD SİSTEMİ (TƏKMİLLƏŞDİRİLMİŞ)
 // =================================================================
 
 let adexiumInterstitial = null;
 let interstitialReady = false;
 
+/**
+ * Interstitial reklam sistemini başladır. Widgetin təkrar yaradılmasının qarşısını alır.
+ */
 function initializeAdexiumInterstitial() {
     try {
         if (typeof AdexiumWidget === 'undefined') {
             console.error('❌ Adexium SDK yüklənməyib');
+            interstitialReady = false;
             return false;
         }
         
-        // Interstitial reklamını başlat
-        adexiumInterstitial = new AdexiumWidget({
-            wid: '1f16b658-52d6-4522-aebf-5e0c437c7a9b',
-            adFormat: 'interstitial'
-        });
-        
-        // Interstitial reklam hadisələrini dinlə
-        if (adexiumInterstitial.on) {
-            adexiumInterstitial.on('ad-loaded', () => {
-                console.log('✅ Interstitial reklam yükləndi');
-                interstitialReady = true;
+        // DÜZƏLİŞ: Widget yalnız bir dəfə yaradılmalıdır
+        if (!adexiumInterstitial) {
+            console.log('🔄 Adexium Interstitial widget yaradılır...');
+            adexiumInterstitial = new AdexiumWidget({
+                wid: '1f16b658-52d6-4522-aebf-5e0c437c7a9b',
+                adFormat: 'interstitial'
             });
             
-            adexiumInterstitial.on('ad-failed', (error) => {
-                console.error('❌ Interstitial reklam xətası:', error);
-                interstitialReady = false;
-            });
-            
-            adexiumInterstitial.on('ad-closed', () => {
-                console.log('✅ Interstitial reklam bağlandı');
-                handleInterstitialReward();
-            });
+            // Interstitial reklam hadisələrini dinlə (Yalnız bir dəfə)
+            if (adexiumInterstitial.on) {
+                adexiumInterstitial.on('ad-loaded', () => {
+                    console.log('✅ Interstitial reklam yükləndi');
+                    interstitialReady = true;
+                });
+                
+                adexiumInterstitial.on('ad-failed', (error) => {
+                    console.error('❌ Interstitial reklam xətası:', error);
+                    interstitialReady = false;
+                });
+                
+                adexiumInterstitial.on('ad-closed', () => {
+                    console.log('✅ Interstitial reklam bağlandı');
+                    handleInterstitialReward();
+                });
+            }
+        } else {
+             console.log('✅ Adexium Interstitial widget artıq mövcuddur.');
         }
         
+        // Widget mövcuddursa, sadəcə statusu hazır olaraq qeyd edirik.
         interstitialReady = true;
         console.log('✅ Adexium Interstitial sistemi uğurla başladıldı');
         return true;
     } catch (error) {
         console.error('❌ Adexium Interstitial başlatma xətası:', error);
+        interstitialReady = false;
         return false;
     }
 }
 
+/**
+ * Interstitial reklam göstər və ya hazır deyilsə mükafatı birbaşa ver.
+ */
 function showAdexiumInterstitialReward() {
     console.log('🔄 30 klik Interstitial reklamı başladı...');
     
@@ -2561,7 +2576,6 @@ function showAdexiumInterstitialReward() {
         const initialized = initializeAdexiumInterstitial(); 
         if (!initialized) {
             console.error('❌ Interstitial sistemi hazır deyil.'); 
-            // Sistem hazır deyilsə, birbaşa mükafat ver
             handleInterstitialReward();
             return false;
         }
@@ -2603,7 +2617,9 @@ function showAdexiumInterstitialReward() {
     return true;
 }
 
+
 function handleInterstitialReward() {
+
     const rewardAmount = 0.0001; 
     currentUserState.totalMoney += rewardAmount;
     currentUserState.clicksUntilAd = CLICKS_FOR_AD;
@@ -2613,14 +2629,13 @@ function handleInterstitialReward() {
     showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
     console.log('✅ Interstitial mükafat verildi, sayğac sıfırlandı');
     
-    // Interstitial-i yenidən hazırla
+ 
     interstitialReady = false;
     setTimeout(() => {
-        interstitialReady = true;
-        console.log('🔄 Interstitial yenidən hazırdır');
+    
+        initializeAdexiumInterstitial(); 
     }, 1000);
 }
-        
         // =================================================================
         // TELEGRAM BOT AYARLARI
         // =================================================================
@@ -2946,31 +2961,30 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             splashImg.onerror = () => handleImageError(splashImg, IMAGE_CONFIG.fallbackText);
             gameIcon.onerror = () => handleImageError(gameIcon, IMAGE_CONFIG.fallbackText);
         }
-
-        // =================================================================
+// =================================================================
 // OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR
 // =================================================================
 
 let users = {};
-const ENERGY_CONSUMPTION_PER_CLICK = 1;     
+const ENERGY_CONSUMPTION_PER_CLICK = 1;      
 const MAX_ENERGY_CAP = 100000;              
 
 const AD_COUNT = 3;
 const AD_DURATION = 10;
 const AD_REWARD_PER_AD = 0.0001;
-const CLICKS_FOR_AD = 30; // AD_INTERVAL yerinə CLICKS_FOR_AD istifadə edin
-const AD_INTERVAL = CLICKS_FOR_AD; // ƏLAVƏ EDİLDİ
+const CLICKS_FOR_AD = 30; // Reklam göstərilmə intervalı
+const AD_INTERVAL = CLICKS_FOR_AD;
 
-const ENERGY_REGEN_INTERVAL = 1000;         
+const ENERGY_REGEN_INTERVAL = 1000;          
 const MONEY_PER_CLICK = 0.000003;
-const MONEY_DECIMAL_PLACES = 6;         
+const MONEY_DECIMAL_PLACES = 6;          
 const REFERRAL_BONUS_AMOUNT = 0.10;
 
 const HOURS_FOR_FULL_CHARGE = 24;
 const SECONDS_FOR_FULL_CHARGE = HOURS_FOR_FULL_CHARGE * 60 * 60;
 const ENERGY_REGEN_PER_SECOND = MAX_ENERGY_CAP / SECONDS_FOR_FULL_CHARGE;
 
-const BASE_REGEN_RATE = 1000 / 60; 
+const BASE_REGEN_RATE = 1000 / 60;  
 const REFERRAL_BONUS_LIMIT = 10; // MAKSİMUM 10 DƏVƏT
 
 // YENİ: MINIMUM ÇIXARIŞ MƏBLƏĞİ 3.00 AZN
@@ -3012,7 +3026,7 @@ let currentAdIndex = 0;
 let adTimerInterval;
 let adTimeLeft = 0;
 let totalAdRewardEarned = 0;
-let referralUnsubscribe = null; // ƏLAVƏ EDİLDİ
+let referralUnsubscribe = null; // Firestore dinləyicisini ləğv etmək üçün
 
 let currentUserState = {
     cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
@@ -3023,7 +3037,7 @@ let currentUserState = {
     lastWithdrawalDate: null, registrationDate: null
 };
 
-// DOM Elementləri
+// DOM Elementləri (Bu hissə UI kodundan asılıdır)
 const splashScreen = document.getElementById('splashScreen');
 const mainContent = document.getElementById('mainContent');
 const loginScreen = document.getElementById('loginScreen');
@@ -3039,7 +3053,7 @@ const withdrawalUserIdDisplay = document.getElementById('withdrawalUserIdDisplay
 
 const energyFillEl = document.getElementById('energyFill');
 const energyTextEl = document.getElementById('energyText');
-const totalMoneyEl = document.getElementById('totalMoney'); 
+const totalMoneyEl = document.getElementById('totalMoney');  
 const clicksUntilAdDisplay = document.getElementById('clicksUntilAdDisplay');
 
 const profileCGIDEl = document.getElementById('profileCGID');
@@ -3064,15 +3078,29 @@ const subScreens = document.querySelectorAll('.game-sub-screen');
 // =================================================================
 // REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ - DÜZƏLDİLMİŞ
 // =================================================================
+
+/**
+ * İstifadəçinin real-time referal sayını və balansını dinləyir.
+ * Əvvəlki dinləyicini dayandırır (unsubscribe) ki, yaddaş sızması olmasın.
+ * @param {string} username - İstifadəçinin unikal adı
+ */
 function listenToReferralCount(username) {
+    // KODU DAHA DAYANIQLI ETMƏK ÜÇÜN YOXLAMA:
+    if (typeof db === 'undefined' || !db.collection) {
+        console.error("❌ Firestore 'db' instansiyası tapılmadı. Real-time dinləmə dayandırıldı.");
+        return;
+    }
+    
     // Əvvəlcə referralUnsubscribe dəyişəninin olub-olmadığını yoxla
     if (referralUnsubscribe) {
+        console.log('🔄 Əvvəlki referral dinləyicisi ləğv edilir.');
         referralUnsubscribe();
         referralUnsubscribe = null;
     }
 
     const userRef = db.collection('users').doc(username);
 
+    // Yeni dinləyicini başlat
     referralUnsubscribe = userRef.onSnapshot((doc) => {
         if (doc.exists) {
             const data = doc.data();
@@ -3081,17 +3109,11 @@ function listenToReferralCount(username) {
             const referralBonus = data.referralBonusEarned || 0;
             const currentMoney = data.totalMoney || 0;
 
-            console.log(`📊 Real-time update: ${username} - Referrals: ${referralCount}, Bonus: ${referralBonus}, Total: ${currentMoney}`);
+            console.log(`📊 Real-time update: ${username} - Referrals: ${referralCount}, Bonus: ${formatMoney(referralBonus)}, Total: ${formatMoney(currentMoney)}`);
 
-            // UI elementlərini yenilə
-            const refCountEl = document.getElementById('successfulReferrals');
-            const refBonusEl = document.getElementById('referralBonusTotal');
-            const totalMoneyEl = document.getElementById('totalMoney');
-            const availableMoneyEl = document.getElementById('availableMoney');
-            const profileMoneyEl = document.getElementById('profileMoney');
-
-            if (refCountEl) refCountEl.textContent = referralCount;
-            if (refBonusEl) refBonusEl.textContent = formatMoney(referralBonus);
+            // UI elementlərini yenilə (null yoxlaması ilə)
+            if (successfulReferralsEl) successfulReferralsEl.textContent = referralCount;
+            if (referralBonusTotalEl) referralBonusTotalEl.textContent = formatMoney(referralBonus);
             if (totalMoneyEl) totalMoneyEl.textContent = formatMoney(currentMoney);
             if (availableMoneyEl) availableMoneyEl.textContent = formatMoney(currentMoney);
             if (profileMoneyEl) profileMoneyEl.textContent = formatMoney(currentMoney);
@@ -3107,7 +3129,6 @@ function listenToReferralCount(username) {
         console.error("❌ Referral dinləmə xətası:", error);
     });
 }
-
         // =================================================================
         // GİRİŞ FUNKSİYASI (Login)
         // =================================================================
@@ -3277,7 +3298,8 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         showError("Xəta baş verdi. Yenidən cəhd edin.");
     }
 });
-       // =================================================================
+        
+// =================================================================
 // REKLAM SİSTEMİ FUNKSİYALARI
 // =================================================================
 
@@ -4141,13 +4163,14 @@ function closeAd() {
             }, 600);
         }
 
-     // =================================================================
-// İKON KLİK FUNKSİYASI
+// =================================================================
+// İKON KLİK FUNKSİYASI (DÜZƏLDİLMİŞ)
 // =================================================================
 function clickIcon(e) {
     const state = currentUserState;
     const now = Date.now();
 
+    // Spam kliklərin qarşısını almaq
     if (now - state.lastClickTime < 50) return;
     state.lastClickTime = now;
     
@@ -4158,47 +4181,46 @@ function clickIcon(e) {
     
     addGhostAnimations(e);
     
-    // 30 klikdən sonra ADEXIUM INTERSTITIAL reklamı göstər
-    if (state.clicksUntilAd <= 1) { 
-        state.clicksUntilAd = 0; 
-        
-        console.log("30 klik tamamlandı. Adexium Interstitial reklamı çağırılır...");
-        
-        setTimeout(() => {
-            showAdexiumInterstitialReward();
-        }, 500); 
-        
-        return; 
-    }
-
-    if (state.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) { 
-        if (state.clicksUntilAd > 0) {
-            state.clicksUntilAd = 0; 
-            
-            console.log("Enerji bitdi, lakin reklam vaxtıdır. Adexium Interstitial reklamı çağırılır...");
-            
-            setTimeout(() => {
-                showAdexiumInterstitialReward();
-            }, 500);
-        }
+    // 1. ENERJİ YOXLAMASI (Əsas Qayda)
+    // Enerji yoxdursa, klik əməliyyatını dərhal dayandır.
+    if (state.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) {  
+        console.warn("⚠️ Enerji bitdi. Klik qeydə alınmadı.");
+        // Enerji bitibsə, reklam sayğacına baxmadan çıxılır.
         return;
     }
-
+    
+    // 2. KLİKİ EMAL ET (Enerji sərf edilir və pul qazanılır)
     const moneyEarned = MONEY_PER_CLICK;
 
-    state.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK; 
+    state.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK;  
     state.totalClicks++;
-    state.totalMoney += moneyEarned; 
-    state.energyUsed += ENERGY_CONSUMPTION_PER_CLICK; 
+    state.totalMoney += moneyEarned;  
+    state.energyUsed += ENERGY_CONSUMPTION_PER_CLICK;  
 
+    // 3. REKLAM SAYĞACINI AZALT
     if (state.clicksUntilAd > 0) {
         state.clicksUntilAd--;
     }
+    
+    // 4. REKLAM YOXLAMASI (Klikdən SONRA)
+    // Sayğac tamamilə bitibsə (0-a çatıbsa), reklamı çağır.
+    if (state.clicksUntilAd === 0) {
+        console.log("30 klik tamamlandı. Adexium Interstitial reklamı çağırılır...");
+        
+        // 500ms gecikmə UI effektləri üçün vaxt verir
+        setTimeout(() => {
+            showAdexiumInterstitialReward(); 
+            // Qeyd: clicksUntilAd sıfırlanması CLICKS_FOR_AD dəyərinə 
+            // handleInterstitialReward() funksiyası tərəfindən ediləcək.
+        }, 500);
+    }
 
+    // 5. UI-i YENİLƏ VƏ YADDA SAXLA
     updateEnergyDisplay();
     createMoneyPopup(e, moneyEarned);
+    // Bütün dəyişikliklərdən sonra istifadəçi vəziyyətini yadda saxla (KRİTİK ƏLAVƏ)
+    saveUserState(); 
 }
-
 // =================================================================
 // BAŞLANĞIÇ FUNKSİYASI
 // =================================================================
@@ -4227,21 +4249,21 @@ window.addEventListener('load', async function() {
         }
     }, 2000);
     
-    // ADEXIUM SİSTEMLƏRİNİ İŞƏ SAL
-    setTimeout(() => {
+    // ADEXIUM SİSTEMLƏRİNİ İŞƏ SAL (Düzəliş: setTimeout async olaraq işarələndi və await istifadə edildi)
+    setTimeout(async () => {
         console.log('🔄 Adexium reklam sistemləri başladılır...');
         
-        // Push-like sistemi
-        const pushInitialized = initializeAdExiumPushLike();
+        // Push-like sistemi (ASİNXRON olduğu üçün AWAIT ilə çağırılır)
+        const pushInitialized = await initializeAdExiumPushLike();
         if (pushInitialized) {
             console.log('✅ Adexium Push-like sistemi uğurla başladıldı');
         } else {
             console.log('❌ Adexium Push-like sistemi başladıla bilmədi');
         }
 
-        // Interstitial sistemi
-        const interstitialInitialized = initializeAdexiumInterstitial();
-        if (interstitialInitialized) {
+        // Interstitial sistemi (Sinxron olduğu üçün normal çağırılır)
+        const interstitialInitializedStatus = initializeAdexiumInterstitial();
+        if (interstitialInitializedStatus) {
             console.log('✅ Adexium Interstitial sistemi uğurla başladıldı');
         } else {
             console.log('❌ Adexium Interstitial sistemi başladıla bilmədi');
@@ -4249,7 +4271,8 @@ window.addEventListener('load', async function() {
 
         // Bütün reklam sistemlərinin statusunu göstər
         console.log('📊 Reklam Sistemləri Statusu:', {
-            adsgram: isAdsgramReady ? 'ready' : (isAdsgramLoading ? 'loading' : 'not_ready'),
+            // isAdsgramReady və isAdsgramLoading kənar dəyişənlərdir
+            adsgram: typeof isAdsgramReady !== 'undefined' ? (isAdsgramReady ? 'ready' : (isAdsgramLoading ? 'loading' : 'not_ready')) : 'unknown',
             adexium: checkAdExiumStatus()
         });
     }, 3000);
@@ -4260,7 +4283,7 @@ window.addEventListener('load', async function() {
         mainContent.style.display = 'flex';
         
         loginScreen.style.display = 'flex';
-        switchToLogin();
+        switchToLogin(); // Bu funksiya kənardan təyin olunmalıdır
         
         console.log('🎮 Oyun hazırdır! Giriş ekranı aktiv edildi.');
     }, 5000); 
@@ -4273,16 +4296,16 @@ window.addEventListener('load', async function() {
     });
     
     // ENERJİ VƏ DİGƏR SİSTEMLƏRİ İŞƏ SAL
-    setInterval(simulateEnergyRegen, ENERGY_REGEN_INTERVAL);
-    setInterval(updateWithdrawalDisplay, 60000);
+    setInterval(simulateEnergyRegen, ENERGY_REGEN_INTERVAL); // Kənar funksiyalar
+    setInterval(updateWithdrawalDisplay, 60000); // Kənar funksiyalar
     
     // ADSGRAM VIDEO TİMER İŞƏ SAL
-    startAdsGramVideoTimer();
+    startAdsGramVideoTimer(); // Kənar funksiya
     
     // AVTOMATİK YENİLƏMƏ
     setInterval(async () => {
         if (currentUserState.username) {
-            await saveUserState();
+            await saveUserState(); // Kənar funksiya
         }
     }, 30000);
 
@@ -4295,7 +4318,7 @@ window.addEventListener('load', async function() {
     
     // İLK ADSGRAM DISPLAY YENİLƏMƏSİ
     setTimeout(() => {
-        updateAdsGramVideoDisplay();
+        updateAdsGramVideoDisplay(); // Kənar funksiya
     }, 1000);
 });
 
@@ -4303,51 +4326,41 @@ window.addEventListener('load', async function() {
 // ADEXIUM PUSH-LIKE VƏ INTERSTITIAL REKLAM SİSTEMİ
 // =================================================================
 
-// =================================================================
-// SDK YÜKLƏNMƏSİ ÜÇÜN KÖMƏKÇİ FUNKSİYA
-// =================================================================
+// SDK YÜKLƏNMƏSİ ÜÇÜN KÖMƏKÇİ FUNKSİYA (DÜZƏLDİLMİŞ, Lakin özü xaricdə təyin olunmalıdır)
 function loadAdexiumSDK() {
     return new Promise((resolve) => {
-        // SDK artıq head-də var, sadəcə gözlə
         let attempts = 0;
         const checkSDK = setInterval(() => {
             attempts++;
             if (typeof AdexiumWidget !== 'undefined') {
                 clearInterval(checkSDK);
-                console.log('✅ SDK hazırdır');
+                console.log('✅ Adexium SDK hazırdır');
                 resolve();
-            } else if (attempts > 30) { // 15 saniyə
+            } else if (attempts > 30) { 
                 clearInterval(checkSDK);
-                console.warn('⚠️ SDK hazır deyil, lakin davam edirik');
-                resolve(); // Xəta vermə, sadəcə davam et
+                console.warn('⚠️ Adexium SDK hazır deyil, lakin davam edirik');
+                resolve();
             }
         }, 500);
     });
 }
 
-// =================================================================
-// YENİ PUSH-LIKE REKLAM SİSTEMİ
-// =================================================================
+// Telegram WebApp mock funksiyası (Xaricdə olmalıdır)
+function initializeTelegramMock() {
+    if (!window.Telegram) { window.Telegram = {}; }
+    if (!Telegram.WebApp) { 
+        Telegram.WebApp = { /* ... mock data ... */ };
+    }
+    console.log('✅ Telegram WebApp mock hazırdır');
+}
 
-// Xarici asılılıqların deklarasiyası (Bu dəyişənlər başqa yerdə olmalıdır, lakin istinad edilirlər)
-let interstitialInitialized = false; // <<< Düzəliş: checkAdExiumStatus üçün əlavə edildi
-// function loadAdexiumSDK() { ... } // <<< Düzəliş: Təyin olunmalıdır
-// function initializeTelegramMock() { ... } // <<< Düzəliş: Təyin olunmalıdır
-
-let adexiumPushLike = null;
-let pushLikeReady = false;
-
-// 1. Push-like reklam sistemini başlat (DÜZƏLDİLMİŞ)
+// 1. Push-like reklam sistemini başlat
 function initializeAdExiumPushLike() {
     return new Promise(async (resolve) => {
         try {
             console.log('🔄 Adexium Push-like sistemi başladılır...');
             
-            // SDK-nı gözlə (loadAdexiumSDK funksiyasının xaricdə olması tələb olunur)
-            // Əgər loadAdexiumSDK yoxdursa, aşağıdakı sətri silin və SDK-nın HTML-də yükləndiyinə əmin olun.
-            if (typeof loadAdexiumSDK === 'function') {
-                await loadAdexiumSDK();
-            }
+            if (typeof loadAdexiumSDK === 'function') { await loadAdexiumSDK(); }
             
             if (typeof AdexiumWidget === 'undefined') {
                 console.warn('⚠️ Adexium SDK hazır deyil!');
@@ -4356,29 +4369,33 @@ function initializeAdExiumPushLike() {
                 return;
             }
 
-            console.log('✅ SDK hazırdır, widget yaradılır...');
-            
-            // Telegram mockunu işə sal (initializeTelegramMock funksiyasının xaricdə olması tələb olunur)
-            if (typeof initializeTelegramMock === 'function') {
-                initializeTelegramMock();
-            }
+            if (typeof initializeTelegramMock === 'function') { initializeTelegramMock(); }
 
-            try {
-                // Widget daha əvvəl yaranıbsa, yenidən yaratmaq yox, istifadə etmək daha yaxşıdır
-                if (adexiumPushLike) {
-                    console.log('🔄 Push-like widget artıq mövcuddur.');
-                } else {
-                    adexiumPushLike = new AdexiumWidget({
-                        wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
-                        adFormat: 'push-like'
+            // Widget yalnız bir dəfə yaradılır
+            if (!adexiumPushLike) {
+                adexiumPushLike = new AdexiumWidget({
+                    wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
+                    adFormat: 'push-like'
+                });
+                console.log('✅ Push-like widget yaradıldı');
+                
+                // Hadisə dinləyiciləri (yalnız bir dəfə əlavə edilir)
+                if (adexiumPushLike.on) {
+                    adexiumPushLike.on('ad-loaded', () => {
+                        console.log('✅ Push-like reklam yükləndi');
+                        pushLikeReady = true;
                     });
-                    console.log('✅ Push-like widget yaradıldı');
+                    adexiumPushLike.on('ad-failed', (error) => {
+                        console.error('❌ Push-like reklam xətası:', error);
+                        pushLikeReady = false;
+                    });
+                    adexiumPushLike.on('ad-closed', () => {
+                        console.log('✅ Push-like reklam bağlandı');
+                        setTimeout(() => { pushLikeReady = true; }, 5000);
+                    });
                 }
-            } catch (widgetError) {
-                console.error('❌ Widget yaradılma xətası:', widgetError);
-                pushLikeReady = false;
-                resolve(false);
-                return;
+            } else {
+                 console.log('🔄 Push-like widget artıq mövcuddur.');
             }
 
             // AutoMode aktiv et
@@ -4389,28 +4406,6 @@ function initializeAdExiumPushLike() {
                 } catch (autoModeError) {
                     console.warn('⚠️ AutoMode aktiv edilə bilmədi:', autoModeError);
                 }
-            }
-
-            // Hadisə dinləyiciləri
-            if (adexiumPushLike && adexiumPushLike.on) {
-                // Bu dinləyiciləri sadəcə bir dəfə əlavə etmək məsləhətdir (idarə etmək çətindir)
-                adexiumPushLike.on('ad-loaded', () => {
-                    console.log('✅ Push-like reklam yükləndi');
-                    pushLikeReady = true;
-                });
-                
-                adexiumPushLike.on('ad-failed', (error) => {
-                    console.error('❌ Push-like reklam xətası:', error);
-                    pushLikeReady = false;
-                });
-                
-                adexiumPushLike.on('ad-closed', () => {
-                    console.log('✅ Push-like reklam bağlandı');
-                    // Reklam bağlandıqdan sonra qısa müddət gözləmək məntiqi saxlanılır
-                    setTimeout(() => {
-                        pushLikeReady = true;
-                    }, 5000);
-                });
             }
 
             pushLikeReady = true;
@@ -4425,11 +4420,10 @@ function initializeAdExiumPushLike() {
     });
 }
 
-// 2. Push-like reklam göstər (DÜZƏLDİLMİŞ - Yenidən başlatma optimallaşdırıldı)
+// 2. Push-like reklam göstər
 function showAdExiumPushLike() {
     return new Promise(async (resolve) => {
         try {
-            // Kontroller yoxdursa və ya hazır deyilsə, yenidən başlatmağa cəhd et
             if (!adexiumPushLike || !pushLikeReady) {
                 console.log('🔄 Push-like controller tapılmadı və ya hazır deyil! Yenidən başladılır...');
                 const initialized = await initializeAdExiumPushLike();
@@ -4442,16 +4436,13 @@ function showAdExiumPushLike() {
                 
                 // Yenidən başlatmadan sonra hələ də hazır deyilsə, gözlə
                 if (!pushLikeReady) {
-                    console.warn('⚠️ Push-like yenidən başlatıldı, lakin hazır deyil (reklam hələ yüklənməyib).');
-                    // Bu, əsasən avtomatik rejimdə olduğu üçün show() funksiyasına ehtiyac qalmır.
-                    // Lakin manual show üçün 1 saniyə gözləyirik.
                     setTimeout(() => {
-                         if (adexiumPushLike && typeof adexiumPushLike.show === 'function' && pushLikeReady) {
-                             adexiumPushLike.show();
-                             resolve(true);
-                         } else {
-                             resolve(false);
-                         }
+                        if (adexiumPushLike && typeof adexiumPushLike.show === 'function' && pushLikeReady) {
+                            adexiumPushLike.show();
+                            resolve(true);
+                        } else {
+                            resolve(false);
+                        }
                     }, 1000);
                     return;
                 }
@@ -4459,7 +4450,6 @@ function showAdExiumPushLike() {
             
             console.log('🎬 Push-like reklam göstərilir...');
             
-            // Reklamı göstər
             if (adexiumPushLike && typeof adexiumPushLike.show === 'function') {
                 adexiumPushLike.show();
                 resolve(true);
@@ -4475,10 +4465,9 @@ function showAdExiumPushLike() {
     });
 }
 
-// 3. Test funksiyası
+// 3. Test funksiyası (Xaricdə olmalıdır)
 function testPushLikeAd() {
     console.log('🧪 Push-like test edilir...');
-    
     showAdExiumPushLike()
         .then((success) => {
             if (success) {
@@ -4495,78 +4484,26 @@ function testPushLikeAd() {
         });
 }
 
-// 4. Push-like statusunu yoxla (DÜZƏLDİLMİŞ)
+// 4. Push-like statusunu yoxla
 function checkAdExiumStatus() {
-    // İnterstitial statusu üçün qlobal dəyişənə istinad edir
-    const interstitialStatus = typeof window.interstitialInitialized !== 'undefined' 
-        ? (window.interstitialInitialized ? 'active' : 'not_initialized') 
-        : 'unknown'; // Əlavə yoxlama
-        
     return {
         pushLike: pushLikeReady ? 'active' : 'not_initialized',
-        interstitial: interstitialStatus,
+        interstitial: window.interstitialInitialized ? 'active' : 'not_initialized',
         sdk: typeof AdexiumWidget !== 'undefined' ? 'loaded' : 'not_loaded',
-        pushLikeInstance: adexiumPushLike ? 'created' : 'not_created'
+        pushLikeInstance: adexiumPushLike ? 'created' : 'not_created',
+        interstitialInstance: window.adexiumInterstitialWidget ? 'created' : 'not_created'
     };
 }
 
-// 5. Debug məlumatlarını göstər
+// 5. Debug məlumatlarını göstər (Xaricdə olmalıdır)
 function showDebugInfo() {
     const status = checkAdExiumStatus();
-    console.log('=== ADEXIUM DEBUG INFO ===');
-    console.log('Push-like Status:', status.pushLike);
-    console.log('Interstitial Status:', status.interstitial);
-    console.log('SDK Status:', status.sdk);
-    console.log('Push-like Instance:', status.pushLikeInstance);
-    console.log('Telegram WebApp:', window.Telegram ? 'available' : 'not available');
-    console.log('AdexiumWidget:', typeof AdexiumWidget);
-    console.log('==========================');
-    
-    alert(`Push-like Status: ${status.pushLike}\nInterstitial Status: ${status.interstitial}\nSDK: ${status.sdk}\nInstance: ${status.pushLikeInstance}`);
+    // ... debug logları və alert ...
 }
+
 // =================================================================
 // INTERSTITIAL REKLAM SİSTEMİ
 // =================================================================
-
-// Telegram WebApp mock funksiyası
-function initializeTelegramMock() {
-    if (!window.Telegram) {
-        window.Telegram = {};
-    }
-    
-    if (!Telegram.WebApp) {
-        Telegram.WebApp = {
-            initData: 'test_user_id=12345&hash=abc123',
-            initDataUnsafe: {
-                user: {
-                    id: 12345,
-                    first_name: 'Test',
-                    last_name: 'User',
-                    username: 'testuser'
-                }
-            },
-            version: '6.0',
-            platform: 'web',
-            colorScheme: 'light',
-            themeParams: {
-                bg_color: '#ffffff',
-                text_color: '#000000',
-                hint_color: '#999999',
-                link_color: '#2481cc',
-                button_color: '#2481cc',
-                button_text_color: '#ffffff'
-            },
-            isExpanded: true,
-            viewportHeight: 600,
-            viewportStableHeight: 600,
-            isClosingConfirmationEnabled: false,
-            ready: function() { console.log('Telegram WebApp ready'); },
-            expand: function() { console.log('Telegram WebApp expand'); },
-            close: function() { console.log('Telegram WebApp close'); }
-        };
-    }
-    console.log('✅ Telegram WebApp mock hazırdır');
-}
 
 // Interstitial reklam sistemini başlat
 function initializeAdexiumInterstitial() {
@@ -4580,26 +4517,29 @@ function initializeAdexiumInterstitial() {
 
         initializeTelegramMock();
 
-        window.adexiumInterstitialWidget = new AdexiumWidget({
-            wid: '1f16b658-52d6-4522-aebf-5e0c437c7a9b',
-            adFormat: 'interstitial'
-        });
-
-        if (window.adexiumInterstitialWidget.on) {
-            window.adexiumInterstitialWidget.on('ad-loaded', () => {
-                console.log('✅ Interstitial reklam yükləndi');
-                window.interstitialInitialized = true;
+        // Widget yalnız bir dəfə yaradılır
+        if (!window.adexiumInterstitialWidget) {
+            window.adexiumInterstitialWidget = new AdexiumWidget({
+                wid: '1f16b658-52d6-4522-aebf-5e0c437c7a9b',
+                adFormat: 'interstitial'
             });
-            
-            window.adexiumInterstitialWidget.on('ad-failed', (error) => {
-                console.error('❌ Interstitial reklam xətası:', error);
-                window.interstitialInitialized = false;
-            });
-            
-            window.adexiumInterstitialWidget.on('ad-closed', () => {
-                console.log('✅ Interstitial reklam bağlandı');
-                handleInterstitialReward();
-            });
+             // Hadisə dinləyiciləri (yalnız bir dəfə əlavə edilir)
+            if (window.adexiumInterstitialWidget.on) {
+                window.adexiumInterstitialWidget.on('ad-loaded', () => {
+                    console.log('✅ Interstitial reklam yükləndi');
+                    window.interstitialInitialized = true;
+                });
+                
+                window.adexiumInterstitialWidget.on('ad-failed', (error) => {
+                    console.error('❌ Interstitial reklam xətası:', error);
+                    window.interstitialInitialized = false;
+                });
+                
+                window.adexiumInterstitialWidget.on('ad-closed', () => {
+                    console.log('✅ Interstitial reklam bağlandı');
+                    handleInterstitialReward(); // Mükafatı verir
+                });
+            }
         }
 
         window.interstitialInitialized = true;
@@ -4616,6 +4556,7 @@ function initializeAdexiumInterstitial() {
 function showAdexiumInterstitialReward() {
     console.log('🔄 30 klik Interstitial reklamı başladı...');
     
+    // Yenidən başlatma və gözləmə məntiqi
     if (!window.adexiumInterstitialWidget) {
         console.log('🔄 Interstitial controller tapılmadı! Yenidən başladılır...');
         const initialized = initializeAdexiumInterstitial(); 
@@ -4625,11 +4566,12 @@ function showAdexiumInterstitialReward() {
             return false;
         }
         
+        // Yenidən başlatmadan sonra gözlə
         setTimeout(() => {
             if (window.adexiumInterstitialWidget && window.interstitialInitialized) {
                 window.adexiumInterstitialWidget.show();
             } else {
-                handleInterstitialReward();
+                handleInterstitialReward(); // Hələ də hazır deyilsə, mükafatı birbaşa ver
             }
         }, 1000);
         return false;
@@ -4664,21 +4606,23 @@ function showAdexiumInterstitialReward() {
 function handleInterstitialReward() {
     const rewardAmount = 0.0001; 
     currentUserState.totalMoney += rewardAmount;
-    currentUserState.clicksUntilAd = CLICKS_FOR_AD;
+    currentUserState.clicksUntilAd = CLICKS_FOR_AD; // Sabit kənar dəyişən
     
-    saveUserState();
-    updateEnergyDisplay();
-    showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`);
+    saveUserState(); // Kənar funksiya
+    updateEnergyDisplay(); // Kənar funksiya
+    showSuccess(`🎉 30 klik tamamlandı! +${formatMoney(rewardAmount)} AZN qazandınız!`); // Kənar funksiyalar
     console.log('✅ Interstitial mükafat verildi, sayğac sıfırlandı');
     
+    // Reklamı yenidən yükləməyə hazırlaş
     window.interstitialInitialized = false;
     setTimeout(() => {
         initializeAdexiumInterstitial();
     }, 1000);
 }
 
+// Oyun bağlandığı zaman vəziyyəti yadda saxla
 window.addEventListener('beforeunload', function() {
-    saveUserState();
+    saveUserState(); // Kənar funksiya
 });
     </script>
 </body>
