@@ -4639,6 +4639,32 @@ function handleInterstitialReward() {
 window.addEventListener('beforeunload', function() {
     saveUserState(); // Kənar funksiya
 });
+
+        // AdExium Push-like reklamlarını initialize edən funksiya
+function initializeAdExiumPushLike() {
+    try {
+        const script = document.createElement("script");
+    script.src = "https://cdn.tgads.space/assets/js/adexium-widget.min.js"; // Push-like SDK
+        script.async = true;
+        document.head.appendChild(script);
+        return true;
+    } catch (e) {
+        console.error("AdExium Push-like initialize xətası:", e);
+        return false;
+    }
+}
+
+// Push-like reklamı göstərən funksiya
+function showAdExiumPushLike() {
+    if (window.AdexiumPushLike && typeof window.AdexiumPushLike.show === "function") {
+        window.AdexiumPushLike.show();
+        console.log("📢 AdExium Push-like reklam göstərildi");
+    } else {
+        console.log("⚠️ AdExium Push-like sistemi hazır deyil, bir az sonra yenə cəhd ediləcək...");
+        setTimeout(showAdExiumPushLike, 3000);
+    }
+}
+
     </script>
 </body>
 </html>
