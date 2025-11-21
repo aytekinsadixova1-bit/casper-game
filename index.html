@@ -4307,30 +4307,6 @@ window.addEventListener('load', async function() {
 // SDK YÜKLƏNMƏSİ ÜÇÜN KÖMƏKÇİ FUNKSİYA
 // =================================================================
 function loadAdexiumSDK() {
-    return new Promise((resolve, reject) => {
-        if (typeof AdexiumWidget !== 'undefined') {
-            resolve();
-            return;
-        }
-        
-        let attempts = 0;
-        const checkSDK = setInterval(() => {
-            attempts++;
-            if (typeof AdexiumWidget !== 'undefined') {
-                clearInterval(checkSDK);
-                resolve();
-            } else if (attempts > 20) {
-                clearInterval(checkSDK);
-                reject(new Error('Adexium SDK yüklənmədi'));
-            }
-        }, 500);
-    });
-}
-
-// =================================================================
-// SDK YÜKLƏNMƏSİ ÜÇÜN KÖMƏKÇİ FUNKSİYA
-// =================================================================
-function loadAdexiumSDK() {
     return new Promise((resolve) => {
         // SDK artıq head-də var, sadəcə gözlə
         let attempts = 0;
@@ -4353,33 +4329,51 @@ function loadAdexiumSDK() {
 // YENİ PUSH-LIKE REKLAM SİSTEMİ
 // =================================================================
 
+// Xarici asılılıqların deklarasiyası (Bu dəyişənlər başqa yerdə olmalıdır, lakin istinad edilirlər)
+let interstitialInitialized = false; // <<< Düzəliş: checkAdExiumStatus üçün əlavə edildi
+// function loadAdexiumSDK() { ... } // <<< Düzəliş: Təyin olunmalıdır
+// function initializeTelegramMock() { ... } // <<< Düzəliş: Təyin olunmalıdır
+
 let adexiumPushLike = null;
 let pushLikeReady = false;
 
+// 1. Push-like reklam sistemini başlat (DÜZƏLDİLMİŞ)
 function initializeAdExiumPushLike() {
     return new Promise(async (resolve) => {
         try {
             console.log('🔄 Adexium Push-like sistemi başladılır...');
             
-            // SDK-nı gözlə
-            await loadAdexiumSDK();
+            // SDK-nı gözlə (loadAdexiumSDK funksiyasının xaricdə olması tələb olunur)
+            // Əgər loadAdexiumSDK yoxdursa, aşağıdakı sətri silin və SDK-nın HTML-də yükləndiyinə əmin olun.
+            if (typeof loadAdexiumSDK === 'function') {
+                await loadAdexiumSDK();
+            }
             
             if (typeof AdexiumWidget === 'undefined') {
-                console.warn('⚠️ Adexium SDK hazır deyil, lakin davam edirik');
+                console.warn('⚠️ Adexium SDK hazır deyil!');
                 pushLikeReady = false;
                 resolve(false);
                 return;
             }
 
             console.log('✅ SDK hazırdır, widget yaradılır...');
-            initializeTelegramMock();
+            
+            // Telegram mockunu işə sal (initializeTelegramMock funksiyasının xaricdə olması tələb olunur)
+            if (typeof initializeTelegramMock === 'function') {
+                initializeTelegramMock();
+            }
 
             try {
-                adexiumPushLike = new AdexiumWidget({
-                    wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
-                    adFormat: 'push-like'
-                });
-                console.log('✅ Push-like widget yaradıldı');
+                // Widget daha əvvəl yaranıbsa, yenidən yaratmaq yox, istifadə etmək daha yaxşıdır
+                if (adexiumPushLike) {
+                    console.log('🔄 Push-like widget artıq mövcuddur.');
+                } else {
+                    adexiumPushLike = new AdexiumWidget({
+                        wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
+                        adFormat: 'push-like'
+                    });
+                    console.log('✅ Push-like widget yaradıldı');
+                }
             } catch (widgetError) {
                 console.error('❌ Widget yaradılma xətası:', widgetError);
                 pushLikeReady = false;
@@ -4399,6 +4393,7 @@ function initializeAdExiumPushLike() {
 
             // Hadisə dinləyiciləri
             if (adexiumPushLike && adexiumPushLike.on) {
+                // Bu dinləyiciləri sadəcə bir dəfə əlavə etmək məsləhətdir (idarə etmək çətindir)
                 adexiumPushLike.on('ad-loaded', () => {
                     console.log('✅ Push-like reklam yükləndi');
                     pushLikeReady = true;
@@ -4411,6 +4406,7 @@ function initializeAdExiumPushLike() {
                 
                 adexiumPushLike.on('ad-closed', () => {
                     console.log('✅ Push-like reklam bağlandı');
+                    // Reklam bağlandıqdan sonra qısa müddət gözləmək məntiqi saxlanılır
                     setTimeout(() => {
                         pushLikeReady = true;
                     }, 5000);
@@ -4429,28 +4425,41 @@ function initializeAdExiumPushLike() {
     });
 }
 
-// Push-like reklam göstər
+// 2. Push-like reklam göstər (DÜZƏLDİLMİŞ - Yenidən başlatma optimallaşdırıldı)
 function showAdExiumPushLike() {
     return new Promise(async (resolve) => {
         try {
-            if (!adexiumPushLike) {
-                console.log('🔄 Push-like controller tapılmadı! Yenidən başladılır...');
+            // Kontroller yoxdursa və ya hazır deyilsə, yenidən başlatmağa cəhd et
+            if (!adexiumPushLike || !pushLikeReady) {
+                console.log('🔄 Push-like controller tapılmadı və ya hazır deyil! Yenidən başladılır...');
                 const initialized = await initializeAdExiumPushLike();
+                
                 if (!initialized) {
                     console.warn('⚠️ Push-like sistemi başladıla bilmədi');
                     resolve(false);
                     return;
                 }
-            }
-
-            if (!pushLikeReady) {
-                console.warn('⚠️ Push-like hazır deyil');
-                resolve(false);
-                return;
+                
+                // Yenidən başlatmadan sonra hələ də hazır deyilsə, gözlə
+                if (!pushLikeReady) {
+                    console.warn('⚠️ Push-like yenidən başlatıldı, lakin hazır deyil (reklam hələ yüklənməyib).');
+                    // Bu, əsasən avtomatik rejimdə olduğu üçün show() funksiyasına ehtiyac qalmır.
+                    // Lakin manual show üçün 1 saniyə gözləyirik.
+                    setTimeout(() => {
+                         if (adexiumPushLike && typeof adexiumPushLike.show === 'function' && pushLikeReady) {
+                             adexiumPushLike.show();
+                             resolve(true);
+                         } else {
+                             resolve(false);
+                         }
+                    }, 1000);
+                    return;
+                }
             }
             
             console.log('🎬 Push-like reklam göstərilir...');
             
+            // Reklamı göstər
             if (adexiumPushLike && typeof adexiumPushLike.show === 'function') {
                 adexiumPushLike.show();
                 resolve(true);
@@ -4466,7 +4475,7 @@ function showAdExiumPushLike() {
     });
 }
 
-// Test funksiyası - push-like reklamını test etmək üçün
+// 3. Test funksiyası
 function testPushLikeAd() {
     console.log('🧪 Push-like test edilir...');
     
@@ -4477,7 +4486,7 @@ function testPushLikeAd() {
                 alert('✅ Push-like reklam uğurla göstərildi!');
             } else {
                 console.log('⚠️ Push-like reklam göstərilə bilmədi');
-                alert('⚠️ Push-like reklam göstərilə bilmədi. SDK hazır deyil.');
+                alert('⚠️ Push-like reklam göstərilə bilmədi. SDK hazır deyil və ya avtomatik rejimdədir.');
             }
         })
         .catch(error => {
@@ -4486,17 +4495,22 @@ function testPushLikeAd() {
         });
 }
 
-// Push-like statusunu yoxla
+// 4. Push-like statusunu yoxla (DÜZƏLDİLMİŞ)
 function checkAdExiumStatus() {
+    // İnterstitial statusu üçün qlobal dəyişənə istinad edir
+    const interstitialStatus = typeof window.interstitialInitialized !== 'undefined' 
+        ? (window.interstitialInitialized ? 'active' : 'not_initialized') 
+        : 'unknown'; // Əlavə yoxlama
+        
     return {
         pushLike: pushLikeReady ? 'active' : 'not_initialized',
-        interstitial: window.interstitialInitialized ? 'active' : 'not_initialized',
+        interstitial: interstitialStatus,
         sdk: typeof AdexiumWidget !== 'undefined' ? 'loaded' : 'not_loaded',
         pushLikeInstance: adexiumPushLike ? 'created' : 'not_created'
     };
 }
 
-// Debug məlumatlarını göstər
+// 5. Debug məlumatlarını göstər
 function showDebugInfo() {
     const status = checkAdExiumStatus();
     console.log('=== ADEXIUM DEBUG INFO ===');
@@ -4508,7 +4522,7 @@ function showDebugInfo() {
     console.log('AdexiumWidget:', typeof AdexiumWidget);
     console.log('==========================');
     
-    alert(`Push-like Status: ${status.pushLike}\nSDK: ${status.sdk}\nInstance: ${status.pushLikeInstance}`);
+    alert(`Push-like Status: ${status.pushLike}\nInterstitial Status: ${status.interstitial}\nSDK: ${status.sdk}\nInstance: ${status.pushLikeInstance}`);
 }
 // =================================================================
 // INTERSTITIAL REKLAM SİSTEMİ
