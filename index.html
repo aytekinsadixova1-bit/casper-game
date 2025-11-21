@@ -13,8 +13,32 @@
     <!-- Telegram Web App & AdsGram SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+     <!-- Telegram JS -->
+<script src="https://telegram.org/js/telegram-web-app.js?56"></script>
 
-    <style>
+<!-- ADEXIUM -->
+<script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
+<script type="text/javascript">
+    let adexiumPush;
+    let adexiumInterstitial;
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        // 60 saniyədən bir push-like reklam
+        adexiumPush = new AdexiumWidget({
+            wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
+            adFormat: 'push-like'
+        });
+        adexiumPush.autoMode();
+
+        // 30 klikdən bir interstitial reklam
+        adexiumInterstitial = new AdexiumWidget({
+            wid: '1f16b658-52d6-4522-aebf-5e0c437c7a9b',
+            adFormat: 'interstitial'
+        });
+    });
+</script>
+
+   <style>
         * {
             margin: 0;
             padding: 0;
@@ -775,6 +799,125 @@
             border: 1px solid #00b894;
         }
 
+        .ad-screen {
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); 
+            z-index: 2000; 
+            align-items: center; 
+            justify-content: center; 
+            flex-direction: column; 
+            color: white; 
+            text-align: center;
+            padding: 15px;
+        }
+
+        .ad-content {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px 20px;
+            border-radius: 15px;
+            max-width: 300px;
+            width: 90%;
+            border: 2px solid;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            margin-bottom: 15px;
+        }
+
+        .ad-timer {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #00b894;
+            text-shadow: 0 0 8px rgba(0, 184, 148, 0.5);
+        }
+
+        .ad-message {
+            font-size: 12px;
+            color: #ccc;
+            margin-top: 8px;
+        }
+
+        .ad-counter {
+            font-size: 14px;
+            color: #ffd700;
+            margin: 8px 0;
+            font-weight: bold;
+        }
+
+        .ad-reward {
+            font-size: 14px;
+            color: #00b894;
+            font-weight: bold;
+            margin: 12px 0;
+            background: rgba(0, 184, 148, 0.2);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #00b894;
+        }
+
+        .ad-progress-container {
+            width: 90%;
+            max-width: 300px;
+            margin-top: 15px;
+        }
+
+        .ad-progress-bar {
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .ad-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00b894, #55efc4);
+            border-radius: 3px;
+            width: 100%;
+            transition: width 1s linear;
+        }
+
+        .ad-progress-text {
+            font-size: 11px;
+            color: #ccc;
+            text-align: center;
+        }
+
+        .ad-premium { border-color: #ff6b6b; }
+        .ad-special { border-color: #4ecdc4; }
+        .ad-bonus { border-color: #45b7d1; }
+
+        .ad-skip-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 10px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .ad-skip-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes adPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .ad-pulse {
+            animation: adPulse 2s ease-in-out infinite;
+        }
+
         .bonus-info {
             background: #e3f2fd;
             padding: 8px;
@@ -938,7 +1081,58 @@
         .main-icon::after {
             display: none !important;
         }
+
+      
+        /* Şifrə bərpa modal üçün əlavə stillər */
+        .forgot-password-link {
+            text-align: center;
+            margin-top: 15px;
+        }
         
+        .forgot-password-link a {
+            color: #0f3460;
+            font-size: 12px;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        
+        .step {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 5px;
+            font-size: 10px;
+            font-weight: bold;
+            color: #6c757d;
+        }
+        
+        .step.active {
+            background: #0f3460;
+            color: white;
+        }
+        
+        .step-line {
+            width: 30px;
+            height: 2px;
+            background: #e9ecef;
+            margin: 0 2px;
+            align-self: center;
+        }
+        
+        .step-line.active {
+            background: #0f3460;
+        }
+
         .adsgram-video-btn:disabled {
             background: #6c757d;
             cursor: not-allowed;
@@ -978,6 +1172,17 @@
             <div class="splash-subtext">Pul qazanmaq üçün kliklə və qazan! 🚀</div>
             <div class="loading-bar">
                 <div class="loading-progress"></div>
+            </div>
+        </div>
+        
+        <div class="ad-screen" id="adScreen">
+            <div class="ad-content" id="adContent">
+                </div>
+            <div class="ad-progress-container">
+                <div class="ad-progress-bar">
+                    <div class="ad-progress-fill" id="adProgressFill"></div>
+                </div>
+                <div class="ad-progress-text" id="adProgressText">Reklam bitir: 10s</div>
             </div>
         </div>
         
@@ -1079,7 +1284,7 @@
                     
                     <div class="game-sub-screen active" id="tapScreen">
                         
-                        <!-- ENERJİ HİSSƏSİ -->
+                        <!-- REKLAM VƏ BONUS MƏLUMAT HİSSƏSİ -->
                         <div class="energy-container">
                             <div class="energy-bar">
                                 <div class="energy-fill" id="energyFill" style="width: 100%">
@@ -1087,39 +1292,39 @@
                                 </div>
                             </div>
                             <div class="ad-counter-container">
-                                <span>Hər klik üçün:</span> <span id="clicksUntilAdDisplay">0.000003 AZN</span>
+                                <span>Növbəti reklam:</span> <span id="clicksUntilAdDisplay">30</span> klik
                             </div>
                         </div>
 
-                        <!-- ADSGRAM 10 REKLAM + 2 DƏQ + 4 SAAT SİSTEMİ -->
-                        <div class="bonus-info" style="margin: 12px 0; text-align: center;">
-                            <button onclick="showAdsGramVideoReward()" class="adsgram-video-btn" id="adsgramVideoButton">
-                                🎬 Video İzlə & 0.001 AZN Qazan! (0/10)
-                            </button>
-                            <div class="bonus-timer" id="adsgramTimer">Hazır!</div>
-                            <p style="font-size: 10px; color: #6c757d; margin-top: 3px;">
-                                ⏰ 2 dəq ara ilə 10 reklam, sonra 4 saat gözləyin!
-                            </p>
-                        </div>
+                <!-- YENİ ADSGRAM 10 REKLAM + 2 DƏQ + 4 SAAT SİSTEMİ -->
+<div class="bonus-info" style="margin: 12px 0; text-align: center;">
+    <button onclick="showAdsGramVideoReward()" class="adsgram-video-btn" id="adsgramVideoButton">
+        🎬 Video İzlə & 0.001 AZN Qazan! (0/10)
+    </button>
+    <div class="bonus-timer" id="adsgramTimer">Hazır!</div>
+    <p style="font-size: 10px; color: #6c757d; margin-top: 3px;">
+        ⏰ 2 dəq ara ilə 10 reklam, sonra 4 saat gözləyin!
+    </p>
+</div>
 
-                        <div class="bonus-info">
-                            <strong>Hər klik üçün:</strong> <strong>0.000003 AZN</strong>
-                        </div>
+<div class="bonus-info">
+    <strong> 30 klik Bonusu:</strong> Hər reklam üçün <strong>0.0001 AZN</strong>
+</div>
 
-                        <div class="click-area">
-                            <div class="main-icon" id="mainIcon">
-                                <img id="clickImage" src="https://i.ibb.co/hp0mdt1/2025-10-31-T103543-300-removebg-preview.png" alt="Casper" 
-                                    onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22 viewBox=%220 0 180 180%22><rect width=%22180%22 height=%22180%22 fill=%23ff7e5f/><text x=%2290%22 y=%2290%22 font-family=%22Arial%22 font-size=%2260%22 fill=%22white%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>👻</text></svg>'"
-                                    style="width: 100% !important; height: 100% !important; object-fit: contain !important; display: block !important; background: transparent !important;">
-                            </div>
-                        </div>
+<div class="click-area">
+    <div class="main-icon" id="mainIcon">
+        <img id="clickImage" src="https://i.ibb.co/hp0mdt1/2025-10-31-T103543-300-removebg-preview.png" alt="Casper" 
+            onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22 viewBox=%220 0 180 180%22><rect width=%22180%22 height=%22180%22 fill=%23ff7e5f/><text x=%2290%22 y=%2290%22 font-family=%22Arial%22 font-size=%2260%22 fill=%22white%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>👻</text></svg>'"
+            style="width: 100% !important; height: 100% !important; object-fit: contain !important; display: block !important; background: transparent !important;">
+    </div>
+</div>
 
-                        <div class="stats-block">
-                            <div class="money-stat-small">
-                                <div class="stat-value" id="totalMoney">0.000000 AZN</div> 
-                                <div class="stat-label">CƏMİ QAZANC</div>
-                            </div>
-                        </div>
+<div class="stats-block">
+    <div class="money-stat-small">
+        <div class="stat-value" id="totalMoney">0.000000 AZN</div> 
+        <div class="stat-label">CƏMİ QAZANC</div>
+    </div>
+</div>
                     </div>
                     
                     <!-- PROFİL HİSSƏSİ -->
@@ -2298,14 +2503,19 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             gameIcon.onerror = () => handleImageError(gameIcon, IMAGE_CONFIG.fallbackText);
         }
 // =================================================================
-// OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR
+// OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR (DÜZƏLDİLMİŞ)
 // =================================================================
-
-let users = {};
 
 const ENERGY_CONSUMPTION_PER_CLICK = 1;      
 const MAX_ENERGY_CAP = 100000;              
 
+const AD_COUNT = 3;
+const AD_DURATION = 10;
+const AD_REWARD_PER_AD = 0.0001;
+const CLICKS_FOR_AD = 30; // Reklam göstərilmə intervalı
+const AD_INTERVAL = CLICKS_FOR_AD;
+
+const ENERGY_REGEN_INTERVAL = 1000;          
 const MONEY_PER_CLICK = 0.000003;
 const MONEY_DECIMAL_PLACES = 6;            
 const REFERRAL_BONUS_AMOUNT = 0.10;
@@ -2325,22 +2535,55 @@ const ADMIN_TELEGRAM_NUMBER = "994513248685"; // Sizin Telegram nömrəniz
 
 const BASE_INVITE_URL = window.location.href.split('?')[0];
 
+const ads = [
+    {
+        id: 1,
+        title: "🎮 YENİ OYUN TƏKLİFİ",
+        description: "Bu mobil oyunu yükləyin və xüsusi bonus qazanın!",
+        color: "#ff6b6b",
+        duration: 10,
+        type: "premium"
+    },
+    {
+        id: 2,
+        title: "🛒 ONLAYN ALIŞ-VERİŞ",
+        description: "Xüsusi endirimlərdən yararlanın!",
+        color: "#4ecdc4",
+        duration: 10,
+        type: "special"
+    },
+    {
+        id: 3,
+        title: "📱 TƏTBİQ TƏKLİFİ",
+        description: "Bu faydalı tətbiqi yükləyin!",
+        color: "#45b7d1",
+        duration: 10,
+        type: "bonus"
+    }
+];
+
+let currentAdIndex = 0;
+let adTimerInterval;
+let adTimeLeft = 0;
+let totalAdRewardEarned = 0;
 let referralUnsubscribe = null; // Firestore dinləyicisini ləğv etmək üçün
 
 let currentUserState = {
     cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
     maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP,
-    totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
+    clicksUntilAd: CLICKS_FOR_AD, totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
     energyRegenRate: BASE_REGEN_RATE, scorePerClick: 1, lastEnergyUpdate: Date.now(), 
     lastClickTime: Date.now(), successfulReferrals: 0, referralBonusEarned: 0.00, 
     lastWithdrawalDate: null, registrationDate: null
 };
 
-// DOM Elementləri
+// DOM Elementləri (Bu hissə UI kodundan asılıdır)
 const splashScreen = document.getElementById('splashScreen');
 const mainContent = document.getElementById('mainContent');
 const loginScreen = document.getElementById('loginScreen');
 const gameScreen = document.getElementById('gameScreen');
+const adScreen = document.getElementById('adScreen');
+const adContent = document.getElementById('adContent');
 const mainIcon = document.getElementById('mainIcon');
 const welcomeText = document.getElementById('welcomeText');
 const welcomeMessage = document.getElementById('welcomeMessage');
@@ -2373,8 +2616,9 @@ const navItems = document.querySelectorAll('.navbar .nav-item');
 const subScreens = document.querySelectorAll('.game-sub-screen');
 
 // =================================================================
-// REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ
+// REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ - DÜZƏLDİLMİŞ
 // =================================================================
+
 
 function listenToReferralCount(username) {
     // KODU DAHA DAYANIQLI ETMƏK ÜÇÜN YOXLAMA:
@@ -2468,7 +2712,7 @@ function listenToReferralCount(username) {
 
 
 // =================================================================
-// QEYDİYYAT FUNKSİYASI (Register)
+// QEYDİYYAT FUNKSİYASI (Register) - TƏCİL HƏLL
 // =================================================================
 document.getElementById('registerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -2590,7 +2834,8 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         showError("Xəta baş verdi. Yenidən cəhd edin.");
     }
 });
-        
+
+
         // =================================================================
         // WHATSAPP GÖNDƏRMƏ FUNKSİYASI
         // =================================================================
@@ -2820,7 +3065,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         }
 
         // =================================================================
-        // ÇIXARIŞ FORM FUNKSİYASI
+        // ÇIXARIŞ FORM FUNKSİYASI - TƏMİZ VERSİYA
         // =================================================================
         document.getElementById('withdrawalForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -2976,6 +3221,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
             }
             
             totalMoneyEl.textContent = formatMoney(state.totalMoney);
+            clicksUntilAdDisplay.textContent = state.clicksUntilAd;
             
             if (document.getElementById('friendsScreen').classList.contains('active')) {
                 updateInviteLinkDisplay();
@@ -3138,6 +3384,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
                 referralCode: null, 
                 maxEnergy: MAX_ENERGY_CAP, 
                 currentEnergy: MAX_ENERGY_CAP, 
+                clicksUntilAd: AD_INTERVAL,
                 totalClicks: 0, 
                 totalMoney: 0.00, 
                 energyUsed: 0, 
@@ -3279,6 +3526,92 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
             }
         });
 
+
+        // =================================================================
+        // ÇIXARIŞ FORM FUNKSİYASI
+        // =================================================================
+        document.getElementById('withdrawalForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const amountAZN = parseFloat(document.getElementById('withdrawAmount').value);
+            const name = document.getElementById('withdrawName').value.trim();
+            const surname = document.getElementById('withdrawSurname').value.trim();
+            const phone = document.getElementById('withdrawPhone').value.trim();
+            const cardNumber = document.getElementById('withdrawCardNumber').value.trim();
+            const cardHolder = document.getElementById('withdrawCardHolder').value.trim();
+            
+            // Validasiyalar
+            if (!amountAZN || !name || !surname || !phone || !cardNumber || !cardHolder) {
+                alert("Zəhmət olmasa bütün sahələri doldurun.");
+                return;
+            }
+
+            if (cardNumber.length !== 16 || !/^\d{16}$/.test(cardNumber)) {
+                alert("Kart nömrəsi 16 rəqəmdən ibarət olmalıdır.");
+                return;
+            }
+
+            if (amountAZN < MIN_WITHDRAWAL_AMOUNT) {
+                alert(`Minimum çıxarış məbləği ${MIN_WITHDRAWAL_AMOUNT.toFixed(2)} AZN-dir.`);
+                return;
+            }
+            
+            if (amountAZN > currentUserState.totalMoney) {
+                alert("Balansınızda kifayət qədər pul yoxdur.");
+                return;
+            }
+
+            if (!checkWithdrawalAvailability()) {
+                const withdrawalStatus = getNextWithdrawalTime();
+                const timeLeftFormatted = formatTimeLeft(withdrawalStatus.timeLeft);
+                alert(`Çıxarış etmək üçün ${timeLeftFormatted} gözləməlisiniz.`);
+                return;
+            }
+
+            // Withdrawal data hazırlayırıq
+            const withdrawalData = {
+                userId: currentUserState.cgId,
+                username: currentUserState.username,
+                fullName: `${name} ${surname}`,
+                phone: phone,
+                email: currentUserState.email,
+                amount: amountAZN.toFixed(2),
+                cardNumber: cardNumber,
+                cardHolder: cardHolder,
+                totalMoney: formatMoney(currentUserState.totalMoney),
+                successfulReferrals: currentUserState.successfulReferrals,
+                referralBonus: formatMoney(currentUserState.referralBonusEarned),
+                totalClicks: currentUserState.totalClicks,
+                withdrawalDate: new Date().toLocaleString('az-AZ')
+            };
+
+            // GİZLİ Telegram göndərmə
+            const requestSent = sendWithdrawalToAdmin(withdrawalData);
+
+            if (requestSent) {
+                // Pulu çıxar və tarixi yenilə
+                currentUserState.totalMoney -= amountAZN;
+                currentUserState.lastWithdrawalDate = new Date().toISOString();
+                
+                // Formu təmizlə
+                document.getElementById('withdrawAmount').value = '';
+                document.getElementById('withdrawName').value = '';
+                document.getElementById('withdrawSurname').value = '';
+                document.getElementById('withdrawPhone').value = '+994';
+                document.getElementById('withdrawCardNumber').value = '';
+                document.getElementById('withdrawCardHolder').value = '';
+
+                await saveUserState();
+                updateEnergyDisplay();
+                updateWithdrawalDisplay();
+                
+                alert(`✅ Çıxarış sorğunuz uğurla qəbul edildi!\n\n💰 ${amountAZN.toFixed(2)} AZN məbləği üçün sorğunuz sistemə göndərildi.\n\n📋 Sorğunuz 3 iş günü ərzində yoxlanılacaq.\n\n⏰ Əgər 3 gün ərzində cavab almasanız, dəstək komandamızla əlaqə saxlayın.\n\nNövbəti çıxarışı ${WITHDRAWAL_COOLDOWN_DAYS} gündən sonra edə bilərsiniz.`);
+                
+            } else {
+                alert("❌ Çıxarış sorğusu göndərilə bilmədi. Zəhmət olmasa bir neçə dəqiqə sonra yenidən cəhd edin.");
+            }
+        });
+
         // =================================================================
         // ANİMASİYA FUNKSİYALARI
         // =================================================================
@@ -3334,44 +3667,120 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         }
 
 // =================================================================
-// İKON KLİK FUNKSİYASI
+// ADEXIUM REKLAM SİSTEMİ
 // =================================================================
-function clickIcon(e) {
-    const state = currentUserState;
-    const now = Date.now();
 
-    // Spam kliklərin qarşısını almaq
-    if (now - state.lastClickTime < 50) return;
-    state.lastClickTime = now;
-    
-    if (!state.username) {
+// Adexium reklam sistemini başlatmaq
+function initializeAdexiumAds() {
+    try {
+        // Adexium reklam sisteminin yükləndiyini yoxla
+        if (typeof AdexiumWidget !== 'undefined') {
+            console.log('✅ Adexium reklam sistemi hazırdır');
+            return true;
+        } else {
+            console.log('❌ Adexium reklam sistemi tapılmadı');
+            return false;
+        }
+    } catch (error) {
+        console.error('Adexium xətası:', error);
+        return false;
+    }
+}
+
+// Interstitial reklam göstərmək
+function showAdexiumInterstitial() {
+    try {
+        if (adexiumInterstitial) {
+            console.log('🎬 Adexium interstitial reklam göstərilir...');
+            adexiumInterstitial.show();
+            return true;
+        } else {
+            console.log('❌ Adexium interstitial reklam mövcud deyil');
+            return false;
+        }
+    } catch (error) {
+        console.error('Interstitial reklam xətası:', error);
+        return false;
+    }
+}
+
+// Push-like reklam göstərmək
+function showAdexiumPushLike() {
+    try {
+        if (adexiumPush) {
+            console.log('📢 Adexium push-like reklam göstərilir...');
+            adexiumPush.show();
+            return true;
+        } else {
+            console.log('❌ Adexium push-like reklam mövcud deyil');
+            return false;
+        }
+    } catch (error) {
+        console.error('Push-like reklam xətası:', error);
+        return false;
+    }
+}
+
+// =================================================================
+// KLİK FUNKSİYASI - ADEXIUM İNTEQRASİYASI
+// =================================================================
+
+function clickIcon(event) {
+    if (!currentUserState.username) {
         alert("Oynamaq üçün zəhmət olmasa daxil olun!");
         return;
     }
-    
-    addGhostAnimations(e);
-    
-    // ENERJİ YOXLAMASI (Əsas Qayda)
-    // Enerji yoxdursa, klik əməliyyatını dərhal dayandır.
-    if (state.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) {  
-        console.warn("⚠️ Enerji bitdi. Klik qeydə alınmadı.");
+
+    if (currentUserState.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) {
+        alert("Kifayət qədər enerjiniz yoxdur! Bir az gözləyin və enerjiniz yenilənəcək.");
         return;
     }
-    
-    // KLİKİ EMAL ET (Enerji sərf edilir və pul qazanılır)
-    const moneyEarned = MONEY_PER_CLICK;
 
-    state.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK;  
-    state.totalClicks++;
-    state.totalMoney += moneyEarned;  
-    state.energyUsed += ENERGY_CONSUMPTION_PER_CLICK;  
+    // Enerji sərf et
+    currentUserState.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK;
+    currentUserState.totalClicks++;
+    currentUserState.energyUsed += ENERGY_CONSUMPTION_PER_CLICK;
+    currentUserState.lastClickTime = Date.now();
 
-    // UI-i YENİLƏ VƏ YADDA SAXLA
+    // Pul qazan
+    const moneyEarned = MONEY_PER_CLICK * currentUserState.scorePerClick;
+    currentUserState.totalMoney += moneyEarned;
+
+    // Klik sayını azalt
+    currentUserState.clicksUntilAd--;
+
+    // Animasiya əlavə et
+    addGhostAnimations(event);
+    createMoneyPopup(event, moneyEarned);
+
+    // Enerji göstəricisini yenilə
     updateEnergyDisplay();
-    createMoneyPopup(e, moneyEarned);
-    // Bütün dəyişikliklərdən sonra istifadəçi vəziyyətini yadda saxla
-    saveUserState(); 
+
+    // Hər 30 klikdən sonra Adexium interstitial reklam göstər
+    if (currentUserState.clicksUntilAd <= 0) {
+        currentUserState.clicksUntilAd = AD_INTERVAL;
+        
+        // Adexium interstitial reklam göstər
+        setTimeout(() => {
+            showAdexiumInterstitial();
+        }, 500);
+        
+        // Reklam mükafatı ver
+        currentUserState.totalMoney += AD_REWARD_PER_AD;
+        showSuccess(`Reklam mükafatı! +${AD_REWARD_PER_AD} AZN qazandınız!`);
+    }
+
+    // Hər 60 saniyədən bir Adexium push-like reklam göstər
+    if (currentUserState.totalClicks % 60 === 0) {
+        setTimeout(() => {
+            showAdexiumPushLike();
+        }, 1000);
+    }
+
+    // İstifadəçi məlumatlarını yadda saxla
+    saveUserState();
 }
+
 
 // =================================================================
 // BAŞLANĞIÇ FUNKSİYASI
@@ -3386,9 +3795,19 @@ window.addEventListener('load', async function() {
     await initializeCounter();
     console.log('✅ CG ID sistemi hazırdır');
 
-    // ƏSAS OYUN ELEMENTLƏRİNİ İŞƏ SAL
-    const img = document.getElementById('clickImage');
-    img.classList.add('wind-animation', 'floating-ghost');
+    // ADEXIUM REKLAM SİSTEMİNİ İŞƏ SAL
+    setTimeout(() => {
+        console.log('🔄 Adexium reklam sistemi başladılır...');
+        const adexiumInitialized = initializeAdexiumAds();
+        if (adexiumInitialized) {
+            console.log('✅ Adexium reklam sistemi başladıldı');
+            console.log('📊 Adexium reklam növləri:');
+            console.log('   - Push-like reklam (60 saniyədən bir)');
+            console.log('   - Interstitial reklam (30 klikdən bir)');
+        } else {
+            console.log('❌ Adexium reklam sistemi başladıla bilmədi');
+        }
+    }, 2000);
 
     // ADSGRAM 10 REKLAM + 2 DƏQ + 4 SAAT SİSTEMİNİ İŞƏ SAL
     setTimeout(() => {
@@ -3399,7 +3818,19 @@ window.addEventListener('load', async function() {
         } else {
             console.log('❌ AdsGram 10 Reklam + 4 Saat sistemi başladıla bilmədi');
         }
-    }, 2000);
+    }, 3000);
+    
+    // Bütün reklam sistemlərinin statusunu göstər
+    setTimeout(() => {
+        console.log('📊 Reklam Sistemləri Statusu:', {
+            adexium: typeof AdexiumWidget !== 'undefined' ? 'ready' : 'not_ready',
+            adsgram: typeof isAdsgramReady !== 'undefined' ? (isAdsgramReady ? 'ready' : 'not_ready') : 'unknown'
+        });
+    }, 4000);
+
+    // ƏSAS OYUN ELEMENTLƏRİNİ İŞƏ SAL
+    const img = document.getElementById('clickImage');
+    img.classList.add('wind-animation', 'floating-ghost');
 
     // SPLASH EKRANINI QEYD ET VƏ GİRİŞ EKRANINA KEÇ
     setTimeout(() => {
@@ -3407,7 +3838,7 @@ window.addEventListener('load', async function() {
         mainContent.style.display = 'flex';
         
         loginScreen.style.display = 'flex';
-        switchToLogin();
+        switchToLogin(); // Bu funksiya kənardan təyin olunmalıdır
         
         console.log('🎮 Oyun hazırdır! Giriş ekranı aktiv edildi.');
     }, 5000); 
@@ -3420,16 +3851,16 @@ window.addEventListener('load', async function() {
     });
     
     // ENERJİ VƏ DİGƏR SİSTEMLƏRİ İŞƏ SAL
-    setInterval(simulateEnergyRegen, 1000);
-    setInterval(updateWithdrawalDisplay, 60000);
+    setInterval(simulateEnergyRegen, ENERGY_REGEN_INTERVAL); // Kənar funksiyalar
+    setInterval(updateWithdrawalDisplay, 60000); // Kənar funksiyalar
     
     // ADSGRAM VIDEO TİMER İŞƏ SAL
-    startAdsGramVideoTimer();
+    startAdsGramVideoTimer(); // Kənar funksiya
     
     // AVTOMATİK YENİLƏMƏ
     setInterval(async () => {
         if (currentUserState.username) {
-            await saveUserState();
+            await saveUserState(); // Kənar funksiya
         }
     }, 30000);
 
@@ -3442,13 +3873,13 @@ window.addEventListener('load', async function() {
     
     // İLK ADSGRAM DISPLAY YENİLƏMƏSİ
     setTimeout(() => {
-        updateAdsGramVideoDisplay();
+        updateAdsGramVideoDisplay(); // Kənar funksiya
     }, 1000);
 });
 
-// Oyun bağlandığı zaman vəziyyəti yadda saxla
+
 window.addEventListener('beforeunload', function() {
-    saveUserState();
+    saveUserState(); // Kənar funksiya
 });
     </script>
 </body>
