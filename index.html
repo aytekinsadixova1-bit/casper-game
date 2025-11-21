@@ -17,12 +17,31 @@
     <!-- Telegram JS -->
     <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
 
-    <!-- RichAds SDK -->
+ <!-- RichAds SDK -->
     <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js"></script>
-
+    <script>
+        // RichAds reklam sistemini başlat
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof TelegramAdsController !== 'undefined') {
+                window.TelegramAdsController = new TelegramAdsController();
+                window.TelegramAdsController.initialize({
+                    pubId: "993631",
+                    appId: "4699",
+                });
+                console.log('✅ RichAds reklam sistemi başladıldı');
+            }
+        });
+    </script>
+    
     <!-- ADEXIUM - YALNIZ PUSH-LIKE QALSIN -->
     <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
-
+<script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+        const adexiumWidget = new AdexiumWidget({wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae', adFormat: 'push-like'});
+        adexiumWidget.autoMode();
+    });
+</script>
    <style>
         * {
             margin: 0;
@@ -1648,123 +1667,125 @@
     </div>
 
     <script>
-        // =================================================================
-        // REKLAM SİSTEMLƏRİNİN KONFİQURASİYASI
-        // =================================================================
+      // =================================================================
+// REKLAM SİSTEMLƏRİNİN KONFİQURASİYASI
+// =================================================================
 
-        // RichAds konfiqurasiyası
-        document.addEventListener('DOMContentLoaded', () => {
-            // RichAds
-            if (typeof TelegramAdsController !== 'undefined') {
-                window.TelegramAdsController = new TelegramAdsController();
-                window.TelegramAdsController.initialize({
-                    pubId: "993631",
-                    appId: "4699",
-                });
-                console.log('✅ RichAds reklam sistemi başladıldı');
-            }
-
-            // Adexium (Yalnız Push-like)
-            if (typeof AdexiumWidget !== 'undefined') {
-                window.adexiumPush = new AdexiumWidget({
-                    wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
-                    adFormat: 'push-like'
-                });
-                window.adexiumPush.autoMode();
-                console.log('✅ Adexium push-like reklam sistemi başladıldı');
-            }
+// RichAds konfiqurasiyası
+document.addEventListener('DOMContentLoaded', () => {
+    // RichAds
+    if (typeof TelegramAdsController !== 'undefined') {
+        window.TelegramAdsController = new TelegramAdsController();
+        window.TelegramAdsController.initialize({
+            pubId: "993631",
+            appId: "4699",
         });
+        console.log('✅ RichAds reklam sistemi başladıldı');
+    }
 
-        // =================================================================
-        // RICHADS REKLAM SİSTEMİ
-        // =================================================================
+    // Adexium (Yalnız Push-like)
+    if (typeof AdexiumWidget !== 'undefined') {
+        window.adexiumPush = new AdexiumWidget({
+            wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
+            adFormat: 'push-like'
+        });
+        window.adexiumPush.autoMode();
+        console.log('✅ Adexium push-like reklam sistemi başladıldı');
+    }
+});
 
-        // RichAds reklam sistemini başlatmaq
-        function initializeRichAds() {
-            try {
-                if (typeof TelegramAdsController !== 'undefined' && window.TelegramAdsController) {
-                    console.log('✅ RichAds reklam sistemi hazırdır');
-                    return true;
-                } else {
-                    console.log('❌ RichAds reklam sistemi tapılmadı');
-                    return false;
-                }
-            } catch (error) {
-                console.error('RichAds xətası:', error);
-                return false;
-            }
+// =================================================================
+// RICHADS REKLAM SİSTEMİ
+// =================================================================
+
+// RichAds reklam sistemini başlatmaq
+function initializeRichAds() {
+    try {
+        if (typeof TelegramAdsController !== 'undefined' && window.TelegramAdsController) {
+            console.log('✅ RichAds reklam sistemi hazırdır');
+            return true;
+        } else {
+            console.log('❌ RichAds reklam sistemi tapılmadı');
+            return false;
         }
+    } catch (error) {
+        console.error('RichAds xətası:', error);
+        return false;
+    }
+}
 
-        // RichAds interstitial reklam göstərmək
-        function showRichAdsInterstitial() {
-            try {
-                if (window.TelegramAdsController && typeof window.TelegramAdsController.showInterstitial === 'function') {
-                    console.log('🎬 RichAds interstitial reklam göstərilir...');
-                    window.TelegramAdsController.showInterstitial();
-                    return true;
-                } else {
-                    console.log('❌ RichAds interstitial reklam mövcud deyil');
-                    // Fallback: Mock reklam
-                    showMockInterstitialAd();
-                    return true;
-                }
-            } catch (error) {
-                console.error('RichAds interstitial reklam xətası:', error);
-                // Fallback: Mock reklam
-                showMockInterstitialAd();
-                return true;
-            }
+// RichAds interstitial reklam göstərmək
+function showRichAdsInterstitial() {
+    try {
+        if (window.TelegramAdsController && typeof window.TelegramAdsController.showInterstitial === 'function') {
+            console.log('🎬 RichAds interstitial reklam göstərilir...');
+            window.TelegramAdsController.showInterstitial();
+            return true;
+        } else {
+            console.log('❌ RichAds interstitial reklam mövcud deyil');
+            // Fallback: Mock reklam
+            showMockInterstitialAd();
+            return true;
         }
+    } catch (error) {
+        console.error('RichAds interstitial reklam xətası:', error);
+        // Fallback: Mock reklam
+        showMockInterstitialAd();
+        return true;
+    }
+}
 
-        // Mock interstitial reklam (fallback)
-        function showMockInterstitialAd() {
-            console.log('🎬 Mock interstitial reklam göstərilir...');
-            // Burada mock reklam göstərilə bilər
-            setTimeout(() => {
-                console.log('✅ Mock interstitial reklam tamamlandı');
-                // Reklam mükafatı ver
-                currentUserState.totalMoney += AD_REWARD_PER_AD;
-                showSuccess(`Reklam mükafatı! +${AD_REWARD_PER_AD} AZN qazandınız!`);
-                updateEnergyDisplay();
-            }, 2000);
+// Mock interstitial reklam (fallback)
+function showMockInterstitialAd() {
+    console.log('🎬 Mock interstitial reklam göstərilir...');
+    // Burada mock reklam göstərilə bilər
+    setTimeout(() => {
+        console.log('✅ Mock interstitial reklam tamamlandı');
+        // Reklam mükafatı ver
+        currentUserState.totalMoney += AD_REWARD_PER_AD;
+        showSuccess(`Reklam mükafatı! +${AD_REWARD_PER_AD} AZN qazandınız!`);
+        updateEnergyDisplay();
+    }, 2000);
+}
+
+// =================================================================
+// ADEXIUM PUSH-LIKE REKLAM SİSTEMİ
+// =================================================================
+
+// Adexium reklam sistemini başlatmaq
+function initializeAdexiumAds() {
+    try {
+        if (typeof AdexiumWidget !== 'undefined') {
+            console.log('✅ Adexium push-like reklam sistemi hazırdır');
+            return true;
+        } else {
+            console.log('❌ Adexium reklam sistemi tapılmadı');
+            return false;
         }
+    } catch (error) {
+        console.error('Adexium xətası:', error);
+        return false;
+    }
+}
 
-        // =================================================================
-        // ADEXIUM PUSH-LIKE REKLAM SİSTEMİ
-        // =================================================================
-
-        // Adexium reklam sistemini başlatmaq
-        function initializeAdexiumAds() {
-            try {
-                if (typeof AdexiumWidget !== 'undefined') {
-                    console.log('✅ Adexium push-like reklam sistemi hazırdır');
-                    return true;
-                } else {
-                    console.log('❌ Adexium reklam sistemi tapılmadı');
-                    return false;
-                }
-            } catch (error) {
-                console.error('Adexium xətası:', error);
-                return false;
-            }
+// Push-like reklam göstərmək
+function showAdexiumPushLike() {
+    try {
+        if (window.adexiumPush) {
+            console.log('📢 Adexium push-like reklam göstərilir...');
+            window.adexiumPush.show();
+            return true;
+        } else {
+            console.log('❌ Adexium push-like reklam mövcud deyil');
+            return false;
         }
+    } catch (error) {
+        console.error('Push-like reklam xətası:', error);
+        return false;
+    }
+}
 
-        // Push-like reklam göstərmək
-        function showAdexiumPushLike() {
-            try {
-                if (window.adexiumPush) {
-                    console.log('📢 Adexium push-like reklam göstərilir...');
-                    window.adexiumPush.show();
-                    return true;
-                } else {
-                    console.log('❌ Adexium push-like reklam mövcud deyil');
-                    return false;
-                }
-            } catch (error) {
-                console.error('Push-like reklam xətası:', error);
-                return false;
-            }
-        }
+
         // =================================================================
         // ŞİFRƏ BƏRPA SİSTEMİ
         // =================================================================
@@ -2679,65 +2700,64 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
         const subScreens = document.querySelectorAll('.game-sub-screen');
 
         // =================================================================
-        // YENİ KLİK FUNKSİYASI - RICHADS INTERSTITIAL İLƏ
-        // =================================================================
+// KLİK FUNKSİYASI - RICHADS INTERSTITIAL İLƏ
+// =================================================================
 
-        function clickIcon(event) {
-            if (!currentUserState.username) {
-                alert("Oynamaq üçün zəhmət olmasa daxil olun!");
-                return;
-            }
+function clickIcon(event) {
+    if (!currentUserState.username) {
+        alert("Oynamaq üçün zəhmət olmasa daxil olun!");
+        return;
+    }
 
-            if (currentUserState.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) {
-                alert("Kifayət qədər enerjiniz yoxdur! Bir az gözləyin və enerjiniz yenilənəcək.");
-                return;
-            }
+    if (currentUserState.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) {
+        alert("Kifayət qədər enerjiniz yoxdur! Bir az gözləyin və enerjiniz yenilənəcək.");
+        return;
+    }
 
-            // Enerji sərf et
-            currentUserState.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK;
-            currentUserState.totalClicks++;
-            currentUserState.energyUsed += ENERGY_CONSUMPTION_PER_CLICK;
-            currentUserState.lastClickTime = Date.now();
+    // Enerji sərf et
+    currentUserState.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK;
+    currentUserState.totalClicks++;
+    currentUserState.energyUsed += ENERGY_CONSUMPTION_PER_CLICK;
+    currentUserState.lastClickTime = Date.now();
 
-            // Pul qazan
-            const moneyEarned = MONEY_PER_CLICK * currentUserState.scorePerClick;
-            currentUserState.totalMoney += moneyEarned;
+    // Pul qazan
+    const moneyEarned = MONEY_PER_CLICK * currentUserState.scorePerClick;
+    currentUserState.totalMoney += moneyEarned;
 
-            // Klik sayını azalt
-            currentUserState.clicksUntilAd--;
+    // Klik sayını azalt
+    currentUserState.clicksUntilAd--;
 
-            // Animasiya əlavə et
-            addGhostAnimations(event);
-            createMoneyPopup(event, moneyEarned);
+    // Animasiya əlavə et
+    addGhostAnimations(event);
+    createMoneyPopup(event, moneyEarned);
 
-            // Enerji göstəricisini yenilə
-            updateEnergyDisplay();
+    // Enerji göstəricisini yenilə
+    updateEnergyDisplay();
 
-            // Hər 30 klikdən sonra RichAds interstitial reklam göstər
-            if (currentUserState.clicksUntilAd <= 0) {
-                currentUserState.clicksUntilAd = AD_INTERVAL;
-                
-                // RichAds interstitial reklam göstər
-                setTimeout(() => {
-                    showRichAdsInterstitial();
-                }, 500);
-                
-                // Reklam mükafatı ver
-                currentUserState.totalMoney += AD_REWARD_PER_AD;
-                showSuccess(`Reklam mükafatı! +${AD_REWARD_PER_AD} AZN qazandınız!`);
-            }
+    // Hər 30 klikdən sonra RichAds interstitial reklam göstər
+    if (currentUserState.clicksUntilAd <= 0) {
+        currentUserState.clicksUntilAd = AD_INTERVAL;
+        
+        // RichAds interstitial reklam göstər
+        setTimeout(() => {
+            showRichAdsInterstitial();
+        }, 500);
+        
+        // Reklam mükafatı ver
+        currentUserState.totalMoney += AD_REWARD_PER_AD;
+        showSuccess(`Reklam mükafatı! +${AD_REWARD_PER_AD} AZN qazandınız!`);
+    }
 
-            // Hər 60 saniyədən bir Adexium push-like reklam göstər
-            if (currentUserState.totalClicks % 60 === 0) {
-                setTimeout(() => {
-                    showAdexiumPushLike();
-                }, 1000);
-            }
+    // Hər 60 saniyədən bir Adexium push-like reklam göstər
+    if (currentUserState.totalClicks % 60 === 0) {
+        setTimeout(() => {
+            showAdexiumPushLike();
+        }, 1000);
+    }
 
-            // İstifadəçi məlumatlarını yadda saxla
-            saveUserState();
-        }
-
+    // İstifadəçi məlumatlarını yadda saxla
+    saveUserState();
+}
 // =================================================================
 // REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ - DÜZƏLDİLMİŞ
 // =================================================================
