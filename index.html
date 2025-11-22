@@ -20,17 +20,18 @@
  <!-- RichAds SDK -->
     <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js"></script>
     <script>
-        // RichAds reklam sistemini başlat
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof TelegramAdsController !== 'undefined') {
-                window.TelegramAdsController = new TelegramAdsController();
-                window.TelegramAdsController.initialize({
-                    pubId: "993631",
-                    appId: "4699",
-                });
-                console.log('✅ RichAds reklam sistemi başladıldı');
-            }
+       // RichAds reklam sistemini başlat
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof TelegramAdsController !== 'undefined') {
+        window.TelegramAdsController = new TelegramAdsController();
+        window.TelegramAdsController.initialize({
+            pubId: "993631",
+            appId: "4699",
+            interstitialId: "378679" // <--- BU SƏTRİ MÜTLƏQ ƏLAVƏ EDİN (Video ID)
         });
+        console.log('✅ RichAds reklam sistemi başladıldı (Video ID ilə)');
+    }
+});
     </script>
     
     <!-- ADEXIUM - YALNIZ PUSH-LIKE QALSIN -->
@@ -1667,7 +1668,8 @@
     </div>
 
     <script>
-      // =================================================================
+        
+ // =================================================================
 // REKLAM SİSTEMLƏRİNİN KONFİQURASİYASI
 // =================================================================
 
@@ -2699,7 +2701,7 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
         const navItems = document.querySelectorAll('.navbar .nav-item');
         const subScreens = document.querySelectorAll('.game-sub-screen');
 
-        // =================================================================
+ // =================================================================
 // KLİK FUNKSİYASI - RICHADS INTERSTITIAL İLƏ
 // =================================================================
 
