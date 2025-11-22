@@ -14,29 +14,24 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     
-   <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js"></script>
-<script>
-    // RichAds reklam sistemini başlat
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof TelegramAdsController !== 'undefined') {
-            window.TelegramAdsController = new TelegramAdsController();
-            
-            window.TelegramAdsController.initialize({
-                pubId: "993631",
-                appId: "4699",
-                interstitialId: "378679",       
-                playableadsId: "378680",        
-                interstitialbannerId: "378678", 
-                embeddedbannerId: "378677",     
-                pushstyleId: "378676"         
-            });
-            
-            console.log('✅ RichAds reklam sistemi bütün ID-lər ilə başladıldı');
-        } else {
-            console.error('❌ RichAds SDK yüklənmədi');
-        }
-    });
-</script>
+    <!-- Telegram JS -->
+    <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
+
+ <!-- RichAds SDK -->
+    <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js"></script>
+    <script>
+        // RichAds reklam sistemini başlat
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof TelegramAdsController !== 'undefined') {
+                window.TelegramAdsController = new TelegramAdsController();
+                window.TelegramAdsController.initialize({
+                    pubId: "993631",
+                    appId: "4699",
+                });
+                console.log('✅ RichAds reklam sistemi başladıldı');
+            }
+        });
+    </script>
     
     <!-- ADEXIUM - YALNIZ PUSH-LIKE QALSIN -->
     <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
@@ -1672,8 +1667,7 @@
     </div>
 
     <script>
-        
- // =================================================================
+      // =================================================================
 // REKLAM SİSTEMLƏRİNİN KONFİQURASİYASI
 // =================================================================
 
@@ -2705,76 +2699,63 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
         const navItems = document.querySelectorAll('.navbar .nav-item');
         const subScreens = document.querySelectorAll('.game-sub-screen');
 
- // =================================================================
-// KLİK FUNKSİYASI - RICHADS INTERSTITIAL (VIDEO) İLƏ
+        // =================================================================
+// KLİK FUNKSİYASI - RICHADS INTERSTITIAL İLƏ
 // =================================================================
 
 function clickIcon(event) {
-    // 1. Giriş yoxlaması
     if (!currentUserState.username) {
         alert("Oynamaq üçün zəhmət olmasa daxil olun!");
         return;
     }
 
-    // 2. Enerji yoxlaması
     if (currentUserState.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) {
         alert("Kifayət qədər enerjiniz yoxdur! Bir az gözləyin və enerjiniz yenilənəcək.");
         return;
     }
 
-    // 3. Enerji çıxılması və statistika
+    // Enerji sərf et
     currentUserState.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK;
     currentUserState.totalClicks++;
     currentUserState.energyUsed += ENERGY_CONSUMPTION_PER_CLICK;
     currentUserState.lastClickTime = Date.now();
 
-    // 4. Pul qazanılması
+    // Pul qazan
     const moneyEarned = MONEY_PER_CLICK * currentUserState.scorePerClick;
     currentUserState.totalMoney += moneyEarned;
 
-    // 5. Sayğacı azaltmaq (30-dan geriyə sayır)
+    // Klik sayını azalt
     currentUserState.clicksUntilAd--;
 
-    // 6. Animasiya və popup effektləri
+    // Animasiya əlavə et
     addGhostAnimations(event);
     createMoneyPopup(event, moneyEarned);
+
+    // Enerji göstəricisini yenilə
     updateEnergyDisplay();
 
-    // ============================================================
-    // 30 KLİK TAMAMLANANDA VİDEO REKLAM ÇAĞIRILMASI
-    // ============================================================
+    // Hər 30 klikdən sonra RichAds interstitial reklam göstər
     if (currentUserState.clicksUntilAd <= 0) {
+        currentUserState.clicksUntilAd = AD_INTERVAL;
         
-        // Sayğacı yenidən 30-a qaytarırıq (Növbəti dövrə üçün)
-        currentUserState.clicksUntilAd = 30; 
-        
-        console.log("🎬 30 klik bitdi! RichAds Video reklamı çağırılır...");
-
-        // RichAds Interstitial (Video) reklamını göstər
+        // RichAds interstitial reklam göstər
         setTimeout(() => {
-            // showRichAdsInterstitial() funksiyası initialize hissəsindəki ID-yə əsasən Video açacaq
-            if (typeof showRichAdsInterstitial === 'function') {
-                showRichAdsInterstitial();
-            } else if (window.TelegramAdsController) {
-                window.TelegramAdsController.showInterstitial();
-            }
+            showRichAdsInterstitial();
         }, 500);
         
-        // Reklam mükafatını ver
+        // Reklam mükafatı ver
         currentUserState.totalMoney += AD_REWARD_PER_AD;
         showSuccess(`Reklam mükafatı! +${AD_REWARD_PER_AD} AZN qazandınız!`);
     }
 
-    // Hər 60 klikdən bir Adexium (Push) reklamı (İstəyə bağlı)
+    // Hər 60 saniyədən bir Adexium push-like reklam göstər
     if (currentUserState.totalClicks % 60 === 0) {
         setTimeout(() => {
-            if (typeof showAdexiumPushLike === 'function') {
-                showAdexiumPushLike();
-            }
+            showAdexiumPushLike();
         }, 1000);
     }
 
-    // Məlumatları yadda saxla
+    // İstifadəçi məlumatlarını yadda saxla
     saveUserState();
 }
 // =================================================================
