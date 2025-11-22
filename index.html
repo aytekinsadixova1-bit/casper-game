@@ -14,29 +14,29 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     
-    <!-- Telegram JS -->
-    <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
-
- <!-- RichAds SDK -->
-    <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js"></script>
-    <script>
-       // RichAds reklam sistemini başlat
-document.addEventListener('DOMContentLoaded', function() {
-    if (typeof TelegramAdsController !== 'undefined') {
-        window.TelegramAdsController = new TelegramAdsController();
-        window.TelegramAdsController.initialize({
-            pubId: "993631",
-            appId: "4699",
-            interstitialId: "378679" // <--- BU SƏTRİ MÜTLƏQ ƏLAVƏ EDİN (Video ID)
-            playableadsId: "378680"
-            interstitialbannerId: "378678"
-            embeddedbannerId: "378677"
-            pushstyleId: "378676"
-        });
-        console.log('✅ RichAds reklam sistemi başladıldı (Video ID ilə)');
-    }
-});
-    </script>
+   <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js"></script>
+<script>
+    // RichAds reklam sistemini başlat
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof TelegramAdsController !== 'undefined') {
+            window.TelegramAdsController = new TelegramAdsController();
+            
+            window.TelegramAdsController.initialize({
+                pubId: "993631",
+                appId: "4699",
+                interstitialId: "378679",       
+                playableadsId: "378680",        
+                interstitialbannerId: "378678", 
+                embeddedbannerId: "378677",     
+                pushstyleId: "378676"         
+            });
+            
+            console.log('✅ RichAds reklam sistemi bütün ID-lər ilə başladıldı');
+        } else {
+            console.error('❌ RichAds SDK yüklənmədi');
+        }
+    });
+</script>
     
     <!-- ADEXIUM - YALNIZ PUSH-LIKE QALSIN -->
     <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
