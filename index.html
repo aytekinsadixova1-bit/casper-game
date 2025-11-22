@@ -1717,17 +1717,19 @@ function initializeRichAds() {
 // RichAds interstitial reklam göstərmək
 function showRichAdsInterstitial() {
     try {
-        if (window.TelegramAdsController && typeof window.TelegramAdsController.showOB === 'function') {
+        if (window.TelegramAdsController && typeof window.TelegramAdsController.showInterstitial === 'function') {
             console.log('🎬 RichAds interstitial reklam göstərilir...');
-            window.TelegramAdsController.showOB();   // ← DÜZGÜN FUNKSIYA
+            window.TelegramAdsController.showInterstitial();
             return true;
         } else {
             console.log('❌ RichAds interstitial reklam mövcud deyil');
+            // Fallback: Mock reklam
             showMockInterstitialAd();
             return true;
         }
     } catch (error) {
         console.error('RichAds interstitial reklam xətası:', error);
+        // Fallback: Mock reklam
         showMockInterstitialAd();
         return true;
     }
@@ -1736,14 +1738,15 @@ function showRichAdsInterstitial() {
 // Mock interstitial reklam (fallback)
 function showMockInterstitialAd() {
     console.log('🎬 Mock interstitial reklam göstərilir...');
+    // Burada mock reklam göstərilə bilər
     setTimeout(() => {
         console.log('✅ Mock interstitial reklam tamamlandı');
+        // Reklam mükafatı ver
         currentUserState.totalMoney += AD_REWARD_PER_AD;
         showSuccess(`Reklam mükafatı! +${AD_REWARD_PER_AD} AZN qazandınız!`);
         updateEnergyDisplay();
     }, 2000);
 }
-
 
 // =================================================================
 // ADEXIUM PUSH-LIKE REKLAM SİSTEMİ
@@ -2696,7 +2699,7 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
         const navItems = document.querySelectorAll('.navbar .nav-item');
         const subScreens = document.querySelectorAll('.game-sub-screen');
 
- // =================================================================
+        // =================================================================
 // KLİK FUNKSİYASI - RICHADS INTERSTITIAL İLƏ
 // =================================================================
 
@@ -2721,44 +2724,40 @@ function clickIcon(event) {
     const moneyEarned = MONEY_PER_CLICK * currentUserState.scorePerClick;
     currentUserState.totalMoney += moneyEarned;
 
-    // 30 klik sayını azalt
+    // Klik sayını azalt
     currentUserState.clicksUntilAd--;
 
-    // Vizual effekt
+    // Animasiya əlavə et
     addGhostAnimations(event);
     createMoneyPopup(event, moneyEarned);
 
     // Enerji göstəricisini yenilə
     updateEnergyDisplay();
 
-    // =================================================================
-    // 30 KLİKDƏ BİR – RICHADS OB REKLAM
-    // =================================================================
+    // Hər 30 klikdən sonra RichAds interstitial reklam göstər
     if (currentUserState.clicksUntilAd <= 0) {
         currentUserState.clicksUntilAd = AD_INTERVAL;
-
+        
+        // RichAds interstitial reklam göstər
         setTimeout(() => {
-            showRichAdsInterstitial();  // ← BURADA ARTİQ DÜZGÜN FUNKSIYA İŞLƏYİR
+            showRichAdsInterstitial();
         }, 500);
-
+        
         // Reklam mükafatı ver
         currentUserState.totalMoney += AD_REWARD_PER_AD;
         showSuccess(`Reklam mükafatı! +${AD_REWARD_PER_AD} AZN qazandınız!`);
     }
 
-    // =================================================================
-    // Hər 60 klikdə bir — Adexium push-like
-    // =================================================================
+    // Hər 60 saniyədən bir Adexium push-like reklam göstər
     if (currentUserState.totalClicks % 60 === 0) {
         setTimeout(() => {
             showAdexiumPushLike();
         }, 1000);
     }
 
-    // Məlumatları yadda saxla
+    // İstifadəçi məlumatlarını yadda saxla
     saveUserState();
 }
-
 // =================================================================
 // REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ - DÜZƏLDİLMİŞ
 // =================================================================
@@ -3831,6 +3830,22 @@ function initializeAdexiumAds() {
     }
 }
 
+// Interstitial reklam göstərmək
+function showAdexiumInterstitial() {
+    try {
+        if (adexiumInterstitial) {
+            console.log('🎬 Adexium interstitial reklam göstərilir...');
+            adexiumInterstitial.show();
+            return true;
+        } else {
+            console.log('❌ Adexium interstitial reklam mövcud deyil');
+            return false;
+        }
+    } catch (error) {
+        console.error('Interstitial reklam xətası:', error);
+        return false;
+    }
+}
 
 // Push-like reklam göstərmək
 function showAdexiumPushLike() {
