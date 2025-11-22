@@ -28,6 +28,10 @@ document.addEventListener('DOMContentLoaded', function() {
             pubId: "993631",
             appId: "4699",
             interstitialId: "378679" // <--- BU SƏTRİ MÜTLƏQ ƏLAVƏ EDİN (Video ID)
+            playableadsId: "378680"
+            interstitialbannerId: "378678"
+            embeddedbannerId: "378677"
+            pushstyleId: "378676"
         });
         console.log('✅ RichAds reklam sistemi başladıldı (Video ID ilə)');
     }
@@ -2702,62 +2706,75 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
         const subScreens = document.querySelectorAll('.game-sub-screen');
 
  // =================================================================
-// KLİK FUNKSİYASI - RICHADS INTERSTITIAL İLƏ
+// KLİK FUNKSİYASI - RICHADS INTERSTITIAL (VIDEO) İLƏ
 // =================================================================
 
 function clickIcon(event) {
+    // 1. Giriş yoxlaması
     if (!currentUserState.username) {
         alert("Oynamaq üçün zəhmət olmasa daxil olun!");
         return;
     }
 
+    // 2. Enerji yoxlaması
     if (currentUserState.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) {
         alert("Kifayət qədər enerjiniz yoxdur! Bir az gözləyin və enerjiniz yenilənəcək.");
         return;
     }
 
-    // Enerji sərf et
+    // 3. Enerji çıxılması və statistika
     currentUserState.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK;
     currentUserState.totalClicks++;
     currentUserState.energyUsed += ENERGY_CONSUMPTION_PER_CLICK;
     currentUserState.lastClickTime = Date.now();
 
-    // Pul qazan
+    // 4. Pul qazanılması
     const moneyEarned = MONEY_PER_CLICK * currentUserState.scorePerClick;
     currentUserState.totalMoney += moneyEarned;
 
-    // Klik sayını azalt
+    // 5. Sayğacı azaltmaq (30-dan geriyə sayır)
     currentUserState.clicksUntilAd--;
 
-    // Animasiya əlavə et
+    // 6. Animasiya və popup effektləri
     addGhostAnimations(event);
     createMoneyPopup(event, moneyEarned);
-
-    // Enerji göstəricisini yenilə
     updateEnergyDisplay();
 
-    // Hər 30 klikdən sonra RichAds interstitial reklam göstər
+    // ============================================================
+    // 30 KLİK TAMAMLANANDA VİDEO REKLAM ÇAĞIRILMASI
+    // ============================================================
     if (currentUserState.clicksUntilAd <= 0) {
-        currentUserState.clicksUntilAd = AD_INTERVAL;
         
-        // RichAds interstitial reklam göstər
+        // Sayğacı yenidən 30-a qaytarırıq (Növbəti dövrə üçün)
+        currentUserState.clicksUntilAd = 30; 
+        
+        console.log("🎬 30 klik bitdi! RichAds Video reklamı çağırılır...");
+
+        // RichAds Interstitial (Video) reklamını göstər
         setTimeout(() => {
-            showRichAdsInterstitial();
+            // showRichAdsInterstitial() funksiyası initialize hissəsindəki ID-yə əsasən Video açacaq
+            if (typeof showRichAdsInterstitial === 'function') {
+                showRichAdsInterstitial();
+            } else if (window.TelegramAdsController) {
+                window.TelegramAdsController.showInterstitial();
+            }
         }, 500);
         
-        // Reklam mükafatı ver
+        // Reklam mükafatını ver
         currentUserState.totalMoney += AD_REWARD_PER_AD;
         showSuccess(`Reklam mükafatı! +${AD_REWARD_PER_AD} AZN qazandınız!`);
     }
 
-    // Hər 60 saniyədən bir Adexium push-like reklam göstər
+    // Hər 60 klikdən bir Adexium (Push) reklamı (İstəyə bağlı)
     if (currentUserState.totalClicks % 60 === 0) {
         setTimeout(() => {
-            showAdexiumPushLike();
+            if (typeof showAdexiumPushLike === 'function') {
+                showAdexiumPushLike();
+            }
         }, 1000);
     }
 
-    // İstifadəçi məlumatlarını yadda saxla
+    // Məlumatları yadda saxla
     saveUserState();
 }
 // =================================================================
