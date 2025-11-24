@@ -1692,17 +1692,296 @@
     </div>
 
     <script>
-        // JavaScript kodu eyni qalır, sadəcə CSS-də rənglər tam tündləşdirildi
-        // ... JavaScript kodu eyni qalır ...
-    </script>
-</body>
-</html>
-            </div>
-        </div>
-    </div>
+        // =================================================================
+        // FIREBASE KONFİQURASİYASI
+        // =================================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAw5P8Y-IZRGXHiKvjM6WSCfTzRyLYY99U",
+            authDomain: "caspergame27102.firebaseapp.com",
+            projectId: "caspergame27102",
+            storageBucket: "caspergame27102.firebasestorage.app",
+            messagingSenderId: "846750787173",
+            appId: "1:846750787173:web:7ba7d1313a46bf0509c88c",
+            measurementId: "G-27VLW1WKLS"
+        };
 
-    <script>
-      // =================================================================
+        // Firebase-i işə sal
+        let auth, db;
+        try {
+            const app = firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            db = firebase.firestore();
+            
+            console.log('✅ Firebase uğurla işə salındı');
+        } catch (error) {
+            console.error('❌ Firebase xətası:', error);
+        }
+
+        // =================================================================
+        // OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR
+        // =================================================================
+
+        const ENERGY_CONSUMPTION_PER_CLICK = 1;      
+        const MAX_ENERGY_CAP = 100000;              
+        const MONEY_PER_CLICK = 0.000001;
+        const MONEY_DECIMAL_PLACES = 6;            
+        const REFERRAL_BONUS_AMOUNT = 0.10;
+        const HOURS_FOR_FULL_CHARGE = 24;
+        const SECONDS_FOR_FULL_CHARGE = HOURS_FOR_FULL_CHARGE * 60 * 60;
+        const ENERGY_REGEN_PER_SECOND = MAX_ENERGY_CAP / SECONDS_FOR_FULL_CHARGE;
+        const BASE_REGEN_RATE = 1000 / 60;  
+        const REFERRAL_BONUS_LIMIT = 10;
+        const MIN_WITHDRAWAL_AMOUNT = 3.00;
+        const WITHDRAWAL_COOLDOWN_DAYS = 10;
+        const MAX_WITHDRAWAL_AMOUNT = 1000.00;
+        const ADMIN_TELEGRAM_NUMBER = "994513248685";
+        const BASE_INVITE_URL = window.location.href.split('?')[0];
+
+        let currentUserState = {
+            cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
+            maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP,
+            totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
+            energyRegenRate: BASE_REGEN_RATE, scorePerClick: 1, lastEnergyUpdate: Date.now(), 
+            lastClickTime: Date.now(), successfulReferrals: 0, referralBonusEarned: 0.00, 
+            lastWithdrawalDate: null, registrationDate: null
+        };
+
+        // DOM Elementləri
+        const splashScreen = document.getElementById('splashScreen');
+        const mainContent = document.getElementById('mainContent');
+        const loginScreen = document.getElementById('loginScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const adScreen = document.getElementById('adScreen');
+        const adContent = document.getElementById('adContent');
+        const mainIcon = document.getElementById('mainIcon');
+        const welcomeText = document.getElementById('welcomeText');
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        const personalWelcomeText = document.getElementById('personalWelcomeText');
+        const inviteLinkDisplay = document.getElementById('inviteLinkDisplay');
+        const withdrawalUserIdDisplay = document.getElementById('withdrawalUserIdDisplay');
+        const energyFillEl = document.getElementById('energyFill');
+        const energyTextEl = document.getElementById('energyText');
+        const totalMoneyEl = document.getElementById('totalMoney');  
+        const profileCGIDEl = document.getElementById('profileCGID');
+        const profileUsernameEl = document.getElementById('profileUsername');
+        const profileFullNameEl = document.getElementById('profileFullName');
+        const profilePhoneEl = document.getElementById('profilePhone');
+        const profileEmailEl = document.getElementById('profileEmail');
+        const profileMoneyEl = document.getElementById('profileMoney');
+        const profileReferralCodeEl = document.getElementById('profileReferralCode');
+        const availableMoneyEl = document.getElementById('availableMoney');
+        const successfulReferralsEl = document.getElementById('successfulReferrals');
+        const referralBonusTotalEl = document.getElementById('referralBonusTotal');
+        const referralLimitEl = document.getElementById('referralLimit');
+        const nextWithdrawalTimeEl = document.getElementById('nextWithdrawalTime');
+        const withdrawalTimerInfoEl = document.getElementById('withdrawalTimerInfo');
+        const withdrawSubmitBtn = document.getElementById('withdrawSubmitBtn');
+        const navItems = document.querySelectorAll('.navbar .nav-item');
+        const subScreens = document.querySelectorAll('.game-sub-screen');
+
+        // =================================================================
+        // YENİ: KLİK ANİMASİYALARI VƏ BALANS YENİLƏMƏ
+        // =================================================================
+
+        function clickIcon(event) {
+            if (!currentUserState.username) {
+                alert("Oynamaq üçün zəhmət olmasa daxil olun!");
+                return;
+            }
+
+            if (currentUserState.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) {
+                alert("Kifayət qədər enerjiniz yoxdur! Enerji yenilənməsini gözləyin.");
+                return;
+            }
+
+            // Enerji sərf et
+            currentUserState.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK;
+            currentUserState.totalClicks++;
+            currentUserState.lastClickTime = Date.now();
+
+            // Pul əlavə et
+            currentUserState.totalMoney += MONEY_PER_CLICK;
+
+            // Animasiyaları başlat
+            addGhostAnimations(event);
+            createGhostParticles(event);
+
+            // Balansı yenilə
+            updateEnergyDisplay();
+            
+            // Firebase-ə yadda saxla
+            saveUserState();
+        }
+
+        // Kiçik ruh partikülləri yaratmaq
+        function createGhostParticles(event) {
+            const ghostColors = ['ghost-red', 'ghost-blue', 'ghost-green', 'ghost-purple', 'ghost-yellow', 'ghost-cyan'];
+            
+            // 3-5 təsadüfi ruh yarat
+            const particleCount = 3 + Math.floor(Math.random() * 3);
+            
+            for (let i = 0; i < particleCount; i++) {
+                setTimeout(() => {
+                    const ghostParticle = document.createElement('div');
+                    ghostParticle.className = 'ghost-particle';
+                    
+                    // Təsadüfi rəng seç
+                    const randomColor = ghostColors[Math.floor(Math.random() * ghostColors.length)];
+                    ghostParticle.classList.add(randomColor);
+                    
+                    // Təsadüfi ruh simvolu
+                    const ghostSymbols = ['👻', '💀', '👹', '👺', '🦇', '🕷️'];
+                    const randomSymbol = ghostSymbols[Math.floor(Math.random() * ghostSymbols.length)];
+                    ghostParticle.textContent = randomSymbol;
+                    
+                    // Təsadüfi başlanğıc mövqeyi
+                    let x, y;
+                    if (event.touches && event.touches.length > 0) {
+                        x = event.touches[0].clientX;
+                        y = event.touches[0].clientY;
+                    } else {
+                        x = event.clientX;
+                        y = event.clientY;
+                    }
+                    
+                    const rect = document.querySelector('.click-area').getBoundingClientRect();
+                    const startX = x - rect.left;
+                    const startY = y - rect.top;
+                    
+                    // Təsadüfi yerdəyişmə
+                    const offsetX = (Math.random() - 0.5) * 100;
+                    const offsetY = (Math.random() - 0.5) * 100;
+                    
+                    ghostParticle.style.left = (startX + offsetX) + 'px';
+                    ghostParticle.style.top = (startY + offsetY) + 'px';
+                    
+                    document.querySelector('.click-area').appendChild(ghostParticle);
+                    
+                    // Animasiya bitdikdən sonra sil
+                    setTimeout(() => {
+                        if (ghostParticle.parentNode) {
+                            ghostParticle.parentNode.removeChild(ghostParticle);
+                        }
+                    }, 1500);
+                    
+                }, i * 100); // Hər partikül üçün kiçik gecikmə
+            }
+        }
+
+        // Animasiyaları əlavə et
+        function addGhostAnimations(event) {
+            const icon = document.getElementById('mainIcon');
+            const img = document.getElementById('clickImage');
+            
+            img.classList.remove('ghost-hit-animation', 'ghost-stab-animation', 'ghost-explosion', 'ghost-scared-animation');
+            
+            const animations = ['ghost-hit-animation', 'ghost-stab-animation', 'ghost-explosion', 'ghost-scared-animation'];
+            const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
+            
+            img.classList.add(randomAnimation);
+            
+            createGhostStabEffect(event);
+            
+            setTimeout(() => {
+                img.classList.remove(randomAnimation);
+            }, 800);
+        }
+
+        function createGhostStabEffect(event) {
+            const stabEffect = document.createElement('div');
+            stabEffect.style.cssText = `
+                position: absolute;
+                width: 80px;
+                height: 80px;
+                background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 90;
+                animation: stabExpand 0.6s ease-out;
+            `;
+            
+            let x, y;
+            if (event.touches && event.touches.length > 0) {
+                x = event.touches[0].clientX;
+                y = event.touches[0].clientY;
+            } else {
+                x = event.clientX;
+                y = event.clientY;
+            }
+            
+            const rect = document.querySelector('.click-area').getBoundingClientRect();
+            stabEffect.style.left = (x - rect.left - 40) + 'px';
+            stabEffect.style.top = (y - rect.top - 40) + 'px';
+            
+            document.querySelector('.click-area').appendChild(stabEffect);
+            
+            setTimeout(() => {
+                stabEffect.remove();
+            }, 600);
+        }
+
+        // =================================================================
+        // ENERJİ VƏ BALANS YENİLƏMƏ
+        // =================================================================
+
+        function updateEnergyDisplay() {
+            const state = currentUserState;
+            const energyPercent = (state.currentEnergy / state.maxEnergy) * 100;
+            
+            energyFillEl.style.width = energyPercent + '%';
+            energyTextEl.textContent = state.currentEnergy.toFixed(0);
+            
+            if (energyPercent <= 20) {
+                energyFillEl.style.background = 'linear-gradient(90deg, #ff4d4d, #cc0000)'; 
+            } else if (energyPercent <= 50) {
+                energyFillEl.style.background = 'linear-gradient(90deg, #ff9933, #ff6600)'; 
+            } else {
+                energyFillEl.style.background = 'linear-gradient(90deg, #00b894, #55efc4)'; 
+            }
+            
+            totalMoneyEl.textContent = formatMoney(state.totalMoney);
+            
+            if (document.getElementById('friendsScreen').classList.contains('active')) {
+                updateInviteLinkDisplay();
+            }
+
+            if (document.getElementById('profileScreen').classList.contains('active')) {
+                updateProfileDisplay();
+            }
+
+            availableMoneyEl.textContent = formatMoney(state.totalMoney);
+            
+            // DƏVƏT STATISTIKASINI YENİLƏ
+            successfulReferralsEl.textContent = state.successfulReferrals || 0;
+            referralBonusTotalEl.textContent = formatMoney(state.referralBonusEarned || 0);
+            referralLimitEl.textContent = REFERRAL_BONUS_LIMIT;
+
+            saveUserState();
+        }
+
+        function simulateEnergyRegen() {
+            if (!currentUserState.username) return;
+
+            const now = Date.now();
+            const timePassedInSeconds = (now - currentUserState.lastEnergyUpdate) / 1000;
+            
+            if (timePassedInSeconds >= 1) { 
+                const energyToAdd = timePassedInSeconds * ENERGY_REGEN_PER_SECOND;
+                const oldEnergy = currentUserState.currentEnergy;
+                        
+                currentUserState.currentEnergy = Math.min(
+                    currentUserState.maxEnergy, 
+                    currentUserState.currentEnergy + energyToAdd
+                );
+                        
+                currentUserState.lastEnergyUpdate = now - ((energyToAdd % 1) * 1000);
+                        
+                if (Math.floor(currentUserState.currentEnergy) > Math.floor(oldEnergy)) {
+                    updateEnergyDisplay();
+                }
+            }
+        }
+ // =================================================================
 // REKLAM SİSTEMLƏRİNİN KONFİQURASİYASI
 // =================================================================
 
@@ -2051,30 +2330,7 @@ document.getElementById('forgotPasswordForm2').addEventListener('submit', async 
         // İlkin addımı göstər
         showForgotPasswordStep(1);
 
-// =================================================================
-// FIREBASE KONFİQURASİYASI
-// =================================================================
-const firebaseConfig = {
-    apiKey: "AIzaSyAw5P8Y-IZRGXHiKvjM6WSCfTzRyLYY99U",
-    authDomain: "caspergame27102.firebaseapp.com",
-    projectId: "caspergame27102",
-    storageBucket: "caspergame27102.firebasestorage.app",
-    messagingSenderId: "846750787173",
-    appId: "1:846750787173:web:7ba7d1313a46bf0509c88c",
-    measurementId: "G-27VLW1WKLS"
-};
 
-// Firebase-i işə sal
-let auth, db;
-try {
-    const app = firebase.initializeApp(firebaseConfig);
-    auth = firebase.auth();
-    db = firebase.firestore();
-    
-    console.log('✅ Firebase uğurla işə salındı');
-} catch (error) {
-    console.error('❌ Firebase xətası:', error);
-}
 
 // =================================================================
 // ADSGRAM TEST SİSTEMİ - SADƏ VERSİYA
@@ -2660,139 +2916,7 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             splashImg.onerror = () => handleImageError(splashImg, IMAGE_CONFIG.fallbackText);
             gameIcon.onerror = () => handleImageError(gameIcon, IMAGE_CONFIG.fallbackText);
         }
-        // =================================================================
-        // OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR
-        // =================================================================
-
-        const ENERGY_CONSUMPTION_PER_CLICK = 1;      
-        const MAX_ENERGY_CAP = 100000;              
-        const AD_DURATION = 10;
-        const AD_REWARD_PER_AD = 0.0001;
-        const CLICKS_FOR_AD = 30;
-        const AD_INTERVAL = CLICKS_FOR_AD;
-        const ENERGY_REGEN_INTERVAL = 1000;          
-        const MONEY_PER_CLICK = 0.000003;
-        const MONEY_DECIMAL_PLACES = 6;            
-        const REFERRAL_BONUS_AMOUNT = 0.10;
-        const HOURS_FOR_FULL_CHARGE = 24;
-        const SECONDS_FOR_FULL_CHARGE = HOURS_FOR_FULL_CHARGE * 60 * 60;
-        const ENERGY_REGEN_PER_SECOND = MAX_ENERGY_CAP / SECONDS_FOR_FULL_CHARGE;
-        const BASE_REGEN_RATE = 1000 / 60;  
-        const REFERRAL_BONUS_LIMIT = 10;
-        const MIN_WITHDRAWAL_AMOUNT = 3.00;
-        const WITHDRAWAL_COOLDOWN_DAYS = 10;
-        const MAX_WITHDRAWAL_AMOUNT = 1000.00;
-        const ADMIN_TELEGRAM_NUMBER = "994513248685";
-        const BASE_INVITE_URL = window.location.href.split('?')[0];
-
-        let currentAdIndex = 0;
-        let adTimerInterval;
-        let adTimeLeft = 0;
-        let totalAdRewardEarned = 0;
-        let referralUnsubscribe = null;
-
-        let currentUserState = {
-            cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
-            maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP,
-            clicksUntilAd: CLICKS_FOR_AD, totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
-            energyRegenRate: BASE_REGEN_RATE, scorePerClick: 1, lastEnergyUpdate: Date.now(), 
-            lastClickTime: Date.now(), successfulReferrals: 0, referralBonusEarned: 0.00, 
-            lastWithdrawalDate: null, registrationDate: null
-        };
-
-        // DOM Elementləri
-        const splashScreen = document.getElementById('splashScreen');
-        const mainContent = document.getElementById('mainContent');
-        const loginScreen = document.getElementById('loginScreen');
-        const gameScreen = document.getElementById('gameScreen');
-        const adScreen = document.getElementById('adScreen');
-        const adContent = document.getElementById('adContent');
-        const mainIcon = document.getElementById('mainIcon');
-        const welcomeText = document.getElementById('welcomeText');
-        const welcomeMessage = document.getElementById('welcomeMessage');
-        const personalWelcomeText = document.getElementById('personalWelcomeText');
-        const inviteLinkDisplay = document.getElementById('inviteLinkDisplay');
-        const withdrawalUserIdDisplay = document.getElementById('withdrawalUserIdDisplay');
-        const energyFillEl = document.getElementById('energyFill');
-        const energyTextEl = document.getElementById('energyText');
-        const totalMoneyEl = document.getElementById('totalMoney');  
-        const clicksUntilAdDisplay = document.getElementById('clicksUntilAdDisplay');
-        const profileCGIDEl = document.getElementById('profileCGID');
-        const profileUsernameEl = document.getElementById('profileUsername');
-        const profileFullNameEl = document.getElementById('profileFullName');
-        const profilePhoneEl = document.getElementById('profilePhone');
-        const profileEmailEl = document.getElementById('profileEmail');
-        const profileMoneyEl = document.getElementById('profileMoney');
-        const profileReferralCodeEl = document.getElementById('profileReferralCode');
-        const availableMoneyEl = document.getElementById('availableMoney');
-        const successfulReferralsEl = document.getElementById('successfulReferrals');
-        const referralBonusTotalEl = document.getElementById('referralBonusTotal');
-        const referralLimitEl = document.getElementById('referralLimit');
-        const nextWithdrawalTimeEl = document.getElementById('nextWithdrawalTime');
-        const withdrawalTimerInfoEl = document.getElementById('withdrawalTimerInfo');
-        const withdrawSubmitBtn = document.getElementById('withdrawSubmitBtn');
-        const navItems = document.querySelectorAll('.navbar .nav-item');
-        const subScreens = document.querySelectorAll('.game-sub-screen');
-
-        // =================================================================
-// KLİK FUNKSİYASI - RICHADS INTERSTITIAL İLƏ
-// =================================================================
-
-function clickIcon(event) {
-    if (!currentUserState.username) {
-        alert("Oynamaq üçün zəhmət olmasa daxil olun!");
-        return;
-    }
-
-    if (currentUserState.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) {
-        alert("Kifayət qədər enerjiniz yoxdur! Bir az gözləyin və enerjiniz yenilənəcək.");
-        return;
-    }
-
-    // Enerji sərf et
-    currentUserState.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK;
-    currentUserState.totalClicks++;
-    currentUserState.energyUsed += ENERGY_CONSUMPTION_PER_CLICK;
-    currentUserState.lastClickTime = Date.now();
-
-    // Pul qazan
-    const moneyEarned = MONEY_PER_CLICK * currentUserState.scorePerClick;
-    currentUserState.totalMoney += moneyEarned;
-
-    // Klik sayını azalt
-    currentUserState.clicksUntilAd--;
-
-    // Animasiya əlavə et
-    addGhostAnimations(event);
-    createMoneyPopup(event, moneyEarned);
-
-    // Enerji göstəricisini yenilə
-    updateEnergyDisplay();
-
-    // Hər 30 klikdən sonra RichAds interstitial reklam göstər
-    if (currentUserState.clicksUntilAd <= 0) {
-        currentUserState.clicksUntilAd = AD_INTERVAL;
-        
-        // RichAds interstitial reklam göstər
-        setTimeout(() => {
-            showRichAdsInterstitial();
-        }, 500);
-        
-        // Reklam mükafatı ver
-        currentUserState.totalMoney += AD_REWARD_PER_AD;
-        showSuccess(`Reklam mükafatı! +${AD_REWARD_PER_AD} AZN qazandınız!`);
-    }
-
-    // Hər 60 saniyədən bir Adexium push-like reklam göstər
-    if (currentUserState.totalClicks % 60 === 0) {
-        setTimeout(() => {
-            showAdexiumPushLike();
-        }, 1000);
-    }
-
-    // İstifadəçi məlumatlarını yadda saxla
-    saveUserState();
-}
+       
 // =================================================================
 // REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ - DÜZƏLDİLMİŞ
 // =================================================================
