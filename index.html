@@ -59,9 +59,9 @@
         }
 
         body {
-            background: linear-gradient(135deg, #050505 0%, #0d001a 25%, #1a000d 50%, #000d1a 75%, #050505 100%);
+            background: linear-gradient(135deg, #000000 0%, #050008 25%, #080005 50%, #000508 75%, #000000 100%);
             background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+            animation: gradientShift 20s ease infinite;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -79,16 +79,16 @@
             width: 100%;
             height: 100vh;
             max-height: 100vh;
-            background: rgba(10, 10, 15, 0.9);
+            background: rgba(0, 0, 5, 0.98);
             border-radius: 0;
-            box-shadow: 0 0 50px rgba(255, 0, 255, 0.3);
+            box-shadow: 0 0 30px rgba(80, 0, 80, 0.1);
             margin: 0;
             position: relative;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(40, 40, 60, 0.3);
         }
 
         /* Yeni: Parıldayan border effekti */
@@ -99,11 +99,12 @@
             left: -2px;
             right: -2px;
             bottom: -2px;
-            background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff00ff);
+            background: linear-gradient(45deg, #400040, #004040, #404000, #400040);
             background-size: 400% 400%;
-            animation: borderGlow 3s ease infinite;
+            animation: borderGlow 4s ease infinite;
             z-index: -1;
             border-radius: 0;
+            opacity: 0.3;
         }
 
         @keyframes borderGlow {
@@ -114,7 +115,7 @@
         .splash-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #0a1a2f 0%, #0f0f1a 100%);
+            background: linear-gradient(135deg, #000000 0%, #050008 100%);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             z-index: 1000;
             opacity: 1;
@@ -149,7 +150,7 @@
             margin-bottom: 10px;
         }
         .splash-subtext {
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.7);
             font-size: 12px;
             text-align: center;
             margin-bottom: 15px;
@@ -160,7 +161,7 @@
         .loading-bar { 
             width: 200px; 
             height: 4px; 
-            background: rgba(255,255,255,0.3); 
+            background: rgba(255,255,255,0.1); 
             border-radius: 2px; 
             margin-top: 15px; 
             overflow: hidden; 
@@ -168,7 +169,7 @@
         .loading-progress { 
             width: 0%; 
             height: 100%; 
-            background: linear-gradient(90deg, #ff00ff, #00ffff);
+            background: linear-gradient(90deg, #400040, #004040);
             border-radius: 2px; 
             animation: loading 5s linear forwards; 
         }
@@ -184,13 +185,13 @@
         }
 
         .header {
-            background: linear-gradient(135deg, rgba(255, 0, 255, 0.3) 0%, rgba(0, 255, 255, 0.3) 100%);
+            background: linear-gradient(135deg, rgba(60, 0, 60, 0.4) 0%, rgba(0, 60, 60, 0.4) 100%);
             color: white; 
             text-align: center; 
             padding: 15px; 
             flex-shrink: 0;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(50, 50, 70, 0.3);
         }
         
         .header h1 { 
@@ -198,11 +199,11 @@
             margin-bottom: 0px; 
             font-weight: 900; 
             letter-spacing: 1px; 
-            text-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+            text-shadow: 0 0 8px rgba(80, 0, 80, 0.3);
         }
         .header p { 
             font-size: 14px; 
-            opacity: 0.9; 
+            opacity: 0.8; 
             margin-top: 3px; 
         }
         
@@ -219,7 +220,7 @@
             height: 100%; 
             justify-content: space-between; 
             flex-grow: 1; 
-            background: linear-gradient(135deg, rgba(135, 206, 235, 0.1) 0%, rgba(70, 130, 180, 0.1) 100%) !important;
+            background: linear-gradient(135deg, rgba(40, 70, 100, 0.03) 0%, rgba(30, 50, 60, 0.03) 100%) !important;
         }
         
         .login-screen { 
@@ -232,17 +233,17 @@
         .energy-container { 
             margin-bottom: 5px; 
             padding: 8px 0; 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
-            border-top: 1px solid rgba(255, 255, 255, 0.1); 
+            border-bottom: 1px solid rgba(50, 50, 70, 0.3); 
+            border-top: 1px solid rgba(50, 50, 70, 0.3); 
         }
         .energy-bar { 
             width: 100%; 
             height: 16px; 
-            background: rgba(255, 255, 255, 0.1); 
+            background: rgba(30, 30, 40, 0.6); 
             border-radius: 8px; 
             overflow: hidden; 
             position: relative; 
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(60, 60, 80, 0.4);
         }
         .energy-fill { 
             height: 100%; 
@@ -261,15 +262,15 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5); 
         }
         .bonus-info {
-            background: rgba(227, 242, 253, 0.1);
+            background: rgba(60, 0, 60, 0.2);
             padding: 8px;
             border-radius: 6px;
             margin: 8px 0;
             text-align: center;
-            border-left: 3px solid #2196f3;
+            border-left: 3px solid #400040;
             font-size: 12px;
             color: white;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(3px);
         }
         .click-area { 
             text-align: center; 
@@ -301,7 +302,7 @@
             object-fit: contain !important;
             border-radius: 0;
             transition: all 0.3s ease;
-            filter: drop-shadow(0 5px 15px rgba(255, 255, 255, 0.5));
+            filter: drop-shadow(0 5px 15px rgba(255, 255, 255, 0.2));
             background: transparent !important;
             display: block !important;
         }
@@ -447,13 +448,13 @@
             margin: 15px 0 10px 0; 
             padding: 8px; 
             border-radius: 10px; 
-            background: rgba(248, 249, 250, 0.1); 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(40, 0, 40, 0.3); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(60, 60, 80, 0.4);
         }
         .money-stat-small { 
-            background: rgba(212, 237, 218, 0.1); 
+            background: rgba(0, 40, 40, 0.3); 
             color: #155724; 
             padding: 8px 12px; 
             border-radius: 8px; 
@@ -464,14 +465,14 @@
         .money-stat-small .stat-value { 
             font-size: 16px; 
             font-weight: bold; 
-            color: #00ff00;
-            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            color: #00cc00;
+            text-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
         }
         .money-stat-small .stat-label { 
             font-size: 10px; 
             text-transform: uppercase; 
             margin-top: 2px; 
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.7);
         }
         .score-popup, .money-popup { 
             position: absolute; 
@@ -481,9 +482,9 @@
             z-index: 50; 
         }
         .money-popup { 
-            color: #00ff00; 
+            color: #00cc00; 
             font-size: 14px; 
-            text-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
         }
         @keyframes floatUp { 
             0% { 
@@ -499,11 +500,11 @@
         .navbar { 
             display: flex; 
             justify-content: space-around; 
-            background: rgba(20, 20, 30, 0.9); 
+            background: rgba(10, 10, 20, 0.95); 
             padding: 8px 0; 
-            border-top: 3px solid rgba(255, 0, 255, 0.5); 
+            border-top: 3px solid rgba(60, 0, 60, 0.5); 
             flex-shrink: 0; 
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(5px);
         }
         .nav-item { 
             display: flex; 
@@ -520,7 +521,7 @@
         .nav-icon-wrapper { 
             width: 40px; 
             height: 40px; 
-            background: rgba(255, 255, 255, 0.1); 
+            background: rgba(40, 40, 60, 0.5); 
             border-radius: 50%; 
             display: flex; 
             align-items: center; 
@@ -537,8 +538,8 @@
             color: white; 
         }
         .nav-item.active .nav-icon-wrapper { 
-            background: rgba(255, 0, 255, 0.5); 
-            box-shadow: 0 0 15px rgba(255, 0, 255, 0.7); 
+            background: rgba(60, 0, 60, 0.6); 
+            box-shadow: 0 0 12px rgba(80, 0, 80, 0.5); 
         }
         .nav-item.active i { 
             color: white; 
@@ -549,8 +550,8 @@
             margin-bottom: 15px; 
             border-radius: 10px; 
             overflow: hidden; 
-            background: rgba(248, 249, 250, 0.1); 
-            border: 2px solid rgba(255, 255, 255, 0.1); 
+            background: rgba(40, 0, 40, 0.3); 
+            border: 2px solid rgba(60, 60, 80, 0.4); 
         }
         .tab { 
             flex: 1; 
@@ -563,7 +564,7 @@
             font-size: 12px; 
         }
         .tab.active { 
-            background: rgba(255, 0, 255, 0.3); 
+            background: rgba(60, 0, 60, 0.5); 
             color: white; 
         }
         .form { 
@@ -586,17 +587,17 @@
         .input-group input, .input-group select { 
             width: 100%; 
             padding: 10px; 
-            border: 2px solid rgba(255, 255, 255, 0.2); 
+            border: 2px solid rgba(60, 60, 80, 0.4); 
             border-radius: 6px; 
             font-size: 12px; 
             transition: border-color 0.3s; 
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(30, 30, 40, 0.6);
             color: white;
         }
         .input-group input:focus, .input-group select:focus { 
-            border-color: rgba(255, 0, 255, 0.7); 
+            border-color: rgba(80, 0, 80, 0.7); 
             outline: none; 
-            box-shadow: 0 0 0 2px rgba(255, 0, 255, 0.2); 
+            box-shadow: 0 0 0 2px rgba(80, 0, 80, 0.2); 
         }
         .input-group input::placeholder {
             color: rgba(255, 255, 255, 0.5);
@@ -604,7 +605,7 @@
         .btn {
             width: 100%; 
             padding: 12px; 
-            background: linear-gradient(135deg, rgba(255, 0, 255, 0.7) 0%, rgba(0, 255, 255, 0.7) 100%);
+            background: linear-gradient(135deg, rgba(60, 0, 60, 0.7) 0%, rgba(0, 60, 60, 0.7) 100%);
             color: white; 
             border: none; 
             border-radius: 8px; 
@@ -623,7 +624,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
             transition: left 0.5s;
         }
         .btn:hover::before {
@@ -639,14 +640,14 @@
             font-size: 12px; 
         }
         .error { 
-            background: rgba(255, 230, 230, 0.1); 
+            background: rgba(80, 0, 0, 0.3); 
             color: #ff6b6b; 
-            border: 1px solid rgba(255, 118, 117, 0.3); 
+            border: 1px solid rgba(100, 0, 0, 0.4); 
         }
         .success { 
-            background: rgba(230, 247, 230, 0.1); 
-            color: #00ff00; 
-            border: 1px solid rgba(85, 239, 196, 0.3); 
+            background: rgba(0, 80, 0, 0.3); 
+            color: #00cc00; 
+            border: 1px solid rgba(0, 100, 0, 0.4); 
         }
 
         .sub-header { 
@@ -654,19 +655,19 @@
             color: rgba(255, 255, 255, 0.9); 
             margin-bottom: 12px; 
             padding-bottom: 3px; 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2); 
+            border-bottom: 1px solid rgba(60, 60, 80, 0.4); 
         }
         .profile-item { 
-            background: rgba(248, 249, 250, 0.1); 
+            background: rgba(40, 0, 40, 0.3); 
             padding: 12px; 
             border-radius: 8px; 
             margin-bottom: 8px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            backdrop-filter: blur(3px);
+            border: 1px solid rgba(60, 60, 80, 0.4);
         }
         .profile-info h4 { 
             font-size: 12px; 
@@ -680,7 +681,7 @@
             font-weight: 500; 
         }
         .referral-container { 
-            background: rgba(212, 237, 218, 0.1); 
+            background: rgba(0, 40, 40, 0.3); 
             padding: 12px; 
             border-radius: 8px; 
             margin-top: 15px; 
@@ -688,21 +689,21 @@
             flex-direction: column; 
             align-items: center; 
             text-align: center; 
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(0, 255, 0, 0.2);
+            backdrop-filter: blur(3px);
+            border: 1px solid rgba(0, 80, 0, 0.3);
         }
         .referral-code { 
             font-size: 14px; 
             font-weight: bold; 
-            color: #00ff00; 
+            color: #00cc00; 
             margin: 8px 0; 
             padding: 5px 8px; 
-            background: rgba(255, 255, 255, 0.1); 
+            background: rgba(30, 30, 40, 0.6); 
             border-radius: 5px; 
-            border: 1px dashed rgba(0, 255, 0, 0.5); 
+            border: 1px dashed rgba(0, 100, 0, 0.4); 
         }
         .copy-btn { 
-            background: linear-gradient(135deg, rgba(0, 184, 148, 0.7), rgba(0, 206, 201, 0.7)); 
+            background: linear-gradient(135deg, rgba(0, 60, 0, 0.7), rgba(0, 80, 80, 0.7)); 
             color: white; 
             padding: 6px 12px; 
             border-radius: 6px; 
@@ -714,16 +715,16 @@
             margin-top: 8px; 
         }
         .friend-item { 
-            background: rgba(248, 249, 250, 0.1); 
+            background: rgba(40, 0, 40, 0.3); 
             padding: 12px; 
             border-radius: 8px; 
             margin-bottom: 8px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            backdrop-filter: blur(3px);
+            border: 1px solid rgba(60, 60, 80, 0.4);
         }
         .settings-btn-group { 
             display: flex; 
@@ -739,18 +740,18 @@
             cursor: pointer; 
             text-align: left; 
             transition: background 0.3s; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(60, 60, 80, 0.4); 
+            background: rgba(30, 30, 40, 0.5);
             color: white;
         }
         .settings-btn i { 
             margin-right: 8px; 
-            color: rgba(255, 0, 255, 0.7); 
+            color: rgba(80, 0, 80, 0.7); 
         }
         .delete-btn { 
-            background: rgba(248, 215, 218, 0.1); 
+            background: rgba(80, 0, 0, 0.3); 
             color: #ff6b6b; 
-            border: 1px solid rgba(245, 198, 203, 0.3); 
+            border: 1px solid rgba(100, 0, 0, 0.4); 
             margin-top: 12px; 
         }
 
@@ -759,7 +760,7 @@
             justify-content: space-around; 
             margin: 15px 0; 
             padding: 8px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(60, 60, 80, 0.4);
         }
         .social-icon-btn {
             width: 50px; 
@@ -772,7 +773,7 @@
             color: white;
             cursor: pointer;
             transition: transform 0.2s;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
             position: relative;
             overflow: hidden;
         }
@@ -783,7 +784,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
             transition: left 0.5s;
         }
         .social-icon-btn:hover::before {
@@ -792,8 +793,8 @@
         .social-icon-btn:hover {
             transform: scale(1.1);
         }
-        .whatsapp { background: #25d366; }
-        .telegram { background: #0088cc; }
+        .whatsapp { background: #1a5a1a; }
+        .telegram { background: #005580; }
         .tiktok { background: #000000; }
 
         .modal {
@@ -805,21 +806,21 @@
             width: 100%; 
             height: 100%;
             overflow: auto; 
-            background-color: rgba(0,0,0,0.7); 
+            background-color: rgba(0,0,0,0.9); 
             justify-content: center; 
             align-items: center;
         }
         .modal-content {
-            background-color: rgba(10, 10, 15, 0.95); 
+            background-color: rgba(0, 0, 10, 0.95); 
             margin: auto; 
             padding: 15px; 
             border-radius: 12px;
             width: 90%; 
             max-width: 320px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
             animation: slideUp 0.3s;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            border: 1px solid rgba(60, 60, 80, 0.5);
+            backdrop-filter: blur(5px);
         }
         .close-btn { 
             color: rgba(255, 255, 255, 0.7); 
@@ -835,7 +836,7 @@
         .modal h2 { 
             margin-top: 0; 
             color: white; 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2); 
+            border-bottom: 1px solid rgba(60, 60, 80, 0.5); 
             padding-bottom: 8px; 
             margin-bottom: 12px; 
             font-size: 18px;
@@ -852,40 +853,40 @@
         }
 
         .withdrawal-info {
-            background: rgba(227, 242, 253, 0.1);
+            background: rgba(0, 40, 40, 0.3);
             padding: 12px;
             border-radius: 8px;
             margin: 12px 0;
             text-align: center;
-            border-left: 3px solid rgba(33, 150, 243, 0.5);
+            border-left: 3px solid rgba(0, 80, 80, 0.5);
             font-size: 12px;
             color: white;
         }
 
         .withdrawal-warning {
-            background: rgba(255, 243, 205, 0.1);
-            color: #ffd700;
+            background: rgba(80, 80, 0, 0.3);
+            color: #cccc00;
             padding: 10px;
             border-radius: 6px;
             margin-bottom: 12px;
             font-size: 12px;
             text-align: center;
-            border: 1px solid rgba(255, 238, 186, 0.3);
+            border: 1px solid rgba(100, 100, 0, 0.4);
         }
 
         .user-id-container {
-            background: linear-gradient(135deg, rgba(255, 0, 255, 0.3), rgba(0, 255, 255, 0.3));
+            background: linear-gradient(135deg, rgba(60, 0, 60, 0.4), rgba(0, 60, 60, 0.4));
             color: white;
             padding: 12px;
             border-radius: 8px;
             margin: 12px 0;
             text-align: center;
-            border: 1px solid rgba(0, 255, 0, 0.3);
-            box-shadow: 0 4px 15px rgba(255, 0, 255, 0.3);
+            border: 1px solid rgba(0, 80, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(60, 0, 60, 0.3);
         }
 
         .user-id-badge {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(30, 30, 40, 0.6);
             color: white;
             padding: 8px 12px;
             border-radius: 15px;
@@ -893,7 +894,7 @@
             font-size: 14px;
             display: inline-block;
             margin: 8px 0;
-            border: 1px solid rgba(0, 255, 0, 0.3);
+            border: 1px solid rgba(0, 80, 0, 0.3);
         }
 
         .ad-screen {
@@ -903,7 +904,7 @@
             left: 0; 
             width: 100%; 
             height: 100%; 
-            background: linear-gradient(135deg, #0f0f1a 0%, #0a1425 100%); 
+            background: linear-gradient(135deg, #000000 0%, #050008 100%); 
             z-index: 2000; 
             align-items: center; 
             justify-content: center; 
@@ -914,25 +915,25 @@
         }
 
         .ad-content {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(30, 30, 40, 0.6);
             padding: 30px 20px;
             border-radius: 15px;
             max-width: 300px;
             width: 90%;
-            border: 2px solid;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
+            border: 2px solid rgba(60, 60, 80, 0.5);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
             margin-bottom: 15px;
         }
 
         .welcome-message {
-            background: linear-gradient(135deg, rgba(0, 184, 148, 0.7), rgba(85, 239, 196, 0.7));
+            background: linear-gradient(135deg, rgba(0, 60, 0, 0.7), rgba(0, 80, 80, 0.7));
             color: white;
             padding: 12px;
             border-radius: 8px;
             margin: 12px 0;
             text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3);
+            box-shadow: 0 4px 10px rgba(0, 60, 0, 0.3);
             animation: fadeIn 0.8s ease;
         }
 
@@ -948,19 +949,19 @@
         }
 
         .invite-link-container {
-            background: rgba(248, 249, 250, 0.1);
+            background: rgba(40, 0, 40, 0.3);
             padding: 12px;
             border-radius: 8px;
             margin: 12px 0;
-            border: 1px dashed rgba(255, 0, 255, 0.5);
+            border: 1px dashed rgba(60, 0, 60, 0.5);
         }
 
         .invite-link {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(30, 30, 40, 0.6);
             padding: 8px;
             border-radius: 6px;
             margin: 8px 0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(60, 60, 80, 0.4);
             word-break: break-all;
             font-size: 12px;
             color: white;
@@ -999,7 +1000,7 @@
         }
 
         .cg-id-badge {
-            background: linear-gradient(135deg, rgba(255, 0, 255, 0.3), rgba(0, 255, 255, 0.3));
+            background: linear-gradient(135deg, rgba(60, 0, 60, 0.4), rgba(0, 60, 60, 0.4));
             color: white;
             padding: 6px 12px;
             border-radius: 15px;
@@ -1007,12 +1008,12 @@
             font-size: 12px;
             display: inline-block;
             margin: 3px 0;
-            box-shadow: 0 2px 8px rgba(255, 0, 255, 0.3);
-            border: 1px solid rgba(0, 255, 0, 0.3);
+            box-shadow: 0 2px 8px rgba(60, 0, 60, 0.3);
+            border: 1px solid rgba(0, 80, 0, 0.3);
         }
         
         .withdraw-btn-disabled {
-            background: rgba(108, 117, 125, 0.5) !important;
+            background: rgba(50, 50, 60, 0.4) !important;
             cursor: not-allowed !important;
             opacity: 0.6 !important;
         }
@@ -1021,10 +1022,10 @@
             display: flex;
             justify-content: space-between;
             margin: 12px 0;
-            background: rgba(248, 249, 250, 0.1);
+            background: rgba(40, 0, 40, 0.3);
             padding: 12px;
             border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(60, 60, 80, 0.4);
         }
         
         .stat-item {
@@ -1035,8 +1036,8 @@
         .stat-value {
             font-size: 14px;
             font-weight: bold;
-            color: #00ffff;
-            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+            color: #00cccc;
+            text-shadow: 0 0 5px rgba(0, 200, 200, 0.3);
         }
         
         .stat-label {
@@ -1046,7 +1047,7 @@
         }
 
         .adsgram-video-btn {
-            background: linear-gradient(45deg, rgba(255, 107, 107, 0.7), rgba(255, 142, 83, 0.7));
+            background: linear-gradient(45deg, rgba(80, 0, 0, 0.7), rgba(80, 40, 0, 0.7));
             color: white;
             padding: 10px 15px;
             border: none;
@@ -1055,13 +1056,13 @@
             cursor: pointer;
             font-weight: bold;
             margin: 3px;
-            box-shadow: 0 3px 8px rgba(255, 107, 107, 0.3);
+            box-shadow: 0 3px 8px rgba(80, 0, 0, 0.3);
             transition: all 0.3s ease;
         }
 
         .adsgram-video-btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.4);
+            box-shadow: 0 4px 10px rgba(80, 0, 0, 0.4);
         }
 
         .adsgram-video-btn:active {
@@ -1087,7 +1088,7 @@
         }
         
         .forgot-password-link a {
-            color: rgba(255, 0, 255, 0.7);
+            color: rgba(80, 0, 80, 0.7);
             font-size: 12px;
             text-decoration: underline;
             cursor: pointer;
@@ -1103,7 +1104,7 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(40, 40, 60, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1114,24 +1115,24 @@
         }
         
         .step.active {
-            background: rgba(255, 0, 255, 0.7);
+            background: rgba(80, 0, 80, 0.7);
             color: white;
         }
         
         .step-line {
             width: 30px;
             height: 2px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(40, 40, 60, 0.5);
             margin: 0 2px;
             align-self: center;
         }
         
         .step-line.active {
-            background: rgba(255, 0, 255, 0.7);
+            background: rgba(80, 0, 80, 0.7);
         }
 
         .adsgram-video-btn:disabled {
-            background: rgba(108, 117, 125, 0.5);
+            background: rgba(50, 50, 60, 0.4);
             cursor: not-allowed;
             opacity: 0.6;
             transform: none;
@@ -1147,41 +1148,41 @@
 
         /* YENİ: Rəngli və animasiyalı ikonlar */
         .nav-icon-wrapper {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.7) 0%, rgba(118, 75, 162, 0.7) 100%) !important;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4) !important;
+            background: linear-gradient(135deg, rgba(40, 40, 70, 0.7) 0%, rgba(50, 30, 60, 0.7) 100%) !important;
+            box-shadow: 0 4px 12px rgba(40, 40, 70, 0.4) !important;
             transition: all 0.3s ease !important;
         }
 
         .nav-icon-wrapper:hover {
             transform: translateY(-3px) !important;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6) !important;
+            box-shadow: 0 8px 20px rgba(40, 40, 70, 0.6) !important;
         }
 
         /* Hər bir nav item üçün fərqli rənglər */
         .nav-item:nth-child(1) .nav-icon-wrapper {
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.7), rgba(255, 142, 83, 0.7)) !important;
+            background: linear-gradient(135deg, rgba(80, 0, 0, 0.7), rgba(80, 40, 0, 0.7)) !important;
         }
 
         .nav-item:nth-child(2) .nav-icon-wrapper {
-            background: linear-gradient(135deg, rgba(78, 205, 196, 0.7), rgba(68, 160, 141, 0.7)) !important;
+            background: linear-gradient(135deg, rgba(0, 60, 0, 0.7), rgba(0, 50, 50, 0.7)) !important;
         }
 
         .nav-item:nth-child(3) .nav-icon-wrapper {
-            background: linear-gradient(135deg, rgba(255, 217, 61, 0.7), rgba(255, 155, 64, 0.7)) !important;
+            background: linear-gradient(135deg, rgba(80, 80, 0, 0.7), rgba(80, 60, 0, 0.7)) !important;
         }
 
         .nav-item:nth-child(4) .nav-icon-wrapper {
-            background: linear-gradient(135deg, rgba(106, 17, 203, 0.7), rgba(37, 117, 252, 0.7)) !important;
+            background: linear-gradient(135deg, rgba(50, 0, 80, 0.7), rgba(20, 50, 100, 0.7)) !important;
         }
 
         .nav-item:nth-child(5) .nav-icon-wrapper {
-            background: linear-gradient(135deg, rgba(255, 88, 88, 0.7), rgba(240, 152, 25, 0.7)) !important;
+            background: linear-gradient(135deg, rgba(80, 0, 0, 0.7), rgba(100, 60, 0, 0.7)) !important;
         }
 
         /* Aktiv nav item üçün xüsusi stil */
         .nav-item.active .nav-icon-wrapper {
             animation: pulseGlow 2s infinite !important;
-            box-shadow: 0 0 20px currentColor !important;
+            box-shadow: 0 0 15px currentColor !important;
         }
 
         @keyframes pulseGlow {
@@ -1201,7 +1202,7 @@
             left: -10px;
             right: -10px;
             bottom: -10px;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
             border-radius: 50%;
             animation: floatGlow 3s ease-in-out infinite;
             z-index: -1;
@@ -1210,24 +1211,24 @@
         @keyframes floatGlow {
             0%, 100% {
                 transform: scale(1);
-                opacity: 0.5;
+                opacity: 0.2;
             }
             50% {
                 transform: scale(1.1);
-                opacity: 0.8;
+                opacity: 0.4;
             }
         }
 
         /* Hover effekti */
         .main-icon:hover img {
-            filter: drop-shadow(0 10px 20px rgba(255, 255, 255, 0.7));
+            filter: drop-shadow(0 10px 20px rgba(255, 255, 255, 0.2));
             transform: scale(1.05);
         }
 
         /* Klik effekti üçün partlayış */
         @keyframes clickExplosion {
             0% {
-                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2);
             }
             70% {
                 box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
@@ -1243,10 +1244,10 @@
 
         /* YENİ: Kartlara və statistiklara xüsusi dizayn */
         .stats-block, .profile-item, .friend-item {
-            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%) !important;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%) !important;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(60, 60, 80, 0.4);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
             position: relative;
             overflow: hidden;
         }
@@ -1258,7 +1259,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
             transition: left 0.5s;
         }
 
@@ -1268,13 +1269,13 @@
 
         /* Enerji barı üçün daha canlı görünüş */
         .energy-bar {
-            background: rgba(255,255,255,0.1) !important;
-            border: 2px solid rgba(255,255,255,0.2);
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+            background: rgba(30, 30, 40, 0.6) !important;
+            border: 2px solid rgba(60, 60, 80, 0.4);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
         }
 
         .energy-fill {
-            background: linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff) !important;
+            background: linear-gradient(90deg, #400040, #004040, #400040) !important;
             background-size: 200% 100%;
             animation: shimmer 2s infinite;
         }
@@ -1293,10 +1294,10 @@
             width: 100%;
             height: 100%;
             background: 
-                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
-            animation: backgroundShift 10s ease-in-out infinite;
+                radial-gradient(circle at 20% 80%, rgba(50, 40, 70, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(70, 40, 70, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(40, 70, 90, 0.1) 0%, transparent 50%);
+            animation: backgroundShift 15s ease-in-out infinite;
             z-index: -1;
         }
 
@@ -1305,7 +1306,7 @@
                 transform: scale(1);
             }
             50% {
-                transform: scale(1.1);
+                transform: scale(1.05);
             }
         }
 
@@ -1314,9 +1315,9 @@
             position: absolute;
             width: 50px;
             height: 50px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.03);
             border-radius: 50%;
-            animation: floatAround 20s infinite linear;
+            animation: floatAround 25s infinite linear;
         }
 
         @keyframes floatAround {
@@ -1340,46 +1341,46 @@
         /* YENİ: Neon effektləri */
         .neon-text {
             text-shadow: 
-                0 0 5px #fff,
-                0 0 10px #fff,
-                0 0 15px #fff,
-                0 0 20px #ff00ff,
-                0 0 35px #ff00ff,
-                0 0 40px #ff00ff;
+                0 0 3px #fff,
+                0 0 6px #fff,
+                0 0 9px #fff,
+                0 0 12px #400040,
+                0 0 18px #400040,
+                0 0 21px #400040;
         }
 
         .neon-border {
             box-shadow: 
-                0 0 5px rgba(255, 0, 255, 0.5),
-                0 0 10px rgba(255, 0, 255, 0.3),
-                0 0 15px rgba(255, 0, 255, 0.2),
-                inset 0 0 5px rgba(255, 0, 255, 0.1);
+                0 0 3px rgba(64, 0, 64, 0.2),
+                0 0 6px rgba(64, 0, 64, 0.15),
+                0 0 9px rgba(64, 0, 64, 0.1),
+                inset 0 0 3px rgba(64, 0, 64, 0.05);
         }
 
         /* YENİ: Parıldayan nöqtələr */
         .sparkle {
             position: absolute;
-            width: 3px;
-            height: 3px;
+            width: 2px;
+            height: 2px;
             background: white;
             border-radius: 50%;
-            animation: sparkle 2s infinite;
+            animation: sparkle 3s infinite;
         }
 
         @keyframes sparkle {
             0%, 100% { opacity: 0; transform: scale(0); }
-            50% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1); }
         }
 
         /* YENİ: Holografik effekt */
         .holographic {
             background: linear-gradient(45deg, 
-                rgba(255, 0, 255, 0.3), 
-                rgba(0, 255, 255, 0.3), 
-                rgba(255, 255, 0, 0.3), 
-                rgba(255, 0, 255, 0.3));
+                rgba(64, 0, 64, 0.1), 
+                rgba(0, 64, 64, 0.1), 
+                rgba(64, 64, 0, 0.1), 
+                rgba(64, 0, 64, 0.1));
             background-size: 400% 400%;
-            animation: holographic 3s ease infinite;
+            animation: holographic 4s ease infinite;
         }
 
         @keyframes holographic {
@@ -1394,15 +1395,15 @@
             height: 100%;
             background: linear-gradient(90deg, 
                 transparent, 
-                rgba(255, 255, 255, 0.4), 
+                rgba(255, 255, 255, 0.1), 
                 transparent);
-            animation: lightning 3s infinite;
+            animation: lightning 5s infinite;
             pointer-events: none;
         }
 
         @keyframes lightning {
             0%, 90%, 100% { opacity: 0; }
-            95% { opacity: 1; }
+            95% { opacity: 0.5; }
         }
 
         /* YENİ: Ruh animasiyaları */
@@ -1425,10 +1426,30 @@
                 transform: translate(var(--tx), var(--ty)) scale(0.5);
             }
         }
+
+        /* YENİ: Tünd arxa plan üçün əlavə tənzimləmələr */
+        .container, .header, .navbar, .stats-block, .profile-item, .friend-item {
+            background-blend-mode: overlay;
+        }
+
+        /* Tünd gradient overlay */
+        .dark-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
+            pointer-events: none;
+            z-index: -1;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
+    <!-- Tünd overlay -->
+    <div class="dark-overlay"></div>
+
     <!-- Firebase Status Indicator - GİZLƏ -->
     <div class="firebase-status" id="firebaseStatus" style="display: none;">Firebase: Yüklənir...</div>
 
@@ -1702,7 +1723,7 @@
                             <div class="social-icon-btn tiktok" onclick="shareOnTikTok()">
                                 <i class="fa-brands fa-tiktok"></i>
                             </div>
-                            <div class="social-icon-btn" style="background: #252525;" onclick="copyInviteLink()">
+                            <div class="social-icon-btn" style="background: #1a1a1a;" onclick="copyInviteLink()">
                                 <i class="fa-solid fa-link"></i>
                             </div>
                         </div>
@@ -1722,8 +1743,8 @@
                             </div>
                         </div>
                         
-                        <div class="referral-container" style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba;">
-                            <h4 style="color: #856404;">Dəvət Bonus Qaydası</h4>
+                        <div class="referral-container" style="background: rgba(80, 80, 0, 0.3); color: #cccc00; border: 1px solid rgba(100, 100, 0, 0.4);">
+                            <h4 style="color: #cccc00;">Dəvət Bonus Qaydası</h4>
                             <p style="font-size: 12px; margin-top: 3px;">
                                 Hər qeydiyyatdan keçən dostunuz üçün sizə **0.10 AZN** bonus verilir. Bonus yalnız ilk **10 uğurlu dəvət** üçün nəzərdə tutulub. 10 nəfərdən sonra bonus verilmir.</p>
                         </div>
@@ -1736,7 +1757,7 @@
                         <div class="user-id-container">
                             <h4 style="margin-bottom: 8px; color: white;">🆔 Sizin User ID</h4>
                             <div class="user-id-badge" id="withdrawalUserIdDisplay">Yüklənir...</div>
-                            <p style="color: #e0e0e0; font-size: 10px; margin-top: 6px;">
+                            <p style="color: #b0b0b0; font-size: 10px; margin-top: 6px;">
                                 Bu ID çıxarış sorğunuzda avtomatik olaraq adminə göndəriləcək
                             </p>
                         </div>
@@ -1838,7 +1859,7 @@
                 
                 <!-- Addım 1: İstifadəçi məlumatları -->
                 <div id="forgotPasswordStep1">
-                    <p style="font-size: 12px; color: #6c757d; margin-bottom: 15px;">
+                    <p style="font-size: 12px; color: #8a8a8a; margin-bottom: 15px;">
                         Şifrənizi və ya istifadəçi adınızı bərpa etmək üçün qeydiyyat zamanı daxil etdiyiniz məlumatları daxil edin
                     </p>
                     
@@ -1859,7 +1880,7 @@
                 
                 <!-- Addım 2: Təhlükəsizlik sorğuları -->
                 <div id="forgotPasswordStep2" style="display: none;">
-                    <p style="font-size: 12px; color: #6c757d; margin-bottom: 15px;">
+                    <p style="font-size: 12px; color: #8a8a8a; margin-bottom: 15px;">
                         Təhlükəsizliyi təsdiqləmək üçün aşağıdakı suallara cavab verin
                     </p>
                     
@@ -1880,7 +1901,7 @@
                 
                 <!-- Addım 3: Yeni məlumatlar -->
                 <div id="forgotPasswordStep3" style="display: none;">
-                    <p style="font-size: 12px; color: #6c757d; margin-bottom: 15px;">
+                    <p style="font-size: 12px; color: #8a8a8a; margin-bottom: 15px;">
                         Yeni məlumatlarınızı daxil edin
                     </p>
                     
@@ -1940,6 +1961,16 @@
                     <input type="text" id="deleteConfirm" placeholder="SİL" required>
                 </div>
                 <button class="btn delete-btn" onclick="deleteProfile()">Hesabımı Sil</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript kodu eyni qalır, sadəcə CSS-də rənglər tam tündləşdirildi
+        // ... JavaScript kodu eyni qalır ...
+    </script>
+</body>
+</html>
             </div>
         </div>
     </div>
