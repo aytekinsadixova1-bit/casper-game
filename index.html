@@ -3488,65 +3488,61 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
             }
         });
                 
-        // =================================================================
-        // ƏSAS OYUN FUNKSİYALARI
-        // =================================================================
+      // =================================================================
+// ƏSAS OYUN FUNKSİYALARI
+// =================================================================
 
-        function showWelcomeMessage() {
-            const userName = currentUserState.name || currentUserState.username;
-            const welcomeMessages = [
-                `Sizi yenidən görmək əladır, ${userName}! Oynamağa davam edin və daha çox qazanın! 🚀`,
-                `Xoş gəldiniz, ${userName}! Gününüz xoş keçsin və bol qazanclı olsun! 💫`,
-                `Təşəkkürlər, ${userName}! Yenidən oynamağa başladığınız üçün çox sevindik! 🎮`
-            ];
-            
-            const randomMessage = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
-            welcomeText.textContent = `Xoş gəldiniz, ${userName}! 👋`;
-            personalWelcomeText.textContent = randomMessage;
-            welcomeMessage.style.display = 'block';
-            
-            setTimeout(() => {
-                welcomeMessage.style.display = 'none';
-            }, 5000);
+function showWelcomeMessage() {
+    const userName = currentUserState.name || currentUserState.username;
+    const welcomeMessages = [
+        `Sizi yenidən görmək əladır, ${userName}! Oynamağa davam edin və daha çox qazanın! 🚀`,
+        `Xoş gəldiniz, ${userName}! Gününüz xoş keçsin və bol qazanclı olsun! 💫`,
+        `Təşəkkürlər, ${userName}! Yenidən oynamağa başladığınız üçün çox sevindik! 🎮`
+    ];
+    
+    const randomMessage = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+    welcomeText.textContent = `Xoş gəldiniz, ${userName}! 👋`;
+    personalWelcomeText.textContent = randomMessage;
+    welcomeMessage.style.display = 'block';
+    
+    setTimeout(() => {
+        welcomeMessage.style.display = 'none';
+    }, 5000);
+}
+
+function formatMoney(amount) {
+    return parseFloat(amount).toFixed(MONEY_DECIMAL_PLACES) + ' AZN';
+}
+
+function hideMessages() {
+    document.getElementById('errorMessage').style.display = 'none';
+    document.getElementById('successMessage').style.display = 'none';
+}
+
+// İstifadəçi məlumatlarını Firebase-ə yaz
+async function saveUserState() {
+    if (currentUserState.username) {
+        const stateToSave = { 
+            ...currentUserState, 
+            energyRegenRate: BASE_REGEN_RATE, 
+            maxEnergy: MAX_ENERGY_CAP,
+        };
+        
+        // Firebase-ə göndər
+        try {
+            await db.collection('users').doc(currentUserState.username).update(stateToSave);
+            console.log('✅ Firebase uğurlu');
+        } catch (error) {
+            console.warn('⚠️ Firebase uğursuz:', error);
         }
+    }
+}
 
-        function formatMoney(amount) {
-            return parseFloat(amount).toFixed(MONEY_DECIMAL_PLACES) + ' AZN';
-        }
-
-        function hideMessages() {
-            document.getElementById('errorMessage').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'none';
-        }
-
-        // İstifadəçi məlumatlarını Firebase-ə yaz
-        async function saveUserState() {
-            if (currentUserState.username) {
-                const stateToSave = { 
-                    ...currentUserState, 
-                    energyRegenRate: BASE_REGEN_RATE, 
-                    maxEnergy: MAX_ENERGY_CAP,
-                };
-                
-                // Firebase-ə göndər
-                try {
-                    await db.collection('users').doc(currentUserState.username).update(stateToSave);
-                    console.log('✅ Firebase uğurlu');
-                } catch (error) {
-                    console.warn('⚠️ Firebase uğursuz:', error);
-                }
-            }
-        }
-
-        function updateEnergyDisplay() {
-    // ⚠️ Qeyd: Bu funksiyanın düzgün işləməsi üçün 'energyFillEl', 
-    // 'totalMoneyEl', 'clicksUntilAdDisplay', və digər '...El' dəyişənləri 
-    // bu funksiyadan kənarda mütləq TƏYİN edilməlidir.
-
+function updateEnergyDisplay() {
     const state = currentUserState;
     const energyPercent = (state.currentEnergy / state.maxEnergy) * 100;
 
-    // --- ENERJİ BARINI VƏ MƏTNİ YENİLƏ (Null Yoxlaması) ---
+    // ENERJİ BARINI VƏ MƏTNİ YENİLƏ (Null Yoxlaması)
     if (energyFillEl) {
         energyFillEl.style.width = energyPercent + '%';
         
@@ -3564,20 +3560,13 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         energyTextEl.textContent = state.currentEnergy.toFixed(0);
     }
 
-    // --- PUL VƏ REKLAM KLİKLƏRİNİ YENİLƏ (ReferenceError-u aradan qaldırır) ---
-    // Bu hissələr əvvəl ReferenceError verirdi, indi elementin mövcudluğu yoxlanılır.
+    // PUL VƏ REKLAM KLİKLƏRİNİ YENİLƏ
     if (totalMoneyEl) {
         totalMoneyEl.textContent = formatMoney(state.totalMoney);
     }
     
-    if (clicksUntilAdDisplay) {
-        clicksUntilAdDisplay.textContent = state.clicksUntilAd;
-    }
-    
-    // --- EKRANLARI YOXLA VƏ ŞƏRTLİ YENİLƏMƏ ---
-    
+    // EKRANLARI YOXLA VƏ ŞƏRTLİ YENİLƏMƏ
     const friendsScreenEl = document.getElementById('friendsScreen');
-    // Əvvəlcə elementin mövcudluğunu, sonra isə onun 'active' olub-olmadığını yoxla
     if (friendsScreenEl && friendsScreenEl.classList.contains('active')) {
         updateInviteLinkDisplay();
     }
@@ -3590,51 +3579,57 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     if (availableMoneyEl) {
         availableMoneyEl.textContent = formatMoney(state.totalMoney);
     }
+    
+    // DƏVƏT STATISTIKASINI YENİLƏ
+    if (successfulReferralsEl) {
+        successfulReferralsEl.textContent = state.successfulReferrals || 0;
+    }
+    if (referralBonusTotalEl) {
+        referralBonusTotalEl.textContent = formatMoney(state.referralBonusEarned || 0);
+    }
+    if (referralLimitEl) {
+        referralLimitEl.textContent = REFERRAL_BONUS_LIMIT;
+    }
+
+    saveUserState();
 }
-            // DƏVƏT STATISTIKASINI YENİLƏ
-            successfulReferralsEl.textContent = state.successfulReferrals || 0;
-            referralBonusTotalEl.textContent = formatMoney(state.referralBonusEarned || 0);
-            referralLimitEl.textContent = REFERRAL_BONUS_LIMIT;
 
-            saveUserState();
-        }
+function updateProfileDisplay() {
+    const state = currentUserState;
 
-        function updateProfileDisplay() {
-            const state = currentUserState;
+    // CG ID GÖSTƏR
+    if (profileCGIDEl) profileCGIDEl.textContent = state.cgId || 'N/A';
+    if (profileUsernameEl) profileUsernameEl.textContent = state.username || 'N/A';
+    if (profileFullNameEl) profileFullNameEl.textContent = (state.name && state.surname) ? `${state.name} ${state.surname}` : 'N/A';
+    if (profilePhoneEl) profilePhoneEl.textContent = state.phone || 'N/A';
+    if (profileEmailEl) profileEmailEl.textContent = state.email || 'N/A';
+    if (profileMoneyEl) profileMoneyEl.textContent = formatMoney(state.totalMoney);
+    if (profileReferralCodeEl) profileReferralCodeEl.textContent = state.referralCode || 'GENERATING...';
+    
+    // DƏVƏT STATISTIKASINI YENİLƏ
+    if (successfulReferralsEl) successfulReferralsEl.textContent = state.successfulReferrals || 0;
+    if (referralBonusTotalEl) referralBonusTotalEl.textContent = formatMoney(state.referralBonusEarned || 0);
+    if (referralLimitEl) referralLimitEl.textContent = REFERRAL_BONUS_LIMIT;
 
-            // CG ID GÖSTƏR
-            profileCGIDEl.textContent = state.cgId || 'N/A';
-            profileUsernameEl.textContent = state.username || 'N/A';
-            profileFullNameEl.textContent = (state.name && state.surname) ? `${state.name} ${state.surname}` : 'N/A';
-            profilePhoneEl.textContent = state.phone || 'N/A';
-            profileEmailEl.textContent = state.email || 'N/A';
-            profileMoneyEl.textContent = formatMoney(state.totalMoney);
-            profileReferralCodeEl.textContent = state.referralCode || 'GENERATING...';
-            
-            // DƏVƏT STATISTIKASINI YENİLƏ
-            successfulReferralsEl.textContent = state.successfulReferrals || 0;
-            referralBonusTotalEl.textContent = formatMoney(state.referralBonusEarned || 0);
-            referralLimitEl.textContent = REFERRAL_BONUS_LIMIT;
+    if (document.getElementById('withdrawalScreen') && document.getElementById('withdrawalScreen').classList.contains('active')) {
+        updateWithdrawalDisplay();
+    }
+}
 
-            if (document.getElementById('withdrawalScreen').classList.contains('active')) {
-                updateWithdrawalDisplay();
-            }
-        }
+function copyReferralCode() {
+    const code = currentUserState.referralCode;
+    if (code) {
+        navigator.clipboard.writeText(code).then(() => {
+            alert(`Dəvət Kodu: ${code} uğurla kopyalandı!`);
+        }).catch(() => {
+            alert(`Dəvət Kodu: ${code} uğurla kopyalandı!`);
+        });
+    } else {
+        alert("Dəvət kodu hələ mövcud deyil.");
+    }
+}
 
-        function copyReferralCode() {
-            const code = currentUserState.referralCode;
-            if (code) {
-                navigator.clipboard.writeText(code).then(() => {
-                    alert(`Dəvət Kodu: ${code} uğurla kopyalandı!`);
-                }).catch(() => {
-                    alert(`Dəvət Kodu: ${code} uğurla kopyalandı!`);
-                });
-            } else {
-                alert("Dəvət kodu hələ mövcud deyil.");
-            }
-        }
-
-      function simulateEnergyRegen() {
+function simulateEnergyRegen() {
     // 1. İlkin yoxlama: İstifadəçi statusu yoxdursa, funksiyanı dayandır
     if (!currentUserState || !currentUserState.username) {
         return;
@@ -3643,7 +3638,6 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     const now = Date.now();
     
     // 2. Təhlükəsizlik yoxlaması: lastEnergyUpdate-in ilkin dəyərini təyin et
-    // Əgər dəyər mövcud deyilsə (yeni istifadəçi), cari zamanı (now) istifadə et
     const lastUpdate = currentUserState.lastEnergyUpdate || now; 
     
     // Keçən zamanı saniyələrlə hesablayırıq
@@ -3651,7 +3645,6 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     
     // Yalnız ən azı 1 saniyə keçibsə, enerjini bərpa et
     if (timePassedInSeconds >= 1) {
-        // Qeyd: ENERGY_REGEN_PER_SECOND dəyişəninin təyin edildiyinə əmin olun
         const energyToAdd = timePassedInSeconds * ENERGY_REGEN_PER_SECOND;
         const oldEnergy = currentUserState.currentEnergy;
         
@@ -3661,9 +3654,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
             currentUserState.currentEnergy + energyToAdd
         );
         
-        // 4. Yeniləmə vaxtını dəqiqliklə tənzimlə 
-        // (Fraksiya hissəsini növbəti hesablamaya qoymaq üçün)
-        // Bu, "now - kəsik hissə" kimi hesablanır
+        // 4. Yeniləmə vaxtını dəqiqliklə tənzimlə
         currentUserState.lastEnergyUpdate = now - ((energyToAdd % 1) * 1000);
         
         // 5. İnterfeysi yalnız tam enerji dəyişdikdə yenilə (Optimallaşdırma)
@@ -3673,82 +3664,81 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
         
     } else {
         // 6. Əgər 1 saniyə keçməyibsə, lakin lastEnergyUpdate hələ də təyin edilməyibsə,
-        // (bu, ilk çağırış üçün ehtiyat tədbiridir) onu cari vaxtla ilkinləşdir
         if (!currentUserState.lastEnergyUpdate) {
             currentUserState.lastEnergyUpdate = now;
         }
     }
 }
 
-        function createMoneyPopup(event, money) {
-            const popup = document.createElement('div');
-            popup.className = 'money-popup';
-            popup.textContent = `+${formatMoney(money)}`;
-            
-            let x, y;
-            if (event.touches && event.touches.length > 0) {
-                x = event.touches[0].clientX;
-                y = event.touches[0].clientY;
-            } else {
-                x = event.clientX;
-                y = event.clientY;
-            }
+function createMoneyPopup(event, money) {
+    const popup = document.createElement('div');
+    popup.className = 'money-popup';
+    popup.textContent = `+${formatMoney(money)}`;
+    
+    let x, y;
+    if (event.touches && event.touches.length > 0) {
+        x = event.touches[0].clientX;
+        y = event.touches[0].clientY;
+    } else {
+        x = event.clientX;
+        y = event.clientY;
+    }
 
-            const rect = document.querySelector('.click-area').getBoundingClientRect();
-            popup.style.left = (x - rect.left + 20) + 'px'; 
-            popup.style.top = (y - rect.top - 20) + 'px'; 
-            
-            document.querySelector('.click-area').appendChild(popup);
-            
-            setTimeout(() => popup.remove(), 1200);
+    const rect = document.querySelector('.click-area').getBoundingClientRect();
+    popup.style.left = (x - rect.left + 20) + 'px'; 
+    popup.style.top = (y - rect.top - 20) + 'px'; 
+    
+    document.querySelector('.click-area').appendChild(popup);
+    
+    setTimeout(() => popup.remove(), 1200);
+}
+
+function switchScreen(screenName) {
+    if (screenName === 'loginScreen') {
+        if (confirm("Oyundan çıxış etmək istədiyinizə əminsiniz?")) {
+            logout();
         }
-
-        function switchScreen(screenName) {
-            if (screenName === 'loginScreen') {
-                if (confirm("Oyundan çıxış etmək istədiyinizə əminsiniz?")) {
-                    logout();
-                }
-                return;
+        return;
+    }
+    
+    subScreens.forEach(screen => {
+        const isTargetScreen = screen.id === screenName;
+        screen.style.display = isTargetScreen ? 'block' : 'none'; 
+        if (isTargetScreen) {
+            screen.classList.add('active');
+            if (screenName === 'friendsScreen') {
+                updateInviteLinkDisplay();
             }
-            
-            subScreens.forEach(screen => {
-                const isTargetScreen = screen.id === screenName;
-                screen.style.display = isTargetScreen ? 'block' : 'none'; 
-                if (isTargetScreen) {
-                    screen.classList.add('active');
-                    if (screenName === 'friendsScreen') {
-                        updateInviteLinkDisplay();
-                    }
-                    if (screenName === 'profileScreen' || screenName === 'friendsScreen' || screenName === 'withdrawalScreen') {
-                        updateProfileDisplay();
-                    }
-                } else {
-                    screen.classList.remove('active');
-                }
-            });
-            
-            navItems.forEach(item => {
-                item.classList.remove('active');
-                if (item.getAttribute('data-target') === screenName) {
-                    item.classList.add('active');
-                }
-            });
-            
-            updateEnergyDisplay();
+            if (screenName === 'profileScreen' || screenName === 'friendsScreen' || screenName === 'withdrawalScreen') {
+                updateProfileDisplay();
+            }
+        } else {
+            screen.classList.remove('active');
         }
+    });
+    
+    navItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('data-target') === screenName) {
+            item.classList.add('active');
+        }
+    });
+    
+    updateEnergyDisplay();
+}
 
-        navItems.forEach(item => {
-            item.addEventListener('click', function() {
-                const target = this.getAttribute('data-target');
-                if (currentUserState.username === null && target !== 'loginScreen') {
-                     alert("Oynamaq üçün zəhmət olmasa daxil olun!");
-                     return;
-                }
-                switchScreen(target);
-            });
-        });
+navItems.forEach(item => {
+    item.addEventListener('click', function() {
+        const target = this.getAttribute('data-target');
+        if (currentUserState.username === null && target !== 'loginScreen') {
+             alert("Oynamaq üçün zəhmət olmasa daxil olun!");
+             return;
+        }
+        switchScreen(target);
+    });
+});
 
-    function logout() {
+function logout() {
     // REAL-TIME DİNLƏYİCİNİ DAYANDIR
     if (referralUnsubscribe) {
         referralUnsubscribe();
@@ -3784,126 +3774,127 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     showSuccess("Uğurla çıxış etdiniz. Yenidən oynamaq üçün giriş edin.");
     switchToLogin();
 }
-        function switchToLogin() {
-            document.getElementById('loginTab').classList.add('active');
-            document.getElementById('registerTab').classList.remove('active');
-            document.getElementById('loginForm').classList.add('active');
-            document.getElementById('loginForm').style.display = 'block'; 
-            document.getElementById('registerForm').classList.remove('active');
-            document.getElementById('registerForm').style.display = 'none'; 
-            hideMessages();
-            document.getElementById('registerPhone').value = '+994';
-            document.getElementById('withdrawPhone').value = '+994';
+
+function switchToLogin() {
+    document.getElementById('loginTab').classList.add('active');
+    document.getElementById('registerTab').classList.remove('active');
+    document.getElementById('loginForm').classList.add('active');
+    document.getElementById('loginForm').style.display = 'block'; 
+    document.getElementById('registerForm').classList.remove('active');
+    document.getElementById('registerForm').style.display = 'none'; 
+    hideMessages();
+    document.getElementById('registerPhone').value = '+994';
+    document.getElementById('withdrawPhone').value = '+994';
+}
+
+function switchToRegister() {
+    document.getElementById('registerTab').classList.add('active');
+    document.getElementById('loginTab').classList.remove('active');
+    document.getElementById('registerForm').classList.add('active');
+    document.getElementById('registerForm').style.display = 'block'; 
+    document.getElementById('loginForm').classList.remove('active');
+    document.getElementById('loginForm').style.display = 'none'; 
+    hideMessages();
+    document.getElementById('registerPhone').value = '+994';
+    document.getElementById('withdrawPhone').value = '+994';
+}
+
+document.getElementById('loginTab').addEventListener('click', switchToLogin);
+document.getElementById('registerTab').addEventListener('click', switchToRegister);
+
+function enforcePlus994(event) {
+    const input = event.target;
+    if (!input.value.startsWith('+994')) {
+        input.value = '+994';
+    }
+}
+document.getElementById('registerPhone').addEventListener('input', enforcePlus994);
+document.getElementById('withdrawPhone').addEventListener('input', enforcePlus994);
+
+// Modal funksiyaları
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex';
+        
+        if (modalId === 'editProfileModal') {
+            document.getElementById('editName').value = currentUserState.name || '';
+            document.getElementById('editSurname').value = currentUserState.surname || '';
+            document.getElementById('editEmail').value = currentUserState.email || '';
         }
+    }
+}
 
-        function switchToRegister() {
-            document.getElementById('registerTab').classList.add('active');
-            document.getElementById('loginTab').classList.remove('active');
-            document.getElementById('registerForm').classList.add('active');
-            document.getElementById('registerForm').style.display = 'block'; 
-            document.getElementById('loginForm').classList.remove('active');
-            document.getElementById('loginForm').style.display = 'none'; 
-            hideMessages();
-            document.getElementById('registerPhone').value = '+994';
-            document.getElementById('withdrawPhone').value = '+994';
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = "none";
+    }
+}
+
+document.getElementById('editProfileForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const newName = document.getElementById('editName').value.trim();
+    const newSurname = document.getElementById('editSurname').value.trim();
+    const newEmail = document.getElementById('editEmail').value.trim();
+
+    if (newName && newSurname && newEmail) {
+        currentUserState.name = newName;
+        currentUserState.surname = newSurname;
+        currentUserState.email = newEmail;
+        
+        await saveUserState();
+        updateProfileDisplay();
+        closeModal('editProfileModal');
+        alert("Profil məlumatlarınız uğurla yeniləndi!");
+    } else {
+        alert("Zəhmət olmasa bütün sahələri doldurun.");
+    }
+});
+
+async function deleteProfile() {
+    const confirmText = document.getElementById('deleteConfirm').value.trim();
+
+    if (confirmText !== 'SİL') {
+        alert("Hesabınızı silmək üçün zəhmət olmasa \"SİL\" sözünü böyük hərflərlə daxil edin.");
+        return;
+    }
+    
+    if (currentUserState.username) {
+        try {
+            await db.collection('users').doc(currentUserState.username).delete();
+            alert("Hesabınız uğurla silindi.");
+            closeModal('deleteProfileModal');
+            logout(); 
+        } catch (error) {
+            console.error('Hesab silmə xətası:', error);
+            alert("Hesab silinərkən xəta baş verdi.");
         }
+    }
+}
 
-        document.getElementById('loginTab').addEventListener('click', switchToLogin);
-        document.getElementById('registerTab').addEventListener('click', switchToRegister);
-
-        function enforcePlus994(event) {
-            const input = event.target;
-            if (!input.value.startsWith('+994')) {
-                input.value = '+994';
-            }
-        }
-        document.getElementById('registerPhone').addEventListener('input', enforcePlus994);
-        document.getElementById('withdrawPhone').addEventListener('input', enforcePlus994);
-
-        // Modal funksiyaları
-        function openModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.style.display = 'flex';
-                
-                if (modalId === 'editProfileModal') {
-                    document.getElementById('editName').value = currentUserState.name || '';
-                    document.getElementById('editSurname').value = currentUserState.surname || '';
-                    document.getElementById('editEmail').value = currentUserState.email || '';
-                }
-            }
-        }
-
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.style.display = 'none';
-            }
-        }
-
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = "none";
-            }
-        }
-
-        document.getElementById('editProfileForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const newName = document.getElementById('editName').value.trim();
-            const newSurname = document.getElementById('editSurname').value.trim();
-            const newEmail = document.getElementById('editEmail').value.trim();
-
-            if (newName && newSurname && newEmail) {
-                currentUserState.name = newName;
-                currentUserState.surname = newSurname;
-                currentUserState.email = newEmail;
-                
-                await saveUserState();
-                updateProfileDisplay();
-                closeModal('editProfileModal');
-                alert("Profil məlumatlarınız uğurla yeniləndi!");
-            } else {
-                alert("Zəhmət olmasa bütün sahələri doldurun.");
-            }
-        });
-
-        async function deleteProfile() {
-            const confirmText = document.getElementById('deleteConfirm').value.trim();
-
-            if (confirmText !== 'SİL') {
-                alert("Hesabınızı silmək üçün zəhmət olmasa \"SİL\" sözünü böyük hərflərlə daxil edin.");
-                return;
-            }
-            
-            if (currentUserState.username) {
-                try {
-                    await db.collection('users').doc(currentUserState.username).delete();
-                    alert("Hesabınız uğurla silindi.");
-                    closeModal('deleteProfileModal');
-                    logout(); 
-                } catch (error) {
-                    console.error('Hesab silmə xətası:', error);
-                    alert("Hesab silinərkən xəta baş verdi.");
-                }
-            }
-        }
-
-        // Çıxarış məbləği real-time validasiyası
-        document.getElementById('withdrawAmount').addEventListener('input', function(e) {
-            const amount = parseFloat(e.target.value) || 0;
-            const hint = document.getElementById('amountHint');
-            
-            if (amount < MIN_WITHDRAWAL_AMOUNT) {
-                hint.innerHTML = `<span style="color: #dc3545;">⚠️ Minimum ${MIN_WITHDRAWAL_AMOUNT.toFixed(2)} AZN</span>`;
-            } else if (amount > currentUserState.totalMoney) {
-                hint.innerHTML = `<span style="color: #dc3545;">⚠️ Balansınız kifayət deyil</span>`;
-            } else if (amount > MAX_WITHDRAWAL_AMOUNT) {
-                hint.innerHTML = `<span style="color: #dc3545;">⚠️ Maksimum ${MAX_WITHDRAWAL_AMOUNT.toFixed(2)} AZN</span>`;
-            } else {
-                hint.innerHTML = `<span style="color: #28a745;">✓ Məbləğ uyğundur</span>`;
-            }
-        });
+// Çıxarış məbləği real-time validasiyası
+document.getElementById('withdrawAmount').addEventListener('input', function(e) {
+    const amount = parseFloat(e.target.value) || 0;
+    const hint = document.getElementById('amountHint');
+    
+    if (amount < MIN_WITHDRAWAL_AMOUNT) {
+        hint.innerHTML = `<span style="color: #dc3545;">⚠️ Minimum ${MIN_WITHDRAWAL_AMOUNT.toFixed(2)} AZN</span>`;
+    } else if (amount > currentUserState.totalMoney) {
+        hint.innerHTML = `<span style="color: #dc3545;">⚠️ Balansınız kifayət deyil</span>`;
+    } else if (amount > MAX_WITHDRAWAL_AMOUNT) {
+        hint.innerHTML = `<span style="color: #dc3545;">⚠️ Maksimum ${MAX_WITHDRAWAL_AMOUNT.toFixed(2)} AZN</span>`;
+    } else {
+        hint.innerHTML = `<span style="color: #28a745;">✓ Məbləğ uyğundur</span>`;
+    }
+});
 
 
         // =================================================================
