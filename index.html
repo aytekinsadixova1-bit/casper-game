@@ -59,7 +59,9 @@
         }
 
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a0033 25%, #33001a 50%, #001a33 75%, #0c0c0c 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -67,18 +69,46 @@
             touch-action: manipulation;
         }
 
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .container {
             width: 100%;
             height: 100vh;
             max-height: 100vh;
-            background: white;
+            background: rgba(15, 15, 25, 0.85);
             border-radius: 0;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            box-shadow: 0 0 50px rgba(255, 0, 255, 0.3);
             margin: 0;
             position: relative;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Yeni: Parıldayan border effekti */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff00ff);
+            background-size: 400% 400%;
+            animation: borderGlow 3s ease infinite;
+            z-index: -1;
+            border-radius: 0;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
         .splash-screen {
@@ -138,7 +168,7 @@
         .loading-progress { 
             width: 0%; 
             height: 100%; 
-            background: white; 
+            background: linear-gradient(90deg, #ff00ff, #00ffff);
             border-radius: 2px; 
             animation: loading 5s linear forwards; 
         }
@@ -154,11 +184,13 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.3) 0%, rgba(0, 255, 255, 0.3) 100%);
             color: white; 
             text-align: center; 
             padding: 15px; 
             flex-shrink: 0;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .header h1 { 
@@ -166,6 +198,7 @@
             margin-bottom: 0px; 
             font-weight: 900; 
             letter-spacing: 1px; 
+            text-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
         }
         .header p { 
             font-size: 14px; 
@@ -186,7 +219,7 @@
             height: 100%; 
             justify-content: space-between; 
             flex-grow: 1; 
-            background: linear-gradient(135deg, #87CEEB 0%, #4682B4 100%) !important;
+            background: linear-gradient(135deg, rgba(135, 206, 235, 0.1) 0%, rgba(70, 130, 180, 0.1) 100%) !important;
         }
         
         .login-screen { 
@@ -199,16 +232,17 @@
         .energy-container { 
             margin-bottom: 5px; 
             padding: 8px 0; 
-            border-bottom: 1px solid #e9ecef; 
-            border-top: 1px solid #e9ecef; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+            border-top: 1px solid rgba(255, 255, 255, 0.1); 
         }
         .energy-bar { 
             width: 100%; 
             height: 16px; 
-            background: #e9ecef; 
+            background: rgba(255, 255, 255, 0.1); 
             border-radius: 8px; 
             overflow: hidden; 
             position: relative; 
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .energy-fill { 
             height: 100%; 
@@ -227,13 +261,15 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5); 
         }
         .bonus-info {
-            background: #e3f2fd;
+            background: rgba(227, 242, 253, 0.1);
             padding: 8px;
             border-radius: 6px;
             margin: 8px 0;
             text-align: center;
             border-left: 3px solid #2196f3;
             font-size: 12px;
+            color: white;
+            backdrop-filter: blur(5px);
         }
         .click-area { 
             text-align: center; 
@@ -411,25 +447,31 @@
             margin: 15px 0 10px 0; 
             padding: 8px; 
             border-radius: 10px; 
-            background: #f8f9fa; 
+            background: rgba(248, 249, 250, 0.1); 
             box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .money-stat-small { 
-            background: #d4edda; 
+            background: rgba(212, 237, 218, 0.1); 
             color: #155724; 
             padding: 8px 12px; 
             border-radius: 8px; 
             text-align: center; 
             margin-bottom: 0; 
+            color: white;
         }
         .money-stat-small .stat-value { 
             font-size: 16px; 
             font-weight: bold; 
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
         }
         .money-stat-small .stat-label { 
             font-size: 10px; 
             text-transform: uppercase; 
             margin-top: 2px; 
+            color: rgba(255, 255, 255, 0.8);
         }
         .score-popup, .money-popup { 
             position: absolute; 
@@ -439,8 +481,9 @@
             z-index: 50; 
         }
         .money-popup { 
-            color: #155724; 
+            color: #00ff00; 
             font-size: 14px; 
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
         }
         @keyframes floatUp { 
             0% { 
@@ -456,16 +499,17 @@
         .navbar { 
             display: flex; 
             justify-content: space-around; 
-            background: #1a1a2e; 
+            background: rgba(26, 26, 46, 0.8); 
             padding: 8px 0; 
-            border-top: 3px solid #0f3460; 
+            border-top: 3px solid rgba(255, 0, 255, 0.5); 
             flex-shrink: 0; 
+            backdrop-filter: blur(10px);
         }
         .nav-item { 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            color: #6c757d; 
+            color: rgba(255, 255, 255, 0.7); 
             font-size: 10px; 
             font-weight: 600; 
             cursor: pointer; 
@@ -486,15 +530,15 @@
         }
         .nav-item i { 
             font-size: 18px; 
-            color: #6c757d; 
+            color: rgba(255, 255, 255, 0.7); 
             transition: color 0.3s ease; 
         }
         .nav-item.active { 
             color: white; 
         }
         .nav-item.active .nav-icon-wrapper { 
-            background: #0f3460; 
-            box-shadow: 0 0 8px #0f3460; 
+            background: rgba(255, 0, 255, 0.5); 
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.7); 
         }
         .nav-item.active i { 
             color: white; 
@@ -505,8 +549,8 @@
             margin-bottom: 15px; 
             border-radius: 10px; 
             overflow: hidden; 
-            background: #f8f9fa; 
-            border: 2px solid #e9ecef; 
+            background: rgba(248, 249, 250, 0.1); 
+            border: 2px solid rgba(255, 255, 255, 0.1); 
         }
         .tab { 
             flex: 1; 
@@ -515,11 +559,11 @@
             cursor: pointer; 
             transition: all 0.3s ease; 
             font-weight: 600; 
-            color: #6c757d; 
+            color: rgba(255, 255, 255, 0.7); 
             font-size: 12px; 
         }
         .tab.active { 
-            background: #0f3460; 
+            background: rgba(255, 0, 255, 0.3); 
             color: white; 
         }
         .form { 
@@ -536,26 +580,31 @@
             display: block; 
             margin-bottom: 5px; 
             font-weight: 600; 
-            color: #495057; 
+            color: rgba(255, 255, 255, 0.9); 
             font-size: 12px; 
         }
         .input-group input, .input-group select { 
             width: 100%; 
             padding: 10px; 
-            border: 2px solid #e9ecef; 
+            border: 2px solid rgba(255, 255, 255, 0.2); 
             border-radius: 6px; 
             font-size: 12px; 
             transition: border-color 0.3s; 
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
         }
         .input-group input:focus, .input-group select:focus { 
-            border-color: #0f3460; 
+            border-color: rgba(255, 0, 255, 0.7); 
             outline: none; 
-            box-shadow: 0 0 0 2px rgba(15, 52, 96, 0.1); 
+            box-shadow: 0 0 0 2px rgba(255, 0, 255, 0.2); 
+        }
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
         }
         .btn {
             width: 100%; 
             padding: 12px; 
-            background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.7) 0%, rgba(0, 255, 255, 0.7) 100%);
             color: white; 
             border: none; 
             border-radius: 8px; 
@@ -564,6 +613,21 @@
             cursor: pointer; 
             transition: all 0.3s ease; 
             margin-top: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .btn:hover::before {
+            left: 100%;
         }
         .message { 
             padding: 8px; 
@@ -575,25 +639,25 @@
             font-size: 12px; 
         }
         .error { 
-            background: #ffe6e6; 
-            color: #d63031; 
-            border: 1px solid #ff7675; 
+            background: rgba(255, 230, 230, 0.1); 
+            color: #ff6b6b; 
+            border: 1px solid rgba(255, 118, 117, 0.3); 
         }
         .success { 
-            background: #e6f7e6; 
-            color: #00b894; 
-            border: 1px solid #55efc4; 
+            background: rgba(230, 247, 230, 0.1); 
+            color: #00ff00; 
+            border: 1px solid rgba(85, 239, 196, 0.3); 
         }
 
         .sub-header { 
             font-size: 16px; 
-            color: #0f3460; 
+            color: rgba(255, 255, 255, 0.9); 
             margin-bottom: 12px; 
             padding-bottom: 3px; 
-            border-bottom: 1px solid #0f3460; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2); 
         }
         .profile-item { 
-            background: #f8f9fa; 
+            background: rgba(248, 249, 250, 0.1); 
             padding: 12px; 
             border-radius: 8px; 
             margin-bottom: 8px; 
@@ -601,20 +665,22 @@
             justify-content: space-between; 
             align-items: center; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .profile-info h4 { 
             font-size: 12px; 
-            color: #1a1a2e; 
+            color: rgba(255, 255, 255, 0.9); 
             margin-bottom: 3px; 
             font-weight: 700; 
         }
         .profile-info p { 
             font-size: 12px; 
-            color: #6c757d; 
+            color: rgba(255, 255, 255, 0.7); 
             font-weight: 500; 
         }
         .referral-container { 
-            background: #d4edda; 
+            background: rgba(212, 237, 218, 0.1); 
             padding: 12px; 
             border-radius: 8px; 
             margin-top: 15px; 
@@ -622,19 +688,21 @@
             flex-direction: column; 
             align-items: center; 
             text-align: center; 
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(0, 255, 0, 0.2);
         }
         .referral-code { 
             font-size: 14px; 
             font-weight: bold; 
-            color: #155724; 
+            color: #00ff00; 
             margin: 8px 0; 
             padding: 5px 8px; 
-            background: white; 
+            background: rgba(255, 255, 255, 0.1); 
             border-radius: 5px; 
-            border: 1px dashed #00b894; 
+            border: 1px dashed rgba(0, 255, 0, 0.5); 
         }
         .copy-btn { 
-            background: linear-gradient(135deg, #00b894, #00cec9); 
+            background: linear-gradient(135deg, rgba(0, 184, 148, 0.7), rgba(0, 206, 201, 0.7)); 
             color: white; 
             padding: 6px 12px; 
             border-radius: 6px; 
@@ -646,7 +714,7 @@
             margin-top: 8px; 
         }
         .friend-item { 
-            background: #f8f9fa; 
+            background: rgba(248, 249, 250, 0.1); 
             padding: 12px; 
             border-radius: 8px; 
             margin-bottom: 8px; 
@@ -654,6 +722,8 @@
             justify-content: space-between; 
             align-items: center; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .settings-btn-group { 
             display: flex; 
@@ -669,16 +739,18 @@
             cursor: pointer; 
             text-align: left; 
             transition: background 0.3s; 
-            border: 1px solid #e9ecef; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
         }
         .settings-btn i { 
             margin-right: 8px; 
-            color: #0f3460; 
+            color: rgba(255, 0, 255, 0.7); 
         }
         .delete-btn { 
-            background: #f8d7da; 
-            color: #721c24; 
-            border: 1px solid #f5c6cb; 
+            background: rgba(248, 215, 218, 0.1); 
+            color: #ff6b6b; 
+            border: 1px solid rgba(245, 198, 203, 0.3); 
             margin-top: 12px; 
         }
 
@@ -687,7 +759,7 @@
             justify-content: space-around; 
             margin: 15px 0; 
             padding: 8px;
-            border-top: 1px solid #e9ecef;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
         .social-icon-btn {
             width: 50px; 
@@ -701,6 +773,21 @@
             cursor: pointer;
             transition: transform 0.2s;
             box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .social-icon-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        .social-icon-btn:hover::before {
+            left: 100%;
         }
         .social-icon-btn:hover {
             transform: scale(1.1);
@@ -718,12 +805,12 @@
             width: 100%; 
             height: 100%;
             overflow: auto; 
-            background-color: rgba(0,0,0,0.4); 
+            background-color: rgba(0,0,0,0.7); 
             justify-content: center; 
             align-items: center;
         }
         .modal-content {
-            background-color: #fff; 
+            background-color: rgba(15, 15, 25, 0.95); 
             margin: auto; 
             padding: 15px; 
             border-radius: 12px;
@@ -731,22 +818,24 @@
             max-width: 320px; 
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             animation: slideUp 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
         }
         .close-btn { 
-            color: #aaa; 
+            color: rgba(255, 255, 255, 0.7); 
             float: right; 
             font-size: 24px; 
             font-weight: bold; 
         }
         .close-btn:hover, .close-btn:focus { 
-            color: #000; 
+            color: white; 
             text-decoration: none; 
             cursor: pointer; 
         }
         .modal h2 { 
             margin-top: 0; 
-            color: #0f3460; 
-            border-bottom: 1px solid #0f3460; 
+            color: white; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2); 
             padding-bottom: 8px; 
             margin-bottom: 12px; 
             font-size: 18px;
@@ -763,47 +852,48 @@
         }
 
         .withdrawal-info {
-            background: #e3f2fd;
+            background: rgba(227, 242, 253, 0.1);
             padding: 12px;
             border-radius: 8px;
             margin: 12px 0;
             text-align: center;
-            border-left: 3px solid #2196f3;
+            border-left: 3px solid rgba(33, 150, 243, 0.5);
             font-size: 12px;
+            color: white;
         }
 
         .withdrawal-warning {
-            background: #fff3cd;
-            color: #856404;
+            background: rgba(255, 243, 205, 0.1);
+            color: #ffd700;
             padding: 10px;
             border-radius: 6px;
             margin-bottom: 12px;
             font-size: 12px;
             text-align: center;
-            border: 1px solid #ffeeba;
+            border: 1px solid rgba(255, 238, 186, 0.3);
         }
 
         .user-id-container {
-            background: linear-gradient(135deg, #0f3460, #1a1a2e);
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.3), rgba(0, 255, 255, 0.3));
             color: white;
             padding: 12px;
             border-radius: 8px;
             margin: 12px 0;
             text-align: center;
-            border: 1px solid #00b894;
-            box-shadow: 0 4px 15px rgba(15, 52, 96, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(255, 0, 255, 0.3);
         }
 
         .user-id-badge {
-            background: white;
-            color: #0f3460;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
             padding: 8px 12px;
             border-radius: 15px;
             font-weight: bold;
             font-size: 14px;
             display: inline-block;
             margin: 8px 0;
-            border: 1px solid #00b894;
+            border: 1px solid rgba(0, 255, 0, 0.3);
         }
 
         .ad-screen {
@@ -836,7 +926,7 @@
         }
 
         .welcome-message {
-            background: linear-gradient(135deg, #00b894, #55efc4);
+            background: linear-gradient(135deg, rgba(0, 184, 148, 0.7), rgba(85, 239, 196, 0.7));
             color: white;
             padding: 12px;
             border-radius: 8px;
@@ -858,28 +948,28 @@
         }
 
         .invite-link-container {
-            background: #f8f9fa;
+            background: rgba(248, 249, 250, 0.1);
             padding: 12px;
             border-radius: 8px;
             margin: 12px 0;
-            border: 1px dashed #0f3460;
+            border: 1px dashed rgba(255, 0, 255, 0.5);
         }
 
         .invite-link {
-            background: white;
+            background: rgba(255, 255, 255, 0.1);
             padding: 8px;
             border-radius: 6px;
             margin: 8px 0;
-            border: 1px solid #e9ecef;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             word-break: break-all;
             font-size: 12px;
-            color: #0f3460;
+            color: white;
             font-weight: 600;
         }
 
         .amount-input-hint {
             font-size: 10px;
-            color: #6c757d;
+            color: rgba(255, 255, 255, 0.7);
             margin-top: 3px;
             text-align: center;
         }
@@ -909,7 +999,7 @@
         }
 
         .cg-id-badge {
-            background: linear-gradient(135deg, #0f3460, #1a1a2e);
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.3), rgba(0, 255, 255, 0.3));
             color: white;
             padding: 6px 12px;
             border-radius: 15px;
@@ -917,12 +1007,12 @@
             font-size: 12px;
             display: inline-block;
             margin: 3px 0;
-            box-shadow: 0 2px 8px rgba(15, 52, 96, 0.3);
-            border: 1px solid #00b894;
+            box-shadow: 0 2px 8px rgba(255, 0, 255, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
         }
         
         .withdraw-btn-disabled {
-            background: #6c757d !important;
+            background: rgba(108, 117, 125, 0.5) !important;
             cursor: not-allowed !important;
             opacity: 0.6 !important;
         }
@@ -931,10 +1021,10 @@
             display: flex;
             justify-content: space-between;
             margin: 12px 0;
-            background: #f8f9fa;
+            background: rgba(248, 249, 250, 0.1);
             padding: 12px;
             border-radius: 8px;
-            border: 1px solid #e9ecef;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .stat-item {
@@ -945,17 +1035,18 @@
         .stat-value {
             font-size: 14px;
             font-weight: bold;
-            color: #0f3460;
+            color: #00ffff;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
         }
         
         .stat-label {
             font-size: 10px;
-            color: #6c757d;
+            color: rgba(255, 255, 255, 0.7);
             margin-top: 3px;
         }
 
         .adsgram-video-btn {
-            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            background: linear-gradient(45deg, rgba(255, 107, 107, 0.7), rgba(255, 142, 83, 0.7));
             color: white;
             padding: 10px 15px;
             border: none;
@@ -996,7 +1087,7 @@
         }
         
         .forgot-password-link a {
-            color: #0f3460;
+            color: rgba(255, 0, 255, 0.7);
             font-size: 12px;
             text-decoration: underline;
             cursor: pointer;
@@ -1012,35 +1103,35 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: #e9ecef;
+            background: rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 5px;
             font-size: 10px;
             font-weight: bold;
-            color: #6c757d;
+            color: rgba(255, 255, 255, 0.7);
         }
         
         .step.active {
-            background: #0f3460;
+            background: rgba(255, 0, 255, 0.7);
             color: white;
         }
         
         .step-line {
             width: 30px;
             height: 2px;
-            background: #e9ecef;
+            background: rgba(255, 255, 255, 0.1);
             margin: 0 2px;
             align-self: center;
         }
         
         .step-line.active {
-            background: #0f3460;
+            background: rgba(255, 0, 255, 0.7);
         }
 
         .adsgram-video-btn:disabled {
-            background: #6c757d;
+            background: rgba(108, 117, 125, 0.5);
             cursor: not-allowed;
             opacity: 0.6;
             transform: none;
@@ -1049,14 +1140,14 @@
 
         .bonus-timer {
             font-size: 10px;
-            color: #6c757d;
+            color: rgba(255, 255, 255, 0.7);
             margin-top: 3px;
             font-weight: bold;
         }
 
         /* YENİ: Rəngli və animasiyalı ikonlar */
         .nav-icon-wrapper {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.7) 0%, rgba(118, 75, 162, 0.7) 100%) !important;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4) !important;
             transition: all 0.3s ease !important;
         }
@@ -1068,23 +1159,23 @@
 
         /* Hər bir nav item üçün fərqli rənglər */
         .nav-item:nth-child(1) .nav-icon-wrapper {
-            background: linear-gradient(135deg, #FF6B6B, #FF8E53) !important;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.7), rgba(255, 142, 83, 0.7)) !important;
         }
 
         .nav-item:nth-child(2) .nav-icon-wrapper {
-            background: linear-gradient(135deg, #4ECDC4, #44A08D) !important;
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.7), rgba(68, 160, 141, 0.7)) !important;
         }
 
         .nav-item:nth-child(3) .nav-icon-wrapper {
-            background: linear-gradient(135deg, #FFD93D, #FF9B40) !important;
+            background: linear-gradient(135deg, rgba(255, 217, 61, 0.7), rgba(255, 155, 64, 0.7)) !important;
         }
 
         .nav-item:nth-child(4) .nav-icon-wrapper {
-            background: linear-gradient(135deg, #6A11CB, #2575FC) !important;
+            background: linear-gradient(135deg, rgba(106, 17, 203, 0.7), rgba(37, 117, 252, 0.7)) !important;
         }
 
         .nav-item:nth-child(5) .nav-icon-wrapper {
-            background: linear-gradient(135deg, #FF5858, #F09819) !important;
+            background: linear-gradient(135deg, rgba(255, 88, 88, 0.7), rgba(240, 152, 25, 0.7)) !important;
         }
 
         /* Aktiv nav item üçün xüsusi stil */
@@ -1096,56 +1187,6 @@
         @keyframes pulseGlow {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
-        }
-
-        /* Sosial media ikonları üçün daha canlı effektlər */
-        .social-icon-btn {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .social-icon-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s;
-        }
-
-        .social-icon-btn:hover::before {
-            left: 100%;
-        }
-
-        /* YENİ: Düymələrə xüsusi effektlər */
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-            position: relative;
-            overflow: hidden;
-            border: none;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
         }
 
         /* YENİ: Əsas oyun ikonuna daha canlı effektlər */
@@ -1202,9 +1243,9 @@
 
         /* YENİ: Kartlara və statistiklara xüsusi dizayn */
         .stats-block, .profile-item, .friend-item {
-            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%) !important;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%) !important;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
             box-shadow: 0 8px 32px rgba(0,0,0,0.1);
             position: relative;
             overflow: hidden;
@@ -1217,7 +1258,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
             transition: left 0.5s;
         }
 
@@ -1227,13 +1268,13 @@
 
         /* Enerji barı üçün daha canlı görünüş */
         .energy-bar {
-            background: rgba(255,255,255,0.3) !important;
-            border: 2px solid rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.1) !important;
+            border: 2px solid rgba(255,255,255,0.2);
             box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .energy-fill {
-            background: linear-gradient(90deg, #00b894, #55efc4, #00b894) !important;
+            background: linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff) !important;
             background-size: 200% 100%;
             animation: shimmer 2s infinite;
         }
@@ -1295,7 +1336,74 @@
                 transform: translate(0, 0) rotate(360deg);
             }
         }
-        
+
+        /* YENİ: Neon effektləri */
+        .neon-text {
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 15px #fff,
+                0 0 20px #ff00ff,
+                0 0 35px #ff00ff,
+                0 0 40px #ff00ff;
+        }
+
+        .neon-border {
+            box-shadow: 
+                0 0 5px rgba(255, 0, 255, 0.5),
+                0 0 10px rgba(255, 0, 255, 0.3),
+                0 0 15px rgba(255, 0, 255, 0.2),
+                inset 0 0 5px rgba(255, 0, 255, 0.1);
+        }
+
+        /* YENİ: Parıldayan nöqtələr */
+        .sparkle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: white;
+            border-radius: 50%;
+            animation: sparkle 2s infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        /* YENİ: Holografik effekt */
+        .holographic {
+            background: linear-gradient(45deg, 
+                rgba(255, 0, 255, 0.3), 
+                rgba(0, 255, 255, 0.3), 
+                rgba(255, 255, 0, 0.3), 
+                rgba(255, 0, 255, 0.3));
+            background-size: 400% 400%;
+            animation: holographic 3s ease infinite;
+        }
+
+        @keyframes holographic {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* YENİ: Şimşək effekti */
+        .lightning {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.4), 
+                transparent);
+            animation: lightning 3s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes lightning {
+            0%, 90%, 100% { opacity: 0; }
+            95% { opacity: 1; }
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -1309,6 +1417,19 @@
         <button class="debug-btn" onclick="debugGetAllUsers()">All Users</button>
         <button class="debug-btn" onclick="debugCheckUser(currentUserState.username || 'test')">Check User</button>
     </div>
+
+    <!-- Yeni: Üzən elementlər -->
+    <div class="floating-element" style="top: 10%; left: 5%;"></div>
+    <div class="floating-element" style="top: 20%; left: 80%;"></div>
+    <div class="floating-element" style="top: 60%; left: 10%;"></div>
+    <div class="floating-element" style="top: 80%; left: 70%;"></div>
+
+    <!-- Yeni: Parıldayan nöqtələr -->
+    <div class="sparkle" style="top: 15%; left: 20%;"></div>
+    <div class="sparkle" style="top: 25%; left: 60%;"></div>
+    <div class="sparkle" style="top: 45%; left: 30%;"></div>
+    <div class="sparkle" style="top: 65%; left: 80%;"></div>
+    <div class="sparkle" style="top: 85%; left: 40%;"></div>
 
     <div class="container">
         <div class="splash-screen" id="splashScreen">
