@@ -3162,29 +3162,29 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             }
         }
 
-        function simulateEnergyRegen() {
-            if (!currentUserState.username) return;
+       function simulateEnergyRegen() {
+    if (!currentUserState.username) return;
 
-            const now = Date.now();
-            const timePassedInSeconds = (now - currentUserState.lastEnergyUpdate) / 1000;
-            
-            if (timePassedInSeconds >= 1) { 
-                const energyToAdd = timePassedInSeconds * ENERGY_REGEN_PER_SECOND;
-                const oldEnergy = currentUserState.currentEnergy;
-                        
-                currentUserState.currentEnergy = Math.min(
-                    currentUserState.maxEnergy, 
-                    currentUserState.currentEnergy + energyToAdd
-                );
-                        
-                currentUserState.lastEnergyUpdate = now - ((energyToAdd % 1) * 1000);
-                        
-                if (Math.floor(currentUserState.currentEnergy) > Math.floor(oldEnergy)) {
-                    updateEnergyDisplay();
-                }
-            }
+    const now = Date.now();
+    const timePassedInSeconds = (now - currentUserState.lastEnergyUpdate) / 1000;
+    
+    if (timePassedInSeconds >= 1) { 
+        const energyToAdd = timePassedInSeconds * ENERGY_REGEN_PER_SECOND;
+        const oldEnergy = currentUserState.currentEnergy;
+                
+        currentUserState.currentEnergy = Math.min(
+            currentUserState.maxEnergy, 
+            currentUserState.currentEnergy + energyToAdd
+        );
+                
+        // XƏTA BURADADIR - DÜZELDİLMİŞ VERSİYA:
+        currentUserState.lastEnergyUpdate = now; // SADƏCƏ 'now' QOYUN
+                
+        if (Math.floor(currentUserState.currentEnergy) > Math.floor(oldEnergy)) {
+            updateEnergyDisplay();
         }
-
+    }
+}
         function createMoneyPopup(event, money) {
             const popup = document.createElement('div');
             popup.className = 'money-popup';
