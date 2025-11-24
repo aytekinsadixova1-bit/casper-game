@@ -1717,6 +1717,14 @@
             console.error('❌ Firebase xətası:', error);
         }
 
+
+ // =================================================================
+// GLOBAL DƏYİŞƏNLƏR
+// =================================================================
+let referralUnsubscribe = null; // BURAYA ƏLAVƏ EDİN
+let auth, db;
+
+        
         // =================================================================
         // OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR
         // =================================================================
@@ -2745,6 +2753,19 @@ function startAdsGramVideoTimer() {
             }, 5000);
         }
 
+ // =================================================================
+// İSTİFADƏÇİ DƏYİŞDİKƏ DİNLƏYİCİNİ YENİLƏ
+// =================================================================
+function switchUser(newUsername) {
+    // Köhnə dinləyicini təmizlə
+    if (referralUnsubscribe) {
+        referralUnsubscribe();
+        referralUnsubscribe = null;
+    }
+    
+    // Yeni dinləyicini başlat
+    listenToReferralCount(newUsername);
+}
         // =================================================================
         // DƏVƏT LİNKİ SİSTEMİ FUNKSİYALARI
         // =================================================================
@@ -2920,22 +2941,19 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
 // =================================================================
 // REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ - DÜZƏLDİLMİŞ
 // =================================================================
-
-
 function listenToReferralCount(username) {
+    // Əvvəlki dinləyicini dayandır
+    if (referralUnsubscribe) {
+        referralUnsubscribe();
+        referralUnsubscribe = null;
+    }
+
     // KODU DAHA DAYANIQLI ETMƏK ÜÇÜN YOXLAMA:
     if (typeof db === 'undefined' || !db.collection) {
         console.error("❌ Firestore 'db' instansiyası tapılmadı. Real-time dinləmə dayandırıldı.");
         return;
     }
     
-    // Əvvəlcə referralUnsubscribe dəyişəninin olub-olmadığını yoxla
-    if (referralUnsubscribe) {
-        console.log('🔄 Əvvəlki referral dinləyicisi ləğv edilir.');
-        referralUnsubscribe();
-        referralUnsubscribe = null;
-    }
-
     const userRef = db.collection('users').doc(username);
 
     // Yeni dinləyicini başlat
@@ -3669,44 +3687,42 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
             });
         });
 
-        function logout() {
-            // REAL-TIME DİNLƏYİCİNİ DAYANDIR
-            if (referralUnsubscribe) {
-                referralUnsubscribe();
-                referralUnsubscribe = null;
-            }
-            
-            currentUserState = {
-                cgId: null, 
-                username: null, 
-                name: null, 
-                surname: null, 
-                phone: null, 
-                email: null, 
-                referralCode: null, 
-                maxEnergy: MAX_ENERGY_CAP, 
-                currentEnergy: MAX_ENERGY_CAP, 
-                clicksUntilAd: AD_INTERVAL,
-                totalClicks: 0, 
-                totalMoney: 0.00, 
-                energyUsed: 0, 
-                energyRegenRate: BASE_REGEN_RATE, 
-                successfulReferrals: 0, 
-                referralBonusEarned: 0.00, 
-                scorePerClick: 1, 
-                lastEnergyUpdate: Date.now(), 
-                lastClickTime: Date.now(), 
-                lastWithdrawalDate: null, 
-                registrationDate: null
-            };
+    function logout() {
+    // REAL-TIME DİNLƏYİCİNİ DAYANDIR
+    if (referralUnsubscribe) {
+        referralUnsubscribe();
+        referralUnsubscribe = null;
+    }
+    
+    currentUserState = {
+        cgId: null, 
+        username: null, 
+        name: null, 
+        surname: null, 
+        phone: null, 
+        email: null, 
+        referralCode: null, 
+        maxEnergy: MAX_ENERGY_CAP, 
+        currentEnergy: MAX_ENERGY_CAP, 
+        totalClicks: 0, 
+        totalMoney: 0.00, 
+        energyUsed: 0, 
+        energyRegenRate: BASE_REGEN_RATE, 
+        successfulReferrals: 0, 
+        referralBonusEarned: 0.00, 
+        scorePerClick: 1, 
+        lastEnergyUpdate: Date.now(), 
+        lastClickTime: Date.now(), 
+        lastWithdrawalDate: null, 
+        registrationDate: null
+    };
 
-            gameScreen.style.display = 'none';
-            loginScreen.style.display = 'flex'; 
-            
-            showSuccess("Uğurla çıxış etdiniz. Yenidən oynamaq üçün giriş edin.");
-            switchToLogin();
-        }
-
+    gameScreen.style.display = 'none';
+    loginScreen.style.display = 'flex'; 
+    
+    showSuccess("Uğurla çıxış etdiniz. Yenidən oynamaq üçün giriş edin.");
+    switchToLogin();
+}
         function switchToLogin() {
             document.getElementById('loginTab').classList.add('active');
             document.getElementById('registerTab').classList.remove('active');
