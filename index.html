@@ -59,7 +59,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, #0c0c0c 0%, #1a0033 25%, #33001a 50%, #001a33 75%, #0c0c0c 100%);
+            background: linear-gradient(135deg, #050505 0%, #0d001a 25%, #1a000d 50%, #000d1a 75%, #050505 100%);
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
             display: flex;
@@ -79,7 +79,7 @@
             width: 100%;
             height: 100vh;
             max-height: 100vh;
-            background: rgba(15, 15, 25, 0.85);
+            background: rgba(10, 10, 15, 0.9);
             border-radius: 0;
             box-shadow: 0 0 50px rgba(255, 0, 255, 0.3);
             margin: 0;
@@ -114,7 +114,7 @@
         .splash-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
+            background: linear-gradient(135deg, #0a1a2f 0%, #0f0f1a 100%);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             z-index: 1000;
             opacity: 1;
@@ -499,7 +499,7 @@
         .navbar { 
             display: flex; 
             justify-content: space-around; 
-            background: rgba(26, 26, 46, 0.8); 
+            background: rgba(20, 20, 30, 0.9); 
             padding: 8px 0; 
             border-top: 3px solid rgba(255, 0, 255, 0.5); 
             flex-shrink: 0; 
@@ -810,7 +810,7 @@
             align-items: center;
         }
         .modal-content {
-            background-color: rgba(15, 15, 25, 0.95); 
+            background-color: rgba(10, 10, 15, 0.95); 
             margin: auto; 
             padding: 15px; 
             border-radius: 12px;
@@ -903,7 +903,7 @@
             left: 0; 
             width: 100%; 
             height: 100%; 
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); 
+            background: linear-gradient(135deg, #0f0f1a 0%, #0a1425 100%); 
             z-index: 2000; 
             align-items: center; 
             justify-content: center; 
@@ -1403,6 +1403,27 @@
         @keyframes lightning {
             0%, 90%, 100% { opacity: 0; }
             95% { opacity: 1; }
+        }
+
+        /* YENİ: Ruh animasiyaları */
+        .ghost-particle {
+            position: absolute;
+            font-size: 20px;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.8;
+            animation: ghostFly 1.5s ease-out forwards;
+        }
+
+        @keyframes ghostFly {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0.5);
+            }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -2666,7 +2687,7 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
         }
 
         // =================================================================
-        // KLİK FUNKSİYASI - 30 KLİK SİSTEMİ LƏĞV EDİLDİ
+        // KLİK FUNKSİYASI - YENİ ANİMASİYA SİSTEMİ
         // =================================================================
 
         function clickIcon(event) {
@@ -2690,7 +2711,10 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             const moneyEarned = MONEY_PER_CLICK * currentUserState.scorePerClick;
             currentUserState.totalMoney += moneyEarned;
 
-            // Animasiya əlavə et
+            // YENİ: Ruh animasiyaları əlavə et
+            createGhostParticles(event);
+            
+            // Köhnə animasiyaları da saxla
             addGhostAnimations(event);
             createMoneyPopup(event, moneyEarned);
 
@@ -2707,6 +2731,60 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
 
             // İstifadəçi məlumatlarını yadda saxla
             saveUserState();
+        }
+
+        // =================================================================
+        // YENİ: RUHLARIN UÇMASI ANİMASİYASI
+        // =================================================================
+
+        function createGhostParticles(event) {
+            const clickArea = document.querySelector('.click-area');
+            const ghostCount = 5 + Math.floor(Math.random() * 5); // 5-10 ruh
+            
+            for (let i = 0; i < ghostCount; i++) {
+                setTimeout(() => {
+                    const ghost = document.createElement('div');
+                    ghost.className = 'ghost-particle';
+                    ghost.innerHTML = '👻';
+                    
+                    // Təsadüfi istiqamət və məsafə
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = 50 + Math.random() * 100;
+                    const tx = Math.cos(angle) * distance;
+                    const ty = Math.sin(angle) * distance;
+                    
+                    ghost.style.setProperty('--tx', `${tx}px`);
+                    ghost.style.setProperty('--ty', `${ty}px`);
+                    
+                    // Təsadüfi başlanğıc mövqeyi
+                    let x, y;
+                    if (event.touches && event.touches.length > 0) {
+                        x = event.touches[0].clientX;
+                        y = event.touches[0].clientY;
+                    } else {
+                        x = event.clientX;
+                        y = event.clientY;
+                    }
+                    
+                    const rect = clickArea.getBoundingClientRect();
+                    ghost.style.left = (x - rect.left - 10) + 'px';
+                    ghost.style.top = (y - rect.top - 10) + 'px';
+                    
+                    // Təsadüfi ölçü və rəng effekti
+                    const size = 0.5 + Math.random() * 0.5;
+                    ghost.style.fontSize = (20 * size) + 'px';
+                    ghost.style.filter = `hue-rotate(${Math.random() * 360}deg) brightness(${0.7 + Math.random() * 0.6})`;
+                    
+                    clickArea.appendChild(ghost);
+                    
+                    // Animasiya bitdikdən sonra sil
+                    setTimeout(() => {
+                        if (ghost.parentNode) {
+                            ghost.parentNode.removeChild(ghost);
+                        }
+                    }, 1500);
+                }, i * 50); // Ardıcıl animasiya
+            }
         }
 
         // =================================================================
