@@ -59,63 +59,62 @@
         }
 
         body {
-            background: linear-gradient(135deg, #000000 0%, #050008 25%, #080005 50%, #000508 75%, #000000 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 20s ease infinite;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a0033 30%, #330033 60%, #000000 100%);
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 0;
             touch-action: manipulation;
+            position: relative;
         }
 
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* YENİ: Dinamik arxa plan effektləri */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 0, 255, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 0, 100, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(0, 150, 255, 0.2) 0%, transparent 50%);
+            animation: backgroundPulse 8s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes backgroundPulse {
+            0%, 100% {
+                opacity: 0.7;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
         }
 
         .container {
             width: 100%;
             height: 100vh;
             max-height: 100vh;
-            background: rgba(0, 0, 5, 0.98);
+            background: rgba(0, 0, 0, 0.7);
             border-radius: 0;
-            box-shadow: 0 0 30px rgba(80, 0, 80, 0.1);
+            box-shadow: 0 0 30px rgba(255, 0, 150, 0.3);
             margin: 0;
             position: relative;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(40, 40, 60, 0.3);
-        }
-
-        /* Yeni: Parıldayan border effekti */
-        .container::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, #400040, #004040, #404000, #400040);
-            background-size: 400% 400%;
-            animation: borderGlow 4s ease infinite;
-            z-index: -1;
-            border-radius: 0;
-            opacity: 0.3;
-        }
-
-        @keyframes borderGlow {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .splash-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #000000 0%, #050008 100%);
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a0033 50%, #330033 100%);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             z-index: 1000;
             opacity: 1;
@@ -140,28 +139,30 @@
             object-fit: contain;
             border-radius: 0;
             background: transparent !important;
+            filter: drop-shadow(0 0 20px rgba(255, 0, 150, 0.5));
         }
         .splash-text { 
             color: white; 
             font-size: 20px; 
             font-weight: bold; 
             text-align: center; 
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5); 
+            text-shadow: 0 0 10px rgba(255, 0, 150, 0.7), 2px 2px 4px rgba(0,0,0,0.5); 
             margin-bottom: 10px;
         }
         .splash-subtext {
-            color: rgba(255,255,255,0.7);
+            color: rgba(255,255,255,0.8);
             font-size: 12px;
             text-align: center;
             margin-bottom: 15px;
             max-width: 280px;
             line-height: 1.4;
             padding: 0 10px;
+            text-shadow: 0 0 5px rgba(255, 0, 150, 0.5);
         }
         .loading-bar { 
             width: 200px; 
             height: 4px; 
-            background: rgba(255,255,255,0.1); 
+            background: rgba(255,255,255,0.3); 
             border-radius: 2px; 
             margin-top: 15px; 
             overflow: hidden; 
@@ -169,7 +170,7 @@
         .loading-progress { 
             width: 0%; 
             height: 100%; 
-            background: linear-gradient(90deg, #400040, #004040);
+            background: linear-gradient(90deg, #ff00cc, #ff0066);
             border-radius: 2px; 
             animation: loading 5s linear forwards; 
         }
@@ -185,13 +186,13 @@
         }
 
         .header {
-            background: linear-gradient(135deg, rgba(60, 0, 60, 0.4) 0%, rgba(0, 60, 60, 0.4) 100%);
+            background: linear-gradient(135deg, rgba(255, 0, 150, 0.8) 0%, rgba(100, 0, 255, 0.8) 100%);
             color: white; 
             text-align: center; 
             padding: 15px; 
             flex-shrink: 0;
-            backdrop-filter: blur(5px);
-            border-bottom: 1px solid rgba(50, 50, 70, 0.3);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(255, 0, 150, 0.3);
         }
         
         .header h1 { 
@@ -199,11 +200,11 @@
             margin-bottom: 0px; 
             font-weight: 900; 
             letter-spacing: 1px; 
-            text-shadow: 0 0 8px rgba(80, 0, 80, 0.3);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
         .header p { 
             font-size: 14px; 
-            opacity: 0.8; 
+            opacity: 0.9; 
             margin-top: 3px; 
         }
         
@@ -212,6 +213,7 @@
             flex-grow: 1; 
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            background: rgba(0, 0, 0, 0.3);
         }
         
         .game-screen { 
@@ -220,7 +222,7 @@
             height: 100%; 
             justify-content: space-between; 
             flex-grow: 1; 
-            background: linear-gradient(135deg, rgba(40, 70, 100, 0.03) 0%, rgba(30, 50, 60, 0.03) 100%) !important;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a0033 30%, #330033 60%, #000000 100%) !important;
         }
         
         .login-screen { 
@@ -233,23 +235,26 @@
         .energy-container { 
             margin-bottom: 5px; 
             padding: 8px 0; 
-            border-bottom: 1px solid rgba(50, 50, 70, 0.3); 
-            border-top: 1px solid rgba(50, 50, 70, 0.3); 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2); 
+            border-top: 1px solid rgba(255, 255, 255, 0.2); 
         }
         .energy-bar { 
             width: 100%; 
             height: 16px; 
-            background: rgba(30, 30, 40, 0.6); 
+            background: rgba(255, 255, 255, 0.2); 
             border-radius: 8px; 
             overflow: hidden; 
             position: relative; 
-            border: 1px solid rgba(60, 60, 80, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         .energy-fill { 
             height: 100%; 
             border-radius: 8px; 
             transition: width 0.3s ease, background 0.5s ease; 
             position: relative; 
+            background: linear-gradient(90deg, #ff00cc, #ff0066, #ff00cc) !important;
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
         }
         .energy-text { 
             position: absolute; 
@@ -262,20 +267,21 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5); 
         }
         .bonus-info {
-            background: rgba(60, 0, 60, 0.2);
+            background: rgba(255, 0, 150, 0.2);
             padding: 8px;
             border-radius: 6px;
             margin: 8px 0;
             text-align: center;
-            border-left: 3px solid #400040;
+            border-left: 3px solid #ff00cc;
             font-size: 12px;
             color: white;
-            backdrop-filter: blur(3px);
+            border: 1px solid rgba(255, 0, 150, 0.3);
         }
         .click-area { 
             text-align: center; 
             margin: 15px 0 5px 0; 
             position: relative; 
+            min-height: 200px;
         } 
         
         .main-icon { 
@@ -302,9 +308,44 @@
             object-fit: contain !important;
             border-radius: 0;
             transition: all 0.3s ease;
-            filter: drop-shadow(0 5px 15px rgba(255, 255, 255, 0.2));
+            filter: drop-shadow(0 0 20px rgba(255, 0, 150, 0.7));
             background: transparent !important;
             display: block !important;
+        }
+
+        /* YENİ: Kiçik ruh animasiyaları */
+        .ghost-particle {
+            position: absolute;
+            font-size: 20px;
+            pointer-events: none;
+            z-index: 100;
+            animation: ghostFloat 1.5s ease-out forwards;
+            opacity: 0.8;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+
+        @keyframes ghostFloat {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1) rotate(0deg);
+            }
+            25% {
+                transform: translate(-20px, -30px) scale(1.2) rotate(-10deg);
+            }
+            50% {
+                transform: translate(30px, -50px) scale(1.1) rotate(10deg);
+            }
+            75% {
+                transform: translate(-15px, -70px) scale(0.9) rotate(-5deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(10px, -100px) scale(0.8) rotate(5deg);
+            }
+        }
+
+        .wind-animation {
+            animation: windEffect 4s ease-in-out infinite;
         }
 
         @keyframes windEffect {
@@ -320,10 +361,6 @@
             75% { 
                 transform: translateX(-1px) rotate(-1deg) scale(1.01);
             }
-        }
-
-        .wind-animation {
-            animation: windEffect 4s ease-in-out infinite;
         }
 
         @keyframes ghostHit {
@@ -448,69 +485,60 @@
             margin: 15px 0 10px 0; 
             padding: 8px; 
             border-radius: 10px; 
-            background: rgba(40, 0, 40, 0.3); 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(60, 60, 80, 0.4);
+            background: rgba(255, 255, 255, 0.1); 
+            box-shadow: 0 4px 15px rgba(255, 0, 150, 0.2); 
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
         }
         .money-stat-small { 
-            background: rgba(0, 40, 40, 0.3); 
-            color: #155724; 
+            background: rgba(0, 255, 150, 0.2); 
+            color: #00ff99; 
             padding: 8px 12px; 
             border-radius: 8px; 
             text-align: center; 
             margin-bottom: 0; 
-            color: white;
+            border: 1px solid rgba(0, 255, 150, 0.3);
         }
         .money-stat-small .stat-value { 
             font-size: 16px; 
             font-weight: bold; 
-            color: #00cc00;
-            text-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
+            text-shadow: 0 0 10px rgba(0, 255, 150, 0.5);
         }
         .money-stat-small .stat-label { 
             font-size: 10px; 
             text-transform: uppercase; 
             margin-top: 2px; 
-            color: rgba(255, 255, 255, 0.7);
         }
-        .score-popup, .money-popup { 
+
+        /* YENİ: Pul popup əvəzinə ruh partikülləri */
+        .ghost-popup { 
             position: absolute; 
-            font-weight: bold; 
+            font-size: 24px;
             pointer-events: none; 
-            animation: floatUp 1.2s ease-out forwards; 
+            animation: ghostFloat 1.5s ease-out forwards; 
             z-index: 50; 
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
         }
-        .money-popup { 
-            color: #00cc00; 
-            font-size: 14px; 
-            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
-        }
-        @keyframes floatUp { 
-            0% { 
-                opacity: 1; 
-                transform: translate(-50%, 0) scale(1); 
-            } 
-            100% { 
-                opacity: 0; 
-                transform: translate(-50%, -50px) scale(1.2); 
-            } 
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
         }
         
         .navbar { 
             display: flex; 
             justify-content: space-around; 
-            background: rgba(10, 10, 20, 0.95); 
+            background: rgba(26, 0, 51, 0.9); 
             padding: 8px 0; 
-            border-top: 3px solid rgba(60, 0, 60, 0.5); 
+            border-top: 3px solid rgba(255, 0, 150, 0.8); 
             flex-shrink: 0; 
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(10px);
         }
         .nav-item { 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            color: rgba(255, 255, 255, 0.7); 
+            color: #cccccc; 
             font-size: 10px; 
             font-weight: 600; 
             cursor: pointer; 
@@ -521,28 +549,50 @@
         .nav-icon-wrapper { 
             width: 40px; 
             height: 40px; 
-            background: rgba(40, 40, 60, 0.5); 
+            background: linear-gradient(135deg, #ff00cc, #ff0066); 
             border-radius: 50%; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             margin-bottom: 3px; 
             transition: all 0.3s ease; 
+            box-shadow: 0 4px 15px rgba(255, 0, 150, 0.4);
         }
         .nav-item i { 
             font-size: 18px; 
-            color: rgba(255, 255, 255, 0.7); 
+            color: white; 
             transition: color 0.3s ease; 
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
         .nav-item.active { 
             color: white; 
         }
         .nav-item.active .nav-icon-wrapper { 
-            background: rgba(60, 0, 60, 0.6); 
-            box-shadow: 0 0 12px rgba(80, 0, 80, 0.5); 
+            background: linear-gradient(135deg, #00ffcc, #00ff99); 
+            box-shadow: 0 0 20px rgba(0, 255, 200, 0.6); 
         }
         .nav-item.active i { 
             color: white; 
+        }
+
+        .nav-item:nth-child(1) .nav-icon-wrapper {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+        }
+
+        .nav-item:nth-child(2) .nav-icon-wrapper {
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+        }
+
+        .nav-item:nth-child(3) .nav-icon-wrapper {
+            background: linear-gradient(135deg, #FFD93D, #FF9B40);
+        }
+
+        .nav-item:nth-child(4) .nav-icon-wrapper {
+            background: linear-gradient(135deg, #6A11CB, #2575FC);
+        }
+
+        .nav-item:nth-child(5) .nav-icon-wrapper {
+            background: linear-gradient(135deg, #FF5858, #F09819);
         }
 
         .tabs { 
@@ -550,8 +600,8 @@
             margin-bottom: 15px; 
             border-radius: 10px; 
             overflow: hidden; 
-            background: rgba(40, 0, 40, 0.3); 
-            border: 2px solid rgba(60, 60, 80, 0.4); 
+            background: rgba(255, 255, 255, 0.1); 
+            border: 2px solid rgba(255, 255, 255, 0.2); 
         }
         .tab { 
             flex: 1; 
@@ -560,11 +610,11 @@
             cursor: pointer; 
             transition: all 0.3s ease; 
             font-weight: 600; 
-            color: rgba(255, 255, 255, 0.7); 
+            color: #cccccc; 
             font-size: 12px; 
         }
         .tab.active { 
-            background: rgba(60, 0, 60, 0.5); 
+            background: linear-gradient(135deg, #ff00cc, #ff0066); 
             color: white; 
         }
         .form { 
@@ -581,23 +631,23 @@
             display: block; 
             margin-bottom: 5px; 
             font-weight: 600; 
-            color: rgba(255, 255, 255, 0.9); 
+            color: #cccccc; 
             font-size: 12px; 
         }
         .input-group input, .input-group select { 
             width: 100%; 
             padding: 10px; 
-            border: 2px solid rgba(60, 60, 80, 0.4); 
+            border: 2px solid rgba(255, 255, 255, 0.2); 
             border-radius: 6px; 
             font-size: 12px; 
             transition: border-color 0.3s; 
-            background: rgba(30, 30, 40, 0.6);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
         }
         .input-group input:focus, .input-group select:focus { 
-            border-color: rgba(80, 0, 80, 0.7); 
+            border-color: #ff00cc; 
             outline: none; 
-            box-shadow: 0 0 0 2px rgba(80, 0, 80, 0.2); 
+            box-shadow: 0 0 0 2px rgba(255, 0, 150, 0.1); 
         }
         .input-group input::placeholder {
             color: rgba(255, 255, 255, 0.5);
@@ -605,7 +655,7 @@
         .btn {
             width: 100%; 
             padding: 12px; 
-            background: linear-gradient(135deg, rgba(60, 0, 60, 0.7) 0%, rgba(0, 60, 60, 0.7) 100%);
+            background: linear-gradient(135deg, #ff00cc, #ff0066);
             color: white; 
             border: none; 
             border-radius: 8px; 
@@ -614,21 +664,11 @@
             cursor: pointer; 
             transition: all 0.3s ease; 
             margin-top: 8px;
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(255, 0, 150, 0.3);
         }
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            transition: left 0.5s;
-        }
-        .btn:hover::before {
-            left: 100%;
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 0, 150, 0.4);
         }
         .message { 
             padding: 8px; 
@@ -640,48 +680,49 @@
             font-size: 12px; 
         }
         .error { 
-            background: rgba(80, 0, 0, 0.3); 
+            background: rgba(255, 0, 0, 0.2); 
             color: #ff6b6b; 
-            border: 1px solid rgba(100, 0, 0, 0.4); 
+            border: 1px solid rgba(255, 107, 107, 0.3); 
         }
         .success { 
-            background: rgba(0, 80, 0, 0.3); 
-            color: #00cc00; 
-            border: 1px solid rgba(0, 100, 0, 0.4); 
+            background: rgba(0, 255, 150, 0.2); 
+            color: #00ff99; 
+            border: 1px solid rgba(0, 255, 150, 0.3); 
         }
 
         .sub-header { 
             font-size: 16px; 
-            color: rgba(255, 255, 255, 0.9); 
+            color: #ff00cc; 
             margin-bottom: 12px; 
             padding-bottom: 3px; 
-            border-bottom: 1px solid rgba(60, 60, 80, 0.4); 
+            border-bottom: 1px solid #ff00cc; 
+            text-shadow: 0 0 10px rgba(255, 0, 150, 0.5);
         }
         .profile-item { 
-            background: rgba(40, 0, 40, 0.3); 
+            background: rgba(255, 255, 255, 0.1); 
             padding: 12px; 
             border-radius: 8px; 
             margin-bottom: 8px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-            backdrop-filter: blur(3px);
-            border: 1px solid rgba(60, 60, 80, 0.4);
+            box-shadow: 0 2px 10px rgba(255, 0, 150, 0.2); 
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
         }
         .profile-info h4 { 
             font-size: 12px; 
-            color: rgba(255, 255, 255, 0.9); 
+            color: #cccccc; 
             margin-bottom: 3px; 
             font-weight: 700; 
         }
         .profile-info p { 
             font-size: 12px; 
-            color: rgba(255, 255, 255, 0.7); 
+            color: #ffffff; 
             font-weight: 500; 
         }
         .referral-container { 
-            background: rgba(0, 40, 40, 0.3); 
+            background: rgba(0, 255, 150, 0.2); 
             padding: 12px; 
             border-radius: 8px; 
             margin-top: 15px; 
@@ -689,21 +730,21 @@
             flex-direction: column; 
             align-items: center; 
             text-align: center; 
-            backdrop-filter: blur(3px);
-            border: 1px solid rgba(0, 80, 0, 0.3);
+            border: 1px solid rgba(0, 255, 150, 0.3);
         }
         .referral-code { 
             font-size: 14px; 
             font-weight: bold; 
-            color: #00cc00; 
+            color: #00ff99; 
             margin: 8px 0; 
             padding: 5px 8px; 
-            background: rgba(30, 30, 40, 0.6); 
+            background: rgba(0, 0, 0, 0.5); 
             border-radius: 5px; 
-            border: 1px dashed rgba(0, 100, 0, 0.4); 
+            border: 1px dashed #00ff99; 
+            text-shadow: 0 0 10px rgba(0, 255, 150, 0.5);
         }
         .copy-btn { 
-            background: linear-gradient(135deg, rgba(0, 60, 0, 0.7), rgba(0, 80, 80, 0.7)); 
+            background: linear-gradient(135deg, #00ff99, #00ccff); 
             color: white; 
             padding: 6px 12px; 
             border-radius: 6px; 
@@ -713,18 +754,18 @@
             border: none; 
             transition: opacity 0.3s; 
             margin-top: 8px; 
+            box-shadow: 0 3px 10px rgba(0, 255, 150, 0.3);
         }
         .friend-item { 
-            background: rgba(40, 0, 40, 0.3); 
+            background: rgba(255, 255, 255, 0.1); 
             padding: 12px; 
             border-radius: 8px; 
             margin-bottom: 8px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-            backdrop-filter: blur(3px);
-            border: 1px solid rgba(60, 60, 80, 0.4);
+            box-shadow: 0 2px 10px rgba(255, 0, 150, 0.2); 
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .settings-btn-group { 
             display: flex; 
@@ -740,18 +781,18 @@
             cursor: pointer; 
             text-align: left; 
             transition: background 0.3s; 
-            border: 1px solid rgba(60, 60, 80, 0.4); 
-            background: rgba(30, 30, 40, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            background: rgba(255, 255, 255, 0.1);
             color: white;
         }
         .settings-btn i { 
             margin-right: 8px; 
-            color: rgba(80, 0, 80, 0.7); 
+            color: #ff00cc; 
         }
         .delete-btn { 
-            background: rgba(80, 0, 0, 0.3); 
+            background: rgba(255, 0, 0, 0.2); 
             color: #ff6b6b; 
-            border: 1px solid rgba(100, 0, 0, 0.4); 
+            border: 1px solid rgba(255, 107, 107, 0.3); 
             margin-top: 12px; 
         }
 
@@ -760,7 +801,7 @@
             justify-content: space-around; 
             margin: 15px 0; 
             padding: 8px;
-            border-top: 1px solid rgba(60, 60, 80, 0.4);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
         .social-icon-btn {
             width: 50px; 
@@ -773,28 +814,13 @@
             color: white;
             cursor: pointer;
             transition: transform 0.2s;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        .social-icon-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-        .social-icon-btn:hover::before {
-            left: 100%;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
         }
         .social-icon-btn:hover {
             transform: scale(1.1);
         }
-        .whatsapp { background: #1a5a1a; }
-        .telegram { background: #005580; }
+        .whatsapp { background: #25d366; }
+        .telegram { background: #0088cc; }
         .tiktok { background: #000000; }
 
         .modal {
@@ -806,40 +832,42 @@
             width: 100%; 
             height: 100%;
             overflow: auto; 
-            background-color: rgba(0,0,0,0.9); 
+            background-color: rgba(0,0,0,0.7); 
             justify-content: center; 
             align-items: center;
+            backdrop-filter: blur(5px);
         }
         .modal-content {
-            background-color: rgba(0, 0, 10, 0.95); 
+            background: linear-gradient(135deg, rgba(26, 0, 51, 0.9), rgba(51, 0, 51, 0.9)); 
             margin: auto; 
             padding: 15px; 
             border-radius: 12px;
             width: 90%; 
             max-width: 320px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            box-shadow: 0 0 30px rgba(255, 0, 150, 0.5);
             animation: slideUp 0.3s;
-            border: 1px solid rgba(60, 60, 80, 0.5);
-            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
         }
         .close-btn { 
-            color: rgba(255, 255, 255, 0.7); 
+            color: #cccccc; 
             float: right; 
             font-size: 24px; 
             font-weight: bold; 
         }
         .close-btn:hover, .close-btn:focus { 
-            color: white; 
+            color: #ff00cc; 
             text-decoration: none; 
             cursor: pointer; 
         }
         .modal h2 { 
             margin-top: 0; 
-            color: white; 
-            border-bottom: 1px solid rgba(60, 60, 80, 0.5); 
+            color: #ff00cc; 
+            border-bottom: 1px solid #ff00cc; 
             padding-bottom: 8px; 
             margin-bottom: 12px; 
             font-size: 18px;
+            text-shadow: 0 0 10px rgba(255, 0, 150, 0.5);
         }
         @keyframes slideUp { 
             from { 
@@ -853,48 +881,49 @@
         }
 
         .withdrawal-info {
-            background: rgba(0, 40, 40, 0.3);
+            background: rgba(0, 150, 255, 0.2);
             padding: 12px;
             border-radius: 8px;
             margin: 12px 0;
             text-align: center;
-            border-left: 3px solid rgba(0, 80, 80, 0.5);
+            border-left: 3px solid #0099ff;
             font-size: 12px;
-            color: white;
+            border: 1px solid rgba(0, 150, 255, 0.3);
         }
 
         .withdrawal-warning {
-            background: rgba(80, 80, 0, 0.3);
-            color: #cccc00;
+            background: rgba(255, 200, 0, 0.2);
+            color: #ffcc00;
             padding: 10px;
             border-radius: 6px;
             margin-bottom: 12px;
             font-size: 12px;
             text-align: center;
-            border: 1px solid rgba(100, 100, 0, 0.4);
+            border: 1px solid rgba(255, 200, 0, 0.3);
         }
 
         .user-id-container {
-            background: linear-gradient(135deg, rgba(60, 0, 60, 0.4), rgba(0, 60, 60, 0.4));
+            background: linear-gradient(135deg, rgba(255, 0, 150, 0.8), rgba(100, 0, 255, 0.8));
             color: white;
             padding: 12px;
             border-radius: 8px;
             margin: 12px 0;
             text-align: center;
-            border: 1px solid rgba(0, 80, 0, 0.3);
-            box-shadow: 0 4px 15px rgba(60, 0, 60, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(255, 0, 150, 0.3);
         }
 
         .user-id-badge {
-            background: rgba(30, 30, 40, 0.6);
-            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            color: #ff00cc;
             padding: 8px 12px;
             border-radius: 15px;
             font-weight: bold;
             font-size: 14px;
             display: inline-block;
             margin: 8px 0;
-            border: 1px solid rgba(0, 80, 0, 0.3);
+            border: 1px solid #ff00cc;
+            text-shadow: 0 0 10px rgba(255, 0, 150, 0.5);
         }
 
         .ad-screen {
@@ -904,7 +933,7 @@
             left: 0; 
             width: 100%; 
             height: 100%; 
-            background: linear-gradient(135deg, #000000 0%, #050008 100%); 
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a0033 50%, #330033 100%); 
             z-index: 2000; 
             align-items: center; 
             justify-content: center; 
@@ -915,31 +944,33 @@
         }
 
         .ad-content {
-            background: rgba(30, 30, 40, 0.6);
+            background: rgba(255, 255, 255, 0.1);
             padding: 30px 20px;
             border-radius: 15px;
             max-width: 300px;
             width: 90%;
-            border: 2px solid rgba(60, 60, 80, 0.5);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 0, 150, 0.5);
+            box-shadow: 0 0 30px rgba(255, 0, 150, 0.3);
+            backdrop-filter: blur(10px);
             margin-bottom: 15px;
         }
 
         .welcome-message {
-            background: linear-gradient(135deg, rgba(0, 60, 0, 0.7), rgba(0, 80, 80, 0.7));
+            background: linear-gradient(135deg, rgba(0, 255, 150, 0.3), rgba(0, 200, 255, 0.3));
             color: white;
             padding: 12px;
             border-radius: 8px;
             margin: 12px 0;
             text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 60, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 255, 150, 0.3);
             animation: fadeIn 0.8s ease;
+            border: 1px solid rgba(0, 255, 150, 0.3);
         }
 
         .welcome-message h3 {
             margin-bottom: 3px;
             font-size: 16px;
+            text-shadow: 0 0 10px rgba(0, 255, 150, 0.5);
         }
 
         .welcome-message p {
@@ -949,28 +980,28 @@
         }
 
         .invite-link-container {
-            background: rgba(40, 0, 40, 0.3);
+            background: rgba(255, 255, 255, 0.1);
             padding: 12px;
             border-radius: 8px;
             margin: 12px 0;
-            border: 1px dashed rgba(60, 0, 60, 0.5);
+            border: 1px dashed rgba(255, 0, 150, 0.5);
         }
 
         .invite-link {
-            background: rgba(30, 30, 40, 0.6);
+            background: rgba(0, 0, 0, 0.5);
             padding: 8px;
             border-radius: 6px;
             margin: 8px 0;
-            border: 1px solid rgba(60, 60, 80, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             word-break: break-all;
             font-size: 12px;
-            color: white;
+            color: #ff00cc;
             font-weight: 600;
         }
 
         .amount-input-hint {
             font-size: 10px;
-            color: rgba(255, 255, 255, 0.7);
+            color: #cccccc;
             margin-top: 3px;
             text-align: center;
         }
@@ -1000,7 +1031,7 @@
         }
 
         .cg-id-badge {
-            background: linear-gradient(135deg, rgba(60, 0, 60, 0.4), rgba(0, 60, 60, 0.4));
+            background: linear-gradient(135deg, rgba(255, 0, 150, 0.8), rgba(100, 0, 255, 0.8));
             color: white;
             padding: 6px 12px;
             border-radius: 15px;
@@ -1008,12 +1039,12 @@
             font-size: 12px;
             display: inline-block;
             margin: 3px 0;
-            box-shadow: 0 2px 8px rgba(60, 0, 60, 0.3);
-            border: 1px solid rgba(0, 80, 0, 0.3);
+            box-shadow: 0 2px 10px rgba(255, 0, 150, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         
         .withdraw-btn-disabled {
-            background: rgba(50, 50, 60, 0.4) !important;
+            background: #666666 !important;
             cursor: not-allowed !important;
             opacity: 0.6 !important;
         }
@@ -1022,10 +1053,10 @@
             display: flex;
             justify-content: space-between;
             margin: 12px 0;
-            background: rgba(40, 0, 40, 0.3);
+            background: rgba(255, 255, 255, 0.1);
             padding: 12px;
             border-radius: 8px;
-            border: 1px solid rgba(60, 60, 80, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .stat-item {
@@ -1036,18 +1067,18 @@
         .stat-value {
             font-size: 14px;
             font-weight: bold;
-            color: #00cccc;
-            text-shadow: 0 0 5px rgba(0, 200, 200, 0.3);
+            color: #ff00cc;
+            text-shadow: 0 0 10px rgba(255, 0, 150, 0.5);
         }
         
         .stat-label {
             font-size: 10px;
-            color: rgba(255, 255, 255, 0.7);
+            color: #cccccc;
             margin-top: 3px;
         }
 
         .adsgram-video-btn {
-            background: linear-gradient(45deg, rgba(80, 0, 0, 0.7), rgba(80, 40, 0, 0.7));
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
             color: white;
             padding: 10px 15px;
             border: none;
@@ -1056,13 +1087,13 @@
             cursor: pointer;
             font-weight: bold;
             margin: 3px;
-            box-shadow: 0 3px 8px rgba(80, 0, 0, 0.3);
+            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.3);
             transition: all 0.3s ease;
         }
 
         .adsgram-video-btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(80, 0, 0, 0.4);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
         }
 
         .adsgram-video-btn:active {
@@ -1088,7 +1119,7 @@
         }
         
         .forgot-password-link a {
-            color: rgba(80, 0, 80, 0.7);
+            color: #ff00cc;
             font-size: 12px;
             text-decoration: underline;
             cursor: pointer;
@@ -1104,35 +1135,35 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: rgba(40, 40, 60, 0.5);
+            background: rgba(255, 255, 255, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 5px;
             font-size: 10px;
             font-weight: bold;
-            color: rgba(255, 255, 255, 0.7);
+            color: #cccccc;
         }
         
         .step.active {
-            background: rgba(80, 0, 80, 0.7);
+            background: #ff00cc;
             color: white;
         }
         
         .step-line {
             width: 30px;
             height: 2px;
-            background: rgba(40, 40, 60, 0.5);
+            background: rgba(255, 255, 255, 0.2);
             margin: 0 2px;
             align-self: center;
         }
         
         .step-line.active {
-            background: rgba(80, 0, 80, 0.7);
+            background: #ff00cc;
         }
 
         .adsgram-video-btn:disabled {
-            background: rgba(50, 50, 60, 0.4);
+            background: #666666;
             cursor: not-allowed;
             opacity: 0.6;
             transform: none;
@@ -1141,315 +1172,23 @@
 
         .bonus-timer {
             font-size: 10px;
-            color: rgba(255, 255, 255, 0.7);
+            color: #cccccc;
             margin-top: 3px;
             font-weight: bold;
         }
 
-        /* YENİ: Rəngli və animasiyalı ikonlar */
-        .nav-icon-wrapper {
-            background: linear-gradient(135deg, rgba(40, 40, 70, 0.7) 0%, rgba(50, 30, 60, 0.7) 100%) !important;
-            box-shadow: 0 4px 12px rgba(40, 40, 70, 0.4) !important;
-            transition: all 0.3s ease !important;
-        }
-
-        .nav-icon-wrapper:hover {
-            transform: translateY(-3px) !important;
-            box-shadow: 0 8px 20px rgba(40, 40, 70, 0.6) !important;
-        }
-
-        /* Hər bir nav item üçün fərqli rənglər */
-        .nav-item:nth-child(1) .nav-icon-wrapper {
-            background: linear-gradient(135deg, rgba(80, 0, 0, 0.7), rgba(80, 40, 0, 0.7)) !important;
-        }
-
-        .nav-item:nth-child(2) .nav-icon-wrapper {
-            background: linear-gradient(135deg, rgba(0, 60, 0, 0.7), rgba(0, 50, 50, 0.7)) !important;
-        }
-
-        .nav-item:nth-child(3) .nav-icon-wrapper {
-            background: linear-gradient(135deg, rgba(80, 80, 0, 0.7), rgba(80, 60, 0, 0.7)) !important;
-        }
-
-        .nav-item:nth-child(4) .nav-icon-wrapper {
-            background: linear-gradient(135deg, rgba(50, 0, 80, 0.7), rgba(20, 50, 100, 0.7)) !important;
-        }
-
-        .nav-item:nth-child(5) .nav-icon-wrapper {
-            background: linear-gradient(135deg, rgba(80, 0, 0, 0.7), rgba(100, 60, 0, 0.7)) !important;
-        }
-
-        /* Aktiv nav item üçün xüsusi stil */
-        .nav-item.active .nav-icon-wrapper {
-            animation: pulseGlow 2s infinite !important;
-            box-shadow: 0 0 15px currentColor !important;
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        /* YENİ: Əsas oyun ikonuna daha canlı effektlər */
-        .main-icon {
-            position: relative;
-        }
-
-        .main-icon::after {
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            right: -10px;
-            bottom: -10px;
-            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
-            border-radius: 50%;
-            animation: floatGlow 3s ease-in-out infinite;
-            z-index: -1;
-        }
-
-        @keyframes floatGlow {
-            0%, 100% {
-                transform: scale(1);
-                opacity: 0.2;
-            }
-            50% {
-                transform: scale(1.1);
-                opacity: 0.4;
-            }
-        }
-
-        /* Hover effekti */
-        .main-icon:hover img {
-            filter: drop-shadow(0 10px 20px rgba(255, 255, 255, 0.2));
-            transform: scale(1.05);
-        }
-
-        /* Klik effekti üçün partlayış */
-        @keyframes clickExplosion {
-            0% {
-                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2);
-            }
-            70% {
-                box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
-            }
-        }
-
-        .ghost-hit-animation {
-            animation: ghostHit 0.8s ease-out, clickExplosion 0.8s ease-out;
-        }
-
-        /* YENİ: Kartlara və statistiklara xüsusi dizayn */
-        .stats-block, .profile-item, .friend-item {
-            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%) !important;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(60, 60, 80, 0.4);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stats-block::before, .profile-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
-            transition: left 0.5s;
-        }
-
-        .stats-block:hover::before, .profile-item:hover::before {
-            left: 100%;
-        }
-
-        /* Enerji barı üçün daha canlı görünüş */
-        .energy-bar {
-            background: rgba(30, 30, 40, 0.6) !important;
-            border: 2px solid rgba(60, 60, 80, 0.4);
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
-        }
-
-        .energy-fill {
-            background: linear-gradient(90deg, #400040, #004040, #400040) !important;
-            background-size: 200% 100%;
-            animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-
-        /* YENİ: Arxa plan effektləri */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(50, 40, 70, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(70, 40, 70, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(40, 70, 90, 0.1) 0%, transparent 50%);
-            animation: backgroundShift 15s ease-in-out infinite;
-            z-index: -1;
-        }
-
-        @keyframes backgroundShift {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-        }
-
-        /* YENİ: Üzən elementlər */
-        .floating-element {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 50%;
-            animation: floatAround 25s infinite linear;
-        }
-
-        @keyframes floatAround {
-            0% {
-                transform: translate(0, 0) rotate(0deg);
-            }
-            25% {
-                transform: translate(100px, 50px) rotate(90deg);
-            }
-            50% {
-                transform: translate(50px, 100px) rotate(180deg);
-            }
-            75% {
-                transform: translate(-50px, 50px) rotate(270deg);
-            }
-            100% {
-                transform: translate(0, 0) rotate(360deg);
-            }
-        }
-
-        /* YENİ: Neon effektləri */
-        .neon-text {
-            text-shadow: 
-                0 0 3px #fff,
-                0 0 6px #fff,
-                0 0 9px #fff,
-                0 0 12px #400040,
-                0 0 18px #400040,
-                0 0 21px #400040;
-        }
-
-        .neon-border {
-            box-shadow: 
-                0 0 3px rgba(64, 0, 64, 0.2),
-                0 0 6px rgba(64, 0, 64, 0.15),
-                0 0 9px rgba(64, 0, 64, 0.1),
-                inset 0 0 3px rgba(64, 0, 64, 0.05);
-        }
-
-        /* YENİ: Parıldayan nöqtələr */
-        .sparkle {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
-            border-radius: 50%;
-            animation: sparkle 3s infinite;
-        }
-
-        @keyframes sparkle {
-            0%, 100% { opacity: 0; transform: scale(0); }
-            50% { opacity: 0.7; transform: scale(1); }
-        }
-
-        /* YENİ: Holografik effekt */
-        .holographic {
-            background: linear-gradient(45deg, 
-                rgba(64, 0, 64, 0.1), 
-                rgba(0, 64, 64, 0.1), 
-                rgba(64, 64, 0, 0.1), 
-                rgba(64, 0, 64, 0.1));
-            background-size: 400% 400%;
-            animation: holographic 4s ease infinite;
-        }
-
-        @keyframes holographic {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        /* YENİ: Şimşək effekti */
-        .lightning {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255, 255, 255, 0.1), 
-                transparent);
-            animation: lightning 5s infinite;
-            pointer-events: none;
-        }
-
-        @keyframes lightning {
-            0%, 90%, 100% { opacity: 0; }
-            95% { opacity: 0.5; }
-        }
-
-        /* YENİ: Ruh animasiyaları */
-        .ghost-particle {
-            position: absolute;
-            font-size: 20px;
-            pointer-events: none;
-            z-index: 100;
-            opacity: 0.8;
-            animation: ghostFly 1.5s ease-out forwards;
-        }
-
-        @keyframes ghostFly {
-            0% {
-                opacity: 1;
-                transform: translate(0, 0) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(var(--tx), var(--ty)) scale(0.5);
-            }
-        }
-
-        /* YENİ: Tünd arxa plan üçün əlavə tənzimləmələr */
-        .container, .header, .navbar, .stats-block, .profile-item, .friend-item {
-            background-blend-mode: overlay;
-        }
-
-        /* Tünd gradient overlay */
-        .dark-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
-            pointer-events: none;
-            z-index: -1;
-        }
+        /* YENİ: Ruh partikülləri üçün rəng variantları */
+        .ghost-red { color: #ff0066; }
+        .ghost-blue { color: #0099ff; }
+        .ghost-green { color: #00ff99; }
+        .ghost-purple { color: #cc00ff; }
+        .ghost-yellow { color: #ffff00; }
+        .ghost-cyan { color: #00ffff; }
+        
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
-    <!-- Tünd overlay -->
-    <div class="dark-overlay"></div>
-
     <!-- Firebase Status Indicator - GİZLƏ -->
     <div class="firebase-status" id="firebaseStatus" style="display: none;">Firebase: Yüklənir...</div>
 
@@ -1459,19 +1198,6 @@
         <button class="debug-btn" onclick="debugGetAllUsers()">All Users</button>
         <button class="debug-btn" onclick="debugCheckUser(currentUserState.username || 'test')">Check User</button>
     </div>
-
-    <!-- Yeni: Üzən elementlər -->
-    <div class="floating-element" style="top: 10%; left: 5%;"></div>
-    <div class="floating-element" style="top: 20%; left: 80%;"></div>
-    <div class="floating-element" style="top: 60%; left: 10%;"></div>
-    <div class="floating-element" style="top: 80%; left: 70%;"></div>
-
-    <!-- Yeni: Parıldayan nöqtələr -->
-    <div class="sparkle" style="top: 15%; left: 20%;"></div>
-    <div class="sparkle" style="top: 25%; left: 60%;"></div>
-    <div class="sparkle" style="top: 45%; left: 30%;"></div>
-    <div class="sparkle" style="top: 65%; left: 80%;"></div>
-    <div class="sparkle" style="top: 85%; left: 40%;"></div>
 
     <div class="container">
         <div class="splash-screen" id="splashScreen">
@@ -2717,8 +2443,8 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             gameIcon.onerror = () => handleImageError(gameIcon, IMAGE_CONFIG.fallbackText);
         }
 
-        // =================================================================
-        // KLİK FUNKSİYASI - YENİ ANİMASİYA SİSTEMİ
+       // =================================================================
+        // YENİ: RUHLARLA PUL QAZANMA SİSTEMİ
         // =================================================================
 
         function clickIcon(event) {
@@ -2738,21 +2464,19 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             currentUserState.energyUsed += ENERGY_CONSUMPTION_PER_CLICK;
             currentUserState.lastClickTime = Date.now();
 
-            // Pul qazan - YENİ: Hər klik üçün 0.000001 AZN
+            // Pul qazan
             const moneyEarned = MONEY_PER_CLICK * currentUserState.scorePerClick;
             currentUserState.totalMoney += moneyEarned;
 
-            // YENİ: Ruh animasiyaları əlavə et
-            createGhostParticles(event);
-            
-            // Köhnə animasiyaları da saxla
+            // YENİ: Ruh partikülləri yarat
+            createGhostParticles(event, 3); // 3 ruh partikülü yarat
+
+            // Animasiya əlavə et
             addGhostAnimations(event);
-            createMoneyPopup(event, moneyEarned);
 
             // Enerji göstəricisini yenilə
             updateEnergyDisplay();
 
-            // 30 KLİK REKLAM SİSTEMİ LƏĞV EDİLDİ
             // Hər 60 saniyədən bir Adexium push-like reklam göstər
             if (currentUserState.totalClicks % 60 === 0) {
                 setTimeout(() => {
@@ -2764,99 +2488,59 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             saveUserState();
         }
 
-        // =================================================================
-        // YENİ: RUHLARIN UÇMASI ANİMASİYASI
-        // =================================================================
-
-        function createGhostParticles(event) {
+        // YENİ: Ruh partikülləri yaratmaq
+        function createGhostParticles(event, count) {
             const clickArea = document.querySelector('.click-area');
-            const ghostCount = 5 + Math.floor(Math.random() * 5); // 5-10 ruh
+            const ghostEmojis = ['👻', '💀', '🦇', '🕷️', '🕸️', '🎃', '😈', '👹'];
+            const ghostColors = ['ghost-red', 'ghost-blue', 'ghost-green', 'ghost-purple', 'ghost-yellow', 'ghost-cyan'];
             
-            for (let i = 0; i < ghostCount; i++) {
-                setTimeout(() => {
-                    const ghost = document.createElement('div');
-                    ghost.className = 'ghost-particle';
-                    ghost.innerHTML = '👻';
-                    
-                    // Təsadüfi istiqamət və məsafə
-                    const angle = Math.random() * Math.PI * 2;
-                    const distance = 50 + Math.random() * 100;
-                    const tx = Math.cos(angle) * distance;
-                    const ty = Math.sin(angle) * distance;
-                    
-                    ghost.style.setProperty('--tx', `${tx}px`);
-                    ghost.style.setProperty('--ty', `${ty}px`);
-                    
-                    // Təsadüfi başlanğıc mövqeyi
-                    let x, y;
-                    if (event.touches && event.touches.length > 0) {
-                        x = event.touches[0].clientX;
-                        y = event.touches[0].clientY;
-                    } else {
-                        x = event.clientX;
-                        y = event.clientY;
-                    }
-                    
-                    const rect = clickArea.getBoundingClientRect();
-                    ghost.style.left = (x - rect.left - 10) + 'px';
-                    ghost.style.top = (y - rect.top - 10) + 'px';
-                    
-                    // Təsadüfi ölçü və rəng effekti
-                    const size = 0.5 + Math.random() * 0.5;
-                    ghost.style.fontSize = (20 * size) + 'px';
-                    ghost.style.filter = `hue-rotate(${Math.random() * 360}deg) brightness(${0.7 + Math.random() * 0.6})`;
-                    
-                    clickArea.appendChild(ghost);
-                    
-                    // Animasiya bitdikdən sonra sil
-                    setTimeout(() => {
-                        if (ghost.parentNode) {
-                            ghost.parentNode.removeChild(ghost);
-                        }
-                    }, 1500);
-                }, i * 50); // Ardıcıl animasiya
-            }
-        }
-
-        // =================================================================
-        // ENERJİ GÖSTƏRİCİSİNİ YENİLƏ - 30 KLİK HİSSƏSİ SİLİNDİ
-        // =================================================================
-
-        function updateEnergyDisplay() {
-            const state = currentUserState;
-            const energyPercent = (state.currentEnergy / state.maxEnergy) * 100;
-            
-            document.getElementById('energyFill').style.width = energyPercent + '%';
-            document.getElementById('energyText').textContent = state.currentEnergy.toFixed(0);
-            
-            if (energyPercent <= 20) {
-                document.getElementById('energyFill').style.background = 'linear-gradient(90deg, #ff4d4d, #cc0000)'; 
-            } else if (energyPercent <= 50) {
-                document.getElementById('energyFill').style.background = 'linear-gradient(90deg, #ff9933, #ff6600)'; 
+            let x, y;
+            if (event.touches && event.touches.length > 0) {
+                x = event.touches[0].clientX;
+                y = event.touches[0].clientY;
             } else {
-                document.getElementById('energyFill').style.background = 'linear-gradient(90deg, #00b894, #55efc4)'; 
-            }
-            
-            document.getElementById('totalMoney').textContent = formatMoney(state.totalMoney);
-            
-            if (document.getElementById('friendsScreen').classList.contains('active')) {
-                updateInviteLinkDisplay();
+                x = event.clientX;
+                y = event.clientY;
             }
 
-            if (document.getElementById('profileScreen').classList.contains('active')) {
-                updateProfileDisplay();
+            const rect = clickArea.getBoundingClientRect();
+            const baseX = x - rect.left;
+            const baseY = y - rect.top;
+
+            for (let i = 0; i < count; i++) {
+                const ghost = document.createElement('div');
+                ghost.className = 'ghost-popup';
+                
+                // Təsadüfi ruh emojisi və rəng seç
+                const randomEmoji = ghostEmojis[Math.floor(Math.random() * ghostEmojis.length)];
+                const randomColor = ghostColors[Math.floor(Math.random() * ghostColors.length)];
+                
+                ghost.innerHTML = randomEmoji;
+                ghost.classList.add(randomColor);
+                
+                // Təsadüfi başlanğıc mövqeyi
+                const startX = baseX + (Math.random() * 40 - 20);
+                const startY = baseY + (Math.random() * 40 - 20);
+                
+                ghost.style.left = startX + 'px';
+                ghost.style.top = startY + 'px';
+                
+                // Təsadüfi animasiya müddəti
+                const duration = 1 + Math.random() * 0.5;
+                ghost.style.animationDuration = duration + 's';
+                
+                clickArea.appendChild(ghost);
+                
+                // Animasiya bitdikdən sonra element sil
+                setTimeout(() => {
+                    if (ghost.parentNode) {
+                        ghost.parentNode.removeChild(ghost);
+                    }
+                }, duration * 1000);
             }
-
-            document.getElementById('availableMoney').textContent = formatMoney(state.totalMoney);
-            
-            // DƏVƏT STATISTIKASINI YENİLƏ
-            document.getElementById('successfulReferrals').textContent = state.successfulReferrals || 0;
-            document.getElementById('referralBonusTotal').textContent = formatMoney(state.referralBonusEarned || 0);
-            document.getElementById('referralLimit').textContent = REFERRAL_BONUS_LIMIT;
-
-            saveUserState();
         }
 
+        
         // =================================================================
         // REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ
         // =================================================================
@@ -3848,6 +3532,17 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                 console.log('🎮 Oyun hazırdır! Giriş ekranı aktiv edildi.');
             }, 5000); 
 
+            
+             // SPLASH EKRANINI QEYD ET VƏ GİRİŞ EKRANINA KEÇ
+            setTimeout(() => {
+                document.getElementById('splashScreen').classList.add('splash-fade-out'); 
+                document.getElementById('mainContent').style.display = 'flex';
+                document.getElementById('loginScreen').style.display = 'flex';
+                switchToLogin();
+                console.log('🎮 Oyun hazırdır! Giriş ekranı aktiv edildi.');
+            }, 5000); 
+            
+            
             // KLİK HADİSƏLƏRİNİ QOŞ
             document.getElementById('mainIcon').addEventListener('click', clickIcon);
             document.getElementById('mainIcon').addEventListener('touchstart', function(e) {
