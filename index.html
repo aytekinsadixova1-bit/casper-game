@@ -1310,11 +1310,6 @@
         ⏰ 2 dəq ara ilə 10 reklam, sonra 4 saat gözləyin!
     </p>
 </div>
-
-<div class="bonus-info">
-    <strong> 30 klik Bonusu:</strong> Hər reklam üçün <strong>0.0001 AZN</strong>
-</div>
-
 <div class="click-area">
     <div class="main-icon" id="mainIcon">
         <img id="clickImage" src="https://i.ibb.co/hp0mdt1/2025-10-31-T103543-300-removebg-preview.png" alt="Casper" 
@@ -2625,18 +2620,15 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             splashImg.onerror = () => handleImageError(splashImg, IMAGE_CONFIG.fallbackText);
             gameIcon.onerror = () => handleImageError(gameIcon, IMAGE_CONFIG.fallbackText);
         }
-        // =================================================================
-        // OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR
+      // =================================================================
+        // OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR - YENİLƏNDİ
         // =================================================================
 
         const ENERGY_CONSUMPTION_PER_CLICK = 1;      
         const MAX_ENERGY_CAP = 100000;              
         const AD_DURATION = 10;
-        const AD_REWARD_PER_AD = 0.0001;
-        const CLICKS_FOR_AD = 30;
-        const AD_INTERVAL = CLICKS_FOR_AD;
-        const ENERGY_REGEN_INTERVAL = 1000;          
-        const MONEY_PER_CLICK = 0.000003;
+        // 30 KLİK BONUSU LƏĞV EDİLDİ
+        const MONEY_PER_CLICK = 0.000001; // YENİ: Hər klik üçün 0.000001 AZN
         const MONEY_DECIMAL_PLACES = 6;            
         const REFERRAL_BONUS_AMOUNT = 0.10;
         const HOURS_FOR_FULL_CHARGE = 24;
@@ -2659,11 +2651,12 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
         let currentUserState = {
             cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
             maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP,
-            clicksUntilAd: CLICKS_FOR_AD, totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
+            totalClicks: 0, totalMoney: 0.00, energyUsed: 0, 
             energyRegenRate: BASE_REGEN_RATE, scorePerClick: 1, lastEnergyUpdate: Date.now(), 
             lastClickTime: Date.now(), successfulReferrals: 0, referralBonusEarned: 0.00, 
             lastWithdrawalDate: null, registrationDate: null
         };
+
 
         // DOM Elementləri
         const splashScreen = document.getElementById('splashScreen');
@@ -2699,65 +2692,89 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
         const navItems = document.querySelectorAll('.navbar .nav-item');
         const subScreens = document.querySelectorAll('.game-sub-screen');
 
+       // =================================================================
+        // KLİK FUNKSİYASI - 30 KLİK SİSTEMİ LƏĞV EDİLDİ
         // =================================================================
-// KLİK FUNKSİYASI - RICHADS INTERSTITIAL İLƏ
-// =================================================================
 
-function clickIcon(event) {
-    if (!currentUserState.username) {
-        alert("Oynamaq üçün zəhmət olmasa daxil olun!");
-        return;
-    }
+        function clickIcon(event) {
+            if (!currentUserState.username) {
+                alert("Oynamaq üçün zəhmət olmasa daxil olun!");
+                return;
+            }
 
-    if (currentUserState.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) {
-        alert("Kifayət qədər enerjiniz yoxdur! Bir az gözləyin və enerjiniz yenilənəcək.");
-        return;
-    }
+            if (currentUserState.currentEnergy < ENERGY_CONSUMPTION_PER_CLICK) {
+                alert("Kifayət qədər enerjiniz yoxdur! Bir az gözləyin və enerjiniz yenilənəcək.");
+                return;
+            }
 
-    // Enerji sərf et
-    currentUserState.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK;
-    currentUserState.totalClicks++;
-    currentUserState.energyUsed += ENERGY_CONSUMPTION_PER_CLICK;
-    currentUserState.lastClickTime = Date.now();
+            // Enerji sərf et
+            currentUserState.currentEnergy -= ENERGY_CONSUMPTION_PER_CLICK;
+            currentUserState.totalClicks++;
+            currentUserState.energyUsed += ENERGY_CONSUMPTION_PER_CLICK;
+            currentUserState.lastClickTime = Date.now();
 
-    // Pul qazan
-    const moneyEarned = MONEY_PER_CLICK * currentUserState.scorePerClick;
-    currentUserState.totalMoney += moneyEarned;
+            // Pul qazan - YENİ: Hər klik üçün 0.000001 AZN
+            const moneyEarned = MONEY_PER_CLICK * currentUserState.scorePerClick;
+            currentUserState.totalMoney += moneyEarned;
 
-    // Klik sayını azalt
-    currentUserState.clicksUntilAd--;
+            // Animasiya əlavə et
+            addGhostAnimations(event);
+            createMoneyPopup(event, moneyEarned);
 
-    // Animasiya əlavə et
-    addGhostAnimations(event);
-    createMoneyPopup(event, moneyEarned);
+            // Enerji göstəricisini yenilə
+            updateEnergyDisplay();
 
-    // Enerji göstəricisini yenilə
-    updateEnergyDisplay();
+            // 30 KLİK REKLAM SİSTEMİ LƏĞV EDİLDİ
+            // Hər 60 saniyədən bir Adexium push-like reklam göstər
+            if (currentUserState.totalClicks % 60 === 0) {
+                setTimeout(() => {
+                    showAdexiumPushLike();
+                }, 1000);
+            }
 
-    // Hər 30 klikdən sonra RichAds interstitial reklam göstər
-    if (currentUserState.clicksUntilAd <= 0) {
-        currentUserState.clicksUntilAd = AD_INTERVAL;
-        
-        // RichAds interstitial reklam göstər
-        setTimeout(() => {
-            showRichAdsInterstitial();
-        }, 500);
-        
-        // Reklam mükafatı ver
-        currentUserState.totalMoney += AD_REWARD_PER_AD;
-        showSuccess(`Reklam mükafatı! +${AD_REWARD_PER_AD} AZN qazandınız!`);
-    }
+            // İstifadəçi məlumatlarını yadda saxla
+            saveUserState();
+        }
+ // =================================================================
+        // ENERJİ GÖSTƏRİCİSİNİ YENİLƏ - 30 KLİK HİSSƏSİ SİLİNDİ
+        // =================================================================
 
-    // Hər 60 saniyədən bir Adexium push-like reklam göstər
-    if (currentUserState.totalClicks % 60 === 0) {
-        setTimeout(() => {
-            showAdexiumPushLike();
-        }, 1000);
-    }
+        function updateEnergyDisplay() {
+            const state = currentUserState;
+            const energyPercent = (state.currentEnergy / state.maxEnergy) * 100;
+            
+            energyFillEl.style.width = energyPercent + '%';
+            energyTextEl.textContent = state.currentEnergy.toFixed(0);
+            
+            if (energyPercent <= 20) {
+                energyFillEl.style.background = 'linear-gradient(90deg, #ff4d4d, #cc0000)'; 
+            } else if (energyPercent <= 50) {
+                energyFillEl.style.background = 'linear-gradient(90deg, #ff9933, #ff6600)'; 
+            } else {
+                energyFillEl.style.background = 'linear-gradient(90deg, #00b894, #55efc4)'; 
+            }
+            
+            totalMoneyEl.textContent = formatMoney(state.totalMoney);
+            
+            // 30 KLİK GÖSTƏRİCİSİ SİLİNDİ
+            
+            if (document.getElementById('friendsScreen').classList.contains('active')) {
+                updateInviteLinkDisplay();
+            }
 
-    // İstifadəçi məlumatlarını yadda saxla
-    saveUserState();
-}
+            if (document.getElementById('profileScreen').classList.contains('active')) {
+                updateProfileDisplay();
+            }
+
+            availableMoneyEl.textContent = formatMoney(state.totalMoney);
+            
+            // DƏVƏT STATISTIKASINI YENİLƏ
+            successfulReferralsEl.textContent = state.successfulReferrals || 0;
+            referralBonusTotalEl.textContent = formatMoney(state.referralBonusEarned || 0);
+            referralLimitEl.textContent = REFERRAL_BONUS_LIMIT;
+
+            saveUserState();
+        }
 // =================================================================
 // REAL-TIME REFERRAL VƏ BALANS DİNLƏYİCİSİ - DÜZƏLDİLMİŞ
 // =================================================================
