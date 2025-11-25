@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>  
-    <meta charset="UTF-8"> 
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
     <title>CASPER GAME</title>
     
@@ -21,27 +21,14 @@
     <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js"></script>
     <script>
         // RichAds reklam sistemini başlat
-document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
             if (typeof TelegramAdsController !== 'undefined') {
-                
-                // RichAds Controller-i başlat (initialize)
                 window.TelegramAdsController = new TelegramAdsController();
                 window.TelegramAdsController.initialize({
                     pubId: "993631",
                     appId: "4699",
-                    // debug: true,
                 });
-                console.log('✅ RichAds reklam sistemi başladıldı.');
-
-                // Kliksiz dərhal ara reklamı (interstitial) çağırın
-                window.TelegramAdsController.triggerInterstitialBanner().then((result) => {
-                    console.log('RichAds Reklam cəhdi uğurlu:', result);
-                }).catch((error) => {
-                    console.error('RichAds Reklam cəhdi uğursuz oldu:', error);
-                });
-
-            } else {
-                console.error('❌ RichAds Kontrolleri (TelegramAdsController) tapılmadı.');
+                console.log('✅ RichAds reklam sistemi başladıldı');
             }
         });
     </script>
