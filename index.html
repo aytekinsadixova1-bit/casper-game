@@ -472,6 +472,17 @@
         /* Hide Elements */
         .firebase-status, .debug-panel { display: none !important; }
 
+        /* RichAds Banner */
+        .richads-banner-container {
+            width: 100%;
+            padding: 10px 0;
+            margin: 10px 0;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 0, 150, 0.3);
+        }
+
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -616,13 +627,18 @@
                             </div>
                         </div>
 
-                        <!-- 50 Click Ad Counter -->
+                        <!-- 100 Click Ad Counter -->
                         <div class="click-counter-container">
-                            <div class="click-counter-text">🎯 50 klikdən sonra reklam gələcək</div>
+                            <div class="click-counter-text">🎯 100 klikdən sonra reklam gələcək</div>
                             <div class="click-counter-bar">
                                 <div class="click-counter-fill" id="clickCounterFill" style="width: 0%"></div>
                             </div>
-                            <div class="click-counter-number" id="clickCounterNumber">0/50</div>
+                            <div class="click-counter-number" id="clickCounterNumber">0/100</div>
+                        </div>
+
+                        <!-- RichAds Banner Container -->
+                        <div class="richads-banner-container" id="richadsBannerContainer">
+                            <div id="richads-banner"></div>
                         </div>
 
                         <!-- AdsGram Video System -->
@@ -1046,14 +1062,19 @@
         const BASE_INVITE_URL = window.location.href.split('?')[0];
         const ENERGY_REGEN_INTERVAL = 1000;
         
-        // 50 KLİK REKLAM SİSTEMİ
-        const CLICKS_FOR_AD = 50;
+        // 100 KLİK REKLAM SİSTEMİ
+        const CLICKS_FOR_AD = 100;
         let clickCounter = 0;
         let isAdShowing = false;
         
         // RichAds kontrolü
         let isRichAdsReady = false;
         let richAdsController = null;
+        
+        // RichAds Banner kontrolü
+        let richAdsBannerInterval = null;
+        let lastBannerShowTime = 0;
+        const BANNER_COOLDOWN = 70000; // 70 saniye
         
         let currentUserState = {
             cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
@@ -1098,9 +1119,10 @@
         const subScreens = document.querySelectorAll('.game-sub-screen');
         const clickCounterFill = document.getElementById('clickCounterFill');
         const clickCounterNumber = document.getElementById('clickCounterNumber');
+        const richadsBannerContainer = document.getElementById('richadsBannerContainer');
 
         // =================================================================
-        // RICHADS SİSTEMİ
+        // RICHADS SİSTEMİ - TAM ENTEGRASİYA
         // =================================================================
 
         function initializeRichAds() {
@@ -1130,6 +1152,9 @@
                 console.log('✅ RichAds sistemi uğurla başladıldı');
                 isRichAdsReady = true;
                 
+                // Banner sistemini başlat
+                initializeRichAdsBanner();
+                
                 setTimeout(() => {
                     testRichAdsSystem();
                 }, 2000);
@@ -1140,6 +1165,57 @@
                 console.error('❌ RichAds başlatma xətası:', error);
                 isRichAdsReady = false;
                 return false;
+            }
+        }
+
+        function initializeRichAdsBanner() {
+            try {
+                console.log('🔄 RichAds Banner sistemi başladılır...');
+                
+                // İlk bannerı göster
+                showRichAdsBanner();
+                
+                // 70 saniyede bir banner göster
+                richAdsBannerInterval = setInterval(() => {
+                    showRichAdsBanner();
+                }, BANNER_COOLDOWN);
+                
+                console.log('✅ RichAds Banner sistemi başladıldı');
+            } catch (error) {
+                console.error('❌ RichAds Banner başlatma xətası:', error);
+            }
+        }
+
+        function showRichAdsBanner() {
+            if (!isRichAdsReady || !richAdsController) {
+                console.log('❌ RichAds sistemi hazır deyil, banner gösterilemez');
+                return;
+            }
+
+            const now = Date.now();
+            if (now - lastBannerShowTime < BANNER_COOLDOWN) {
+                return; // Henüz cooldown süresi dolmamış
+            }
+
+            try {
+                console.log('🔄 RichAds Banner gösteriliyor...');
+                
+                // Banner konteynerini temizle
+                if (richadsBannerContainer) {
+                    richadsBannerContainer.innerHTML = '<div id="richads-banner"></div>';
+                }
+                
+                // Banner göster
+                richAdsController.triggerBanner({
+                    container: 'richads-banner',
+                    format: 'banner'
+                });
+                
+                lastBannerShowTime = now;
+                console.log('✅ RichAds Banner gösterildi');
+                
+            } catch (error) {
+                console.error('❌ RichAds Banner xətası:', error);
             }
         }
 
@@ -1163,7 +1239,7 @@
                 console.log('🎯 RichAds interstitial reklam başladılır...');
                 
                 try {
-                    showAdScreen("🎉 50 klik tamamlandı! Reklam göstərilir...");
+                    showAdScreen("🎉 100 klik tamamlandı! Reklam göstərilir...");
                     
                     richAdsController.triggerInterstitialBanner()
                         .then((result) => {
@@ -1186,7 +1262,7 @@
         }
 
         // =================================================================
-        // 50 KLİK REKLAM SİSTEMİ
+        // 100 KLİK REKLAM SİSTEMİ
         // =================================================================
 
         function updateClickCounter() {
@@ -1212,9 +1288,9 @@
         function checkAndShowAd() {
             if (clickCounter >= CLICKS_FOR_AD && !isAdShowing) {
                 isAdShowing = true;
-                console.log(`🎯 50 klik tamamlandı! Reklam göstəriləcək...`);
+                console.log(`🎯 ${CLICKS_FOR_AD} klik tamamlandı! Reklam göstəriləcək...`);
                 
-                showAdAfter50Clicks()
+                showAdAfter100Clicks()
                     .then(() => {
                         console.log('✅ Reklam prosesi uğurla tamamlandı');
                     })
@@ -1229,7 +1305,7 @@
             }
         }
 
-        function showAdAfter50Clicks() {
+        function showAdAfter100Clicks() {
             return new Promise((resolve, reject) => {
                 console.log('🔄 Reklam prosesi başlayır...');
                 
@@ -1259,7 +1335,7 @@
         function showTestAd() {
             return new Promise((resolve) => {
                 console.log('🎬 Test reklam göstərilir...');
-                showAdScreen("🎯 50 klik tamamlandı! Test reklam göstərilir...");
+                showAdScreen("🎯 100 klik tamamlandı! Test reklam göstərilir...");
                 
                 setTimeout(() => {
                     hideAdScreen();
@@ -2788,6 +2864,12 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             if (referralUnsubscribe) {
                 referralUnsubscribe();
                 referralUnsubscribe = null;
+            }
+            
+            // RichAds banner interval'ını temizle
+            if (richAdsBannerInterval) {
+                clearInterval(richAdsBannerInterval);
+                richAdsBannerInterval = null;
             }
             
             currentUserState = {
