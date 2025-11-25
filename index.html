@@ -1185,6 +1185,45 @@
         .ghost-yellow { color: #ffff00; }
         .ghost-cyan { color: #00ffff; }
         
+        /* YENİ: 50 klik reklam sayğacı */
+        .click-counter-container {
+            background: rgba(255, 215, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 8px 0;
+            text-align: center;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+        }
+        
+        .click-counter-text {
+            font-size: 12px;
+            color: #ffd700;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .click-counter-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+        
+        .click-counter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .click-counter-number {
+            font-size: 11px;
+            color: #ffd700;
+            font-weight: bold;
+        }
+        
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -1322,6 +1361,15 @@
                                     <div class="energy-text" id="energyText">100.000</div>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- YENİ: 50 KLİK REKLAM SAYĞACI -->
+                        <div class="click-counter-container">
+                            <div class="click-counter-text">🎯 50 klikdən sonra reklam gələcək</div>
+                            <div class="click-counter-bar">
+                                <div class="click-counter-fill" id="clickCounterFill" style="width: 0%"></div>
+                            </div>
+                            <div class="click-counter-number" id="clickCounterNumber">0/50</div>
                         </div>
 
                         <!-- YENİ ADSGRAM 10 REKLAM + 2 DƏQ + 4 SAAT SİSTEMİ -->
@@ -1742,6 +1790,12 @@
         const ADMIN_TELEGRAM_NUMBER = "994513248685";
         const BASE_INVITE_URL = window.location.href.split('?')[0];
         const ENERGY_REGEN_INTERVAL = 1000;
+        
+        // YENİ: 50 KLİK REKLAM SİSTEMİ ÜÇÜN DƏYİŞƏNLƏR
+        const CLICKS_FOR_AD = 50;
+        let clickCounter = 0;
+        let isAdShowing = false;
+        
         let currentUserState = {
             cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
             maxEnergy: MAX_ENERGY_CAP, currentEnergy: MAX_ENERGY_CAP,
@@ -1783,6 +1837,109 @@
         const withdrawSubmitBtn = document.getElementById('withdrawSubmitBtn');
         const navItems = document.querySelectorAll('.navbar .nav-item');
         const subScreens = document.querySelectorAll('.game-sub-screen');
+        
+        // YENİ: 50 KLİK REKLAM SİSTEMİ ELEMENTLƏRİ
+        const clickCounterFill = document.getElementById('clickCounterFill');
+        const clickCounterNumber = document.getElementById('clickCounterNumber');
+
+        // =================================================================
+        // YENİ: 50 KLİK REKLAM SİSTEMİ
+        // =================================================================
+
+        // Klik sayğacını yeniləmək
+        function updateClickCounter() {
+            const percent = (clickCounter / CLICKS_FOR_AD) * 100;
+            clickCounterFill.style.width = percent + '%';
+            clickCounterNumber.textContent = `${clickCounter}/${CLICKS_FOR_AD}`;
+            
+            // Rəngi dəyiş
+            if (percent >= 100) {
+                clickCounterFill.style.background = 'linear-gradient(90deg, #ff0000, #ff6b6b)';
+            } else if (percent >= 75) {
+                clickCounterFill.style.background = 'linear-gradient(90deg, #ffa500, #ffd93d)';
+            } else {
+                clickCounterFill.style.background = 'linear-gradient(90deg, #ffd700, #ffed4e)';
+            }
+        }
+
+        // 50 klikdən sonra reklam göstərmək
+        function checkAndShowAd() {
+            if (clickCounter >= CLICKS_FOR_AD && !isAdShowing) {
+                isAdShowing = true;
+                showRichAdsInterstitial();
+                clickCounter = 0;
+                updateClickCounter();
+                
+                // 2 saniyə sonra reklam statusunu sıfırla
+                setTimeout(() => {
+                    isAdShowing = false;
+                }, 2000);
+            }
+        }
+
+        // RichAds interstitial reklam göstərmək
+        function showRichAdsInterstitial() {
+            if (typeof TelegramAdsController !== 'undefined' && window.TelegramAdsController) {
+                console.log('🎯 50 klik tamamlandı! RichAds interstitial reklam göstərilir...');
+                
+                // Reklam ekranını göstər
+                showAdScreen("🎉 50 klik tamamlandı! Reklam göstərilir...");
+                
+                // RichAds reklamını başlat
+                window.TelegramAdsController.triggerInterstitialBanner()
+                    .then((result) => {
+                        console.log('✅ RichAds reklamı uğurla tamamlandı:', result);
+                        hideAdScreen();
+                        showSuccess('🎊 Reklam uğurla tamamlandı! Oynamağa davam edin!');
+                    })
+                    .catch((error) => {
+                        console.log('❌ RichAds reklamı göstərilmədi:', error);
+                        hideAdScreen();
+                        // Reklam göstərilməsə də, oyuna davam et
+                        setTimeout(() => {
+                            showSuccess('Oynamağa davam edin! 🎮');
+                        }, 1000);
+                    });
+            } else {
+                console.log('❌ RichAds sistemi mövcud deyil, test reklam göstərilir');
+                showTestAd();
+            }
+        }
+
+        // Test reklam (RichAds olmadıqda)
+        function showTestAd() {
+            showAdScreen("🎯 50 klik tamamlandı! Test reklam göstərilir...");
+            
+            // 3 saniyəlik test reklam
+            setTimeout(() => {
+                hideAdScreen();
+                showSuccess('✅ Test reklam tamamlandı! Oynamağa davam edin!');
+                isAdShowing = false;
+            }, 3000);
+        }
+
+        // Reklam ekranını göstərmək
+        function showAdScreen(message) {
+            adContent.innerHTML = `
+                <div style="text-align: center;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">🎮</div>
+                    <h3 style="color: #ff00cc; margin-bottom: 15px;">Reklam</h3>
+                    <p style="margin-bottom: 20px;">${message}</p>
+                    <div class="loading-bar">
+                        <div class="loading-progress"></div>
+                    </div>
+                    <p style="font-size: 12px; color: #cccccc; margin-top: 15px;">
+                        Zəhmət olmasa gözləyin...
+                    </p>
+                </div>
+            `;
+            adScreen.style.display = 'flex';
+        }
+
+        // Reklam ekranını gizlətmək
+        function hideAdScreen() {
+            adScreen.style.display = 'none';
+        }
 
         // =================================================================
         // YENİ: KLİK ANİMASİYALARI VƏ BALANS YENİLƏMƏ
@@ -1806,6 +1963,13 @@
 
             // Pul əlavə et
             currentUserState.totalMoney += MONEY_PER_CLICK;
+
+            // YENİ: Klik sayğacını artır
+            clickCounter++;
+            updateClickCounter();
+            
+            // YENİ: 50 klikdən sonra reklam yoxla
+            checkAndShowAd();
 
             // Animasiyaları başlat
             addGhostAnimations(event);
@@ -3958,6 +4122,9 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             // ƏSAS OYUN ELEMENTLƏRİNİ İŞƏ SAL
             const img = document.getElementById('clickImage');
             img.classList.add('wind-animation', 'floating-ghost');
+
+            // YENİ: 50 KLİK SAYĞACINI İŞƏ SAL
+            updateClickCounter();
 
             // SPLASH EKRANINI QEYD ET VƏ GİRİŞ EKRANINA KEÇ
             setTimeout(() => {
