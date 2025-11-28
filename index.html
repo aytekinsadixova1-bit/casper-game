@@ -24,20 +24,7 @@
     <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
     
     <!-- Rewarded Interstitial SDK -->
-    <script type="text/javascript">
-        // Rewarded Interstitial reklam funksiyası
-        function showRewardedInterstitial() {
-            return new Promise((resolve, reject) => {
-                console.log('🎁 Rewarded Interstitial reklam göstərilir...');
-                
-                // Mock reklam - 3 saniyəlik gösterim
-                setTimeout(() => {
-                    console.log('✅ Rewarded Interstitial reklam tamamlandı');
-                    resolve({ status: 'completed' });
-                }, 3000);
-            });
-        }
-    </script>
+    <script src='//libtl.com/sdk.js' data-zone='10135032' data-sdk='show_10135032'></script>
     
     <style>
         * {
@@ -1366,9 +1353,9 @@
                         <!-- YENİ: REWARDED INTERSTITIAL REKLAM SİSTEMİ -->
                         <div class="bonus-info" style="margin: 12px 0; text-align: center;">
                             <button onclick="showRewardedInterstitialAd()" class="rewarded-interstitial-btn" id="rewardedInterstitialButton">
-                                🎁 Hər 50 klikdən sonra reklam izlə & 0.005 AZN qazan!
+                                🎁 Hər 50 klikdən sonra reklam izlə & 0.000003 AZN qazan!
                             </button>
-                            <div class="bonus-timer" id="rewardedInterstitialTimer">Hazır!</div>
+                            <div class="bonus-timer" id="rewardedInterstitialTimer">0/50 klik</div>
                             <p style="font-size: 10px; color: #6c757d; margin-top: 3px;">
                                 ⏰ Hər 50 klikdən sonra reklam izləyərək bonus qazanın!
                             </p>
@@ -1790,7 +1777,7 @@
 
         // YENİ: REWARDED INTERSTITIAL SABİTLƏRİ
         const REWARDED_INTERSTITIAL_CLICKS = 50; // Hər 50 klikdən bir
-        const REWARDED_INTERSTITIAL_REWARD = 0.005; // 0.005 AZN mükafat
+        const REWARDED_INTERSTITIAL_REWARD = 0.000003; // 0.000003 AZN mükafat
 
         // YENİ: RICHADS VƏ ADEXIUM SABİTLƏRİ
         const RICHADS_INTERVAL = 2 * 60 * 1000; // 2 dəqiqə
@@ -1870,11 +1857,7 @@
             
             const canShow = await canShowRewardedInterstitial();
             if (!canShow) {
-                const remaining = await getRewardedInterstitialRemainingTime();
-                const minutes = Math.floor(remaining / 60000);
-                const seconds = Math.floor((remaining % 60000) / 1000);
-                
-                alert(`⏰ Növbəti rewarded interstitial reklam üçün ${minutes}:${seconds.toString().padStart(2,'0')} dəqiqə gözləyin.`);
+                alert(`⏰ Hələlik reklam izləyə bilməzsiniz. ${currentUserState.rewardedInterstitialData.clickCount}/${REWARDED_INTERSTITIAL_CLICKS} klik etmisiniz.`);
                 return false;
             }
 
@@ -1886,18 +1869,20 @@
             if (button) button.innerHTML = '⏳ Reklam Yüklənir...';
             if (timer) timer.textContent = 'Yüklənir...';
 
-            showRewardedInterstitial()
-                .then((result) => {
-                    console.log('✅ Rewarded Interstitial reklam tamamlandı:', result);
-                    handleRewardedInterstitialReward();
-                })
-                .catch((error) => {
-                    console.error('❌ Rewarded Interstitial reklam xətası:', error);
-                    alert('❌ Rewarded Interstitial reklam göstərilərkən xəta baş verdi. Yenidən cəhd edin.');
-                    
-                    // Error halında da mükafat verək (test üçün)
-                    handleRewardedInterstitialReward();
-                });
+            try {
+                // Rewarded Interstitial reklamı göstər
+                await show_10135032();
+                
+                console.log('✅ Rewarded Interstitial reklam tamamlandı');
+                handleRewardedInterstitialReward();
+                
+            } catch (error) {
+                console.error('❌ Rewarded Interstitial reklam xətası:', error);
+                alert('❌ Rewarded Interstitial reklam göstərilərkən xəta baş verdi. Yenidən cəhd edin.');
+                
+                // Error halında da mükafat verək (test üçün)
+                handleRewardedInterstitialReward();
+            }
 
             return true;
         }
@@ -1999,7 +1984,7 @@
                     timerElement.style.color = "#00b894";
                     buttonElement.disabled = false;
                     buttonElement.style.opacity = "1";
-                    buttonElement.innerHTML = `🎁 Hər 50 klikdən sonra reklam izlə & 0.005 AZN qazan! (${rewardedInterstitialData.clickCount}/${REWARDED_INTERSTITIAL_CLICKS})`;
+                    buttonElement.innerHTML = `🎁 Hər 50 klikdən sonra reklam izlə & 0.000003 AZN qazan! (${rewardedInterstitialData.clickCount}/${REWARDED_INTERSTITIAL_CLICKS})`;
                 } else if (remaining > 0) {
                     const minutes = Math.floor(remaining / 60000);
                     const seconds = Math.floor((remaining % 60000) / 1000);
@@ -2013,7 +1998,7 @@
                     timerElement.style.color = "#ffd93d";
                     buttonElement.disabled = true;
                     buttonElement.style.opacity = "0.6";
-                    buttonElement.innerHTML = `🎁 Hər 50 klikdən sonra reklam izlə & 0.005 AZN qazan! (${rewardedInterstitialData.clickCount}/${REWARDED_INTERSTITIAL_CLICKS})`;
+                    buttonElement.innerHTML = `🎁 Hər 50 klikdən sonra reklam izlə & 0.000003 AZN qazan! (${rewardedInterstitialData.clickCount}/${REWARDED_INTERSTITIAL_CLICKS})`;
                 }
                 
                 console.log('🔄 Rewarded Interstitial display yeniləndi');
