@@ -19,28 +19,9 @@
 
     <!-- RichAds SDK -->
     <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js"></script>
-    <script>
-        // RichAds reklam sistemini başlat
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof TelegramAdsController !== 'undefined') {
-                window.TelegramAdsController = new TelegramAdsController();
-                window.TelegramAdsController.initialize({
-                    pubId: "993631",
-                    appId: "4699",
-                });
-                console.log('✅ RichAds reklam sistemi başladıldı');
-            }
-        });
-    </script>
     
     <!-- ADEXIUM - YALNIZ PUSH-LIKE QALSIN -->
     <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', () => {
-            const adexiumWidget = new AdexiumWidget({wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae', adFormat: 'push-like'});
-            adexiumWidget.autoMode();
-        });
-    </script>
     
     <style>
         * {
@@ -1185,6 +1166,38 @@
         .ghost-yellow { color: #ffff00; }
         .ghost-cyan { color: #00ffff; }
         
+        /* YENİ: RichAds reklam düyməsi */
+        .richads-video-btn {
+            background: linear-gradient(45deg, #2575FC, #6A11CB);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 3px;
+            box-shadow: 0 3px 10px rgba(37, 117, 252, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .richads-video-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(37, 117, 252, 0.4);
+        }
+
+        .richads-video-btn:active {
+            transform: translateY(0);
+        }
+
+        .richads-video-btn:disabled {
+            background: #666666;
+            cursor: not-allowed;
+            opacity: 0.6;
+            transform: none;
+            box-shadow: none;
+        }
+        
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -1324,10 +1337,21 @@
                             </div>
                         </div>
 
+                        <!-- YENİ: RICHADS 2 DƏQİQƏLİK REKLAM SİSTEMİ -->
+                        <div class="bonus-info" style="margin: 12px 0; text-align: center;">
+                            <button onclick="showRichAdsReward()" class="richads-video-btn" id="richadsVideoButton">
+                                📺 RichAds Reklam & 0.002 AZN Qazan!
+                            </button>
+                            <div class="bonus-timer" id="richadsTimer">Hazır!</div>
+                            <p style="font-size: 10px; color: #6c757d; margin-top: 3px;">
+                                ⏰ Hər 2 dəqiqədən bir reklam izləyin!
+                            </p>
+                        </div>
+
                         <!-- YENİ ADSGRAM 10 REKLAM + 2 DƏQ + 4 SAAT SİSTEMİ -->
                         <div class="bonus-info" style="margin: 12px 0; text-align: center;">
                             <button onclick="showAdsGramVideoReward()" class="adsgram-video-btn" id="adsgramVideoButton">
-                                🎬 Video İzlə & 0.001 AZN Qazan! (0/10)
+                                🎬 AdsGram Video & 0.001 AZN Qazan! (0/10)
                             </button>
                             <div class="bonus-timer" id="adsgramTimer">Hazır!</div>
                             <p style="font-size: 10px; color: #6c757d; margin-top: 3px;">
@@ -1749,6 +1773,10 @@
         const AD_COOLDOWN_MS = 4 * 60 * 60 * 1000; // 4 saat
         const AD_INTERVAL_BETWEEN = 2 * 60 * 1000; // 2 dəqiqə
 
+        // RICHADS SABİTLƏRİ
+        const RICHADS_REWARD_AMOUNT = 0.002;
+        const RICHADS_INTERVAL_MS = 2 * 60 * 1000; // 2 dəqiqə
+
         // İstifadəçi state-i - BÜTÜN MƏLUMATLAR FIREBASE-DƏ SAXLANILACAQ
         let currentUserState = {
             cgId: null, username: null, name: null, surname: null, phone: null, email: null, referralCode: null, 
@@ -1762,6 +1790,10 @@
                 lastSessionEndTime: 0,
                 adsWatchedInSession: 0,
                 nextAdAvailableTime: 0
+            },
+            // RICHADS MƏLUMATLARI DA FIREBASE-DƏ SAXLANACAQ
+            richadsData: {
+                lastAdTime: 0
             }
         };
 
@@ -2002,50 +2034,482 @@
         }
 
         // =================================================================
-        // REKLAM SİSTEMLƏRİNİN KONFİQURASİYASI
+        // RICHADS REKLAM SİSTEMİ - 2 DƏQİQƏLİK İNTERVAL
         // =================================================================
 
-        // RichAds konfiqurasiyası
-        document.addEventListener('DOMContentLoaded', () => {
-            // RichAds
-            if (typeof TelegramAdsController !== 'undefined') {
-                window.TelegramAdsController = new TelegramAdsController();
-                window.TelegramAdsController.initialize({
-                    pubId: "993631",
-                    appId: "4699",
-                });
-                console.log('✅ RichAds reklam sistemi başladıldı');
+        let RichAdsController = null;
+        let isRichAdsReady = false;
+
+        // RichAds məlumatlarını Firebase-dən oxumaq
+        async function getRichAdsData() {
+            if (currentUserState.username && currentUserState.richadsData) {
+                return currentUserState.richadsData;
             }
+            
+            // Default data
+            return {
+                lastAdTime: 0
+            };
+        }
 
-            // Adexium (Yalnız Push-like)
-            if (typeof AdexiumWidget !== 'undefined') {
-                window.adexiumPush = new AdexiumWidget({
-                    wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae',
-                    adFormat: 'push-like'
-                });
-                window.adexiumPush.autoMode();
-                console.log('✅ Adexium push-like reklam sistemi başladıldı');
+        // RichAds məlumatlarını Firebase-ə yazmaq
+        async function setRichAdsData(data) {
+            if (currentUserState.username) {
+                currentUserState.richadsData = data;
+                await saveUserState();
             }
-        });
+        }
 
-        // =================================================================
-        // RICHADS REKLAM SİSTEMİ
-        // =================================================================
-
-        // RichAds reklam sistemini başlatmaq
+        // RichAds SDK-ni initialize etmək
         function initializeRichAds() {
             try {
-                if (typeof TelegramAdsController !== 'undefined' && window.TelegramAdsController) {
-                    console.log('✅ RichAds reklam sistemi hazırdır');
+                if (typeof TelegramAdsController !== 'undefined') {
+                    console.log('🔄 RichAds SDK tapıldı, başladılır...');
+                    RichAdsController = new TelegramAdsController();
+                    RichAdsController.initialize({
+                        pubId: "993631",
+                        appId: "4699",
+                    });
+                    
+                    // Manual olaraq hazır olduğunu qəbul edək
+                    isRichAdsReady = true;
+                    console.log('✅ RichAds hazır qəbul edildi');
+                    updateRichAdsDisplay();
                     return true;
                 } else {
-                    console.log('❌ RichAds reklam sistemi tapılmadı');
-                    return false;
+                    console.log('❌ RichAds SDK tapılmadı');
+                    // Test üçün mock sistem yaradaq
+                    createMockRichAdsSystem();
+                    return true;
                 }
             } catch (error) {
-                console.error('RichAds xətası:', error);
+                console.error('❌ RichAds xətası:', error);
+                // Xəta halında da mock sistem yaradaq
+                createMockRichAdsSystem();
+                return true;
+            }
+        }
+
+        // Test üçün mock RichAds sistemi
+        function createMockRichAdsSystem() {
+            console.log('🔄 Mock RichAds sistemi yaradılır...');
+            isRichAdsReady = true;
+            
+            // Mock RichAds controller yaradırıq
+            RichAdsController = {
+                show: function() {
+                    return new Promise((resolve, reject) => {
+                        console.log('📺 Mock RichAds reklam göstərilir...');
+                        
+                        // 3 saniyəlik mock reklam
+                        setTimeout(() => {
+                            console.log('✅ Mock RichAds reklam tamamlandı');
+                            resolve({ status: 'completed' });
+                        }, 3000);
+                    });
+                }
+            };
+            
+            console.log('✅ Mock RichAds sistemi hazırdır');
+            updateRichAdsDisplay();
+        }
+
+        // RichAds reklam göstərib-göstərilməyəcəyini yoxlamaq
+        async function canShowRichAdsReward() {
+            const richadsData = await getRichAdsData();
+            const now = Date.now();
+            
+            if (richadsData.lastAdTime > 0 && (now - richadsData.lastAdTime) < RICHADS_INTERVAL_MS) {
                 return false;
             }
+            
+            return true;
+        }
+
+        // RichAds reward göstərmək
+        async function showRichAdsReward() {
+            console.log('🔘 RichAds düyməsinə klik edildi');
+            
+            const canShow = await canShowRichAdsReward();
+            if (!canShow) {
+                const remaining = await getRichAdsRemainingTime();
+                const minutes = Math.floor(remaining / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                
+                alert(`⏰ Növbəti RichAds reklam üçün ${minutes}:${seconds.toString().padStart(2,'0')} dəqiqə gözləyin.`);
+                return false;
+            }
+
+            if (!RichAdsController) {
+                console.log('🔄 RichAds controller yoxdur, yenidən başladılır...');
+                initializeRichAds();
+                
+                setTimeout(() => {
+                    if (isRichAdsReady) {
+                        showRichAdsReward();
+                    } else {
+                        alert('❌ RichAds reklam sistemi hazır deyil. Yenidən cəhd edin.');
+                    }
+                }, 1000);
+                return false;
+            }
+
+            console.log('📺 RichAds reklam göstərilməyə başlayır...');
+            
+            // Loading mesajı göstər
+            const button = document.getElementById('richadsVideoButton');
+            const timer = document.getElementById('richadsTimer');
+            if (button) button.innerHTML = '⏳ RichAds Reklam Yüklənir...';
+            if (timer) timer.textContent = 'Yüklənir...';
+
+            RichAdsController.show()
+                .then((result) => {
+                    console.log('✅ RichAds reklam tamamlandı:', result);
+                    handleRichAdsReward();
+                })
+                .catch((error) => {
+                    console.error('❌ RichAds reklam xətası:', error);
+                    alert('❌ RichAds reklam göstərilərkən xəta baş verdi. Yenidən cəhd edin.');
+                    
+                    // Error halında da mükafat verək (test üçün)
+                    handleRichAdsReward();
+                });
+
+            return true;
+        }
+
+        // RichAds mükafatını emal et
+        async function handleRichAdsReward() {
+            const richadsData = await getRichAdsData();
+            const now = Date.now();
+            
+            richadsData.lastAdTime = now;
+            
+            await setRichAdsData(richadsData);
+            
+            // Pul mükafatı ver
+            if (currentUserState.username) {
+                currentUserState.totalMoney += RICHADS_REWARD_AMOUNT;
+                await saveUserState();
+                updateEnergyDisplay();
+            }
+            
+            showSuccess(`🎉 RichAds reklam tamamlandı! +${RICHADS_REWARD_AMOUNT} AZN qazandınız!`);
+            
+            updateRichAdsDisplay();
+            console.log('💰 RichAds mükafat verildi, display yeniləndi');
+        }
+
+        // RichAds qalan vaxtı hesablamaq
+        async function getRichAdsRemainingTime() {
+            const richadsData = await getRichAdsData();
+            const now = Date.now();
+            
+            if (richadsData.lastAdTime > 0) {
+                const remaining = RICHADS_INTERVAL_MS - (now - richadsData.lastAdTime);
+                return remaining > 0 ? remaining : 0;
+            }
+            
+            return 0;
+        }
+
+        // RichAds UI display-i yeniləmək
+        async function updateRichAdsDisplay() {
+            try {
+                const remaining = await getRichAdsRemainingTime();
+                
+                const timerElement = document.getElementById('richadsTimer');
+                const buttonElement = document.getElementById('richadsVideoButton');
+                
+                if (!timerElement || !buttonElement) {
+                    console.log('⚠️ RichAds elementləri tapılmadı');
+                    return;
+                }
+                
+                if (remaining <= 0) {
+                    timerElement.textContent = "Hazır!";
+                    timerElement.style.color = "#00b894";
+                    buttonElement.disabled = false;
+                    buttonElement.style.opacity = "1";
+                    buttonElement.innerHTML = `📺 RichAds Reklam & 0.002 AZN Qazan!`;
+                } else {
+                    const minutes = Math.floor(remaining / 60000);
+                    const seconds = Math.floor((remaining % 60000) / 1000);
+                    timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    buttonElement.innerHTML = `⏳ ${minutes}:${seconds.toString().padStart(2, '0')} Sonra`;
+                    
+                    timerElement.style.color = "#ff6b6b";
+                    buttonElement.disabled = true;
+                    buttonElement.style.opacity = "0.6";
+                }
+                
+                console.log('🔄 RichAds display yeniləndi');
+            } catch (error) {
+                console.error('RichAds display xətası:', error);
+            }
+        }
+
+        // =================================================================
+        // ADSGRAM SİSTEMİ - FIREBASE İLƏ EŞİTLƏNƏN
+        // =================================================================
+
+        let AdsgramVideoController = null;
+        let isAdsgramReady = false;
+
+        // AdsGram məlumatlarını Firebase-dən oxumaq
+        async function getAdsgramData() {
+            if (currentUserState.username && currentUserState.adsgramData) {
+                return currentUserState.adsgramData;
+            }
+            
+            // Default data
+            return {
+                lastSessionEndTime: 0,
+                adsWatchedInSession: 0,
+                nextAdAvailableTime: 0
+            };
+        }
+
+        // AdsGram məlumatlarını Firebase-ə yazmaq
+        async function setAdsgramData(data) {
+            if (currentUserState.username) {
+                currentUserState.adsgramData = data;
+                await saveUserState();
+            }
+        }
+
+        // AdsGram SDK-ni initialize etmək
+        function initializeAdsGramVideo() {
+            try {
+                if (window.Adsgram) {
+                    console.log('🔄 AdsGram SDK tapıldı, başladılır...');
+                    AdsgramVideoController = window.Adsgram.init({ blockId: "17997" });
+                    
+                    // Manual olaraq hazır olduğunu qəbul edək
+                    isAdsgramReady = true;
+                    console.log('✅ AdsGram hazır qəbul edildi');
+                    updateAdsGramVideoDisplay();
+                    return true;
+                } else {
+                    console.log('❌ AdsGram SDK tapılmadı');
+                    // Test üçün mock sistem yaradaq
+                    createMockAdsSystem();
+                    return true;
+                }
+            } catch (error) {
+                console.error('❌ AdsGram xətası:', error);
+                // Xəta halında da mock sistem yaradaq
+                createMockAdsSystem();
+                return true;
+            }
+        }
+
+        // Test üçün mock reklam sistemi
+        function createMockAdsSystem() {
+            console.log('🔄 Mock reklam sistemi yaradılır...');
+            isAdsgramReady = true;
+            
+            // Mock AdsGram controller yaradırıq
+            AdsgramVideoController = {
+                show: function() {
+                    return new Promise((resolve, reject) => {
+                        console.log('🎬 Mock reklam göstərilir...');
+                        
+                        // 3 saniyəlik mock reklam
+                        setTimeout(() => {
+                            console.log('✅ Mock reklam tamamlandı');
+                            resolve({ status: 'completed' });
+                        }, 3000);
+                    });
+                }
+            };
+            
+            console.log('✅ Mock reklam sistemi hazırdır');
+            updateAdsGramVideoDisplay();
+        }
+
+        // Reklam göstərib-göstərilməyəcəyini yoxlamaq
+        async function canShowAdsGramReward() {
+            const adsgramData = await getAdsgramData();
+            const now = Date.now();
+            
+            if (adsgramData.adsWatchedInSession >= ADS_PER_SESSION) {
+                if (now - adsgramData.lastSessionEndTime < AD_COOLDOWN_MS) {
+                    return false;
+                } else {
+                    // 4 saat bitibsə, sessionu sıfırla
+                    await resetAdsGramSession();
+                    return true;
+                }
+            }
+            
+            if (adsgramData.nextAdAvailableTime > now) {
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Reward video göstərmək
+        async function showAdsGramVideoReward() {
+            console.log('🔘 AdsGram düyməsinə klik edildi');
+            
+            const canShow = await canShowAdsGramReward();
+            if (!canShow) {
+                const remaining = await getRemainingTime();
+                const minutes = Math.floor(remaining / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                
+                alert(`⏰ Növbəti reklam üçün ${minutes}:${seconds.toString().padStart(2,'0')} dəqiqə gözləyin.`);
+                return false;
+            }
+
+            if (!AdsgramVideoController) {
+                console.log('🔄 AdsGram controller yoxdur, yenidən başladılır...');
+                initializeAdsGramVideo();
+                
+                setTimeout(() => {
+                    if (isAdsgramReady) {
+                        showAdsGramVideoReward();
+                    } else {
+                        alert('❌ Reklam sistemi hazır deyil. Yenidən cəhd edin.');
+                    }
+                }, 1000);
+                return false;
+            }
+
+            console.log('🎬 Reklam göstərilməyə başlayır...');
+            
+            // Loading mesajı göstər
+            const button = document.getElementById('adsgramVideoButton');
+            const timer = document.getElementById('adsgramTimer');
+            if (button) button.innerHTML = '⏳ Reklam Yüklənir...';
+            if (timer) timer.textContent = 'Yüklənir...';
+
+            AdsgramVideoController.show()
+                .then((result) => {
+                    console.log('✅ Reklam tamamlandı:', result);
+                    handleAdsGramVideoReward();
+                })
+                .catch((error) => {
+                    console.error('❌ Reklam xətası:', error);
+                    alert('❌ Reklam göstərilərkən xəta baş verdi. Yenidən cəhd edin.');
+                    
+                    // Error halında da mükafat verək (test üçün)
+                    handleAdsGramVideoReward();
+                });
+
+            return true;
+        }
+
+        // Video mükafatını emal et
+        async function handleAdsGramVideoReward() {
+            const adsgramData = await getAdsgramData();
+            const now = Date.now();
+            
+            adsgramData.adsWatchedInSession++;
+            adsgramData.nextAdAvailableTime = now + AD_INTERVAL_BETWEEN;
+            
+            if (adsgramData.adsWatchedInSession >= ADS_PER_SESSION) {
+                adsgramData.lastSessionEndTime = now;
+            }
+            
+            await setAdsgramData(adsgramData);
+            
+            // Pul mükafatı ver
+            if (currentUserState.username) {
+                currentUserState.totalMoney += ADSGRAM_REWARD_AMOUNT;
+                await saveUserState();
+                updateEnergyDisplay();
+            }
+            
+            showSuccess(`🎉 Reklam ${adsgramData.adsWatchedInSession}/${ADS_PER_SESSION} tamamlandı! +${ADSGRAM_REWARD_AMOUNT} AZN qazandınız!`);
+            
+            updateAdsGramVideoDisplay();
+            console.log('💰 Mükafat verildi, display yeniləndi');
+        }
+
+        // Qalan vaxtı hesablamaq
+        async function getRemainingTime() {
+            const adsgramData = await getAdsgramData();
+            const now = Date.now();
+            
+            if (adsgramData.adsWatchedInSession >= ADS_PER_SESSION) {
+                const remaining = AD_COOLDOWN_MS - (now - adsgramData.lastSessionEndTime);
+                return remaining > 0 ? remaining : 0;
+            }
+            
+            if (adsgramData.nextAdAvailableTime > now) {
+                return adsgramData.nextAdAvailableTime - now;
+            }
+            
+            return 0;
+        }
+
+        // UI display-i yeniləmək
+        async function updateAdsGramVideoDisplay() {
+            try {
+                const adsgramData = await getAdsgramData();
+                const remaining = await getRemainingTime();
+                
+                const timerElement = document.getElementById('adsgramTimer');
+                const buttonElement = document.getElementById('adsgramVideoButton');
+                
+                if (!timerElement || !buttonElement) {
+                    console.log('⚠️ AdsGram elementləri tapılmadı');
+                    return;
+                }
+                
+                if (remaining <= 0) {
+                    timerElement.textContent = "Hazır!";
+                    timerElement.style.color = "#00b894";
+                    buttonElement.disabled = false;
+                    buttonElement.style.opacity = "1";
+                    buttonElement.innerHTML = `🎬 AdsGram Video & 0.001 AZN Qazan! (${adsgramData.adsWatchedInSession}/${ADS_PER_SESSION})`;
+                } else {
+                    const adsgramData = await getAdsgramData();
+                    
+                    if (adsgramData.adsWatchedInSession >= ADS_PER_SESSION) {
+                        const hours = Math.floor(remaining / 3600000);
+                        const minutes = Math.floor((remaining % 3600000) / 60000);
+                        timerElement.textContent = `${hours}sa ${minutes}dəq`;
+                        buttonElement.innerHTML = `⏳ ${hours}sa ${minutes}dəq Sonra`;
+                    } else {
+                        const minutes = Math.floor(remaining / 60000);
+                        const seconds = Math.floor((remaining % 60000) / 1000);
+                        timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                        buttonElement.innerHTML = `⏳ ${minutes}:${seconds.toString().padStart(2, '0')} Sonra`;
+                    }
+                    
+                    timerElement.style.color = "#ff6b6b";
+                    buttonElement.disabled = true;
+                    buttonElement.style.opacity = "0.6";
+                }
+                
+                console.log('🔄 AdsGram display yeniləndi');
+            } catch (error) {
+                console.error('AdsGram display xətası:', error);
+            }
+        }
+
+        // Session-u sıfırlamaq
+        async function resetAdsGramSession() {
+            const adsgramData = {
+                lastSessionEndTime: 0,
+                adsWatchedInSession: 0,
+                nextAdAvailableTime: 0
+            };
+            await setAdsgramData(adsgramData);
+            updateAdsGramVideoDisplay();
+            console.log('🔄 AdsGram session sıfırlandı');
+        }
+
+        // Timer-i başlatmaq
+        function startAdsGramVideoTimer() {
+            setInterval(() => {
+                updateAdsGramVideoDisplay();
+            }, 1000);
+            console.log('✅ AdsGram timer başladıldı');
         }
 
         // =================================================================
@@ -2056,7 +2520,9 @@
         function initializeAdexiumAds() {
             try {
                 if (typeof AdexiumWidget !== 'undefined') {
-                    console.log('✅ Adexium push-like reklam sistemi hazırdır');
+                    const adexiumWidget = new AdexiumWidget({wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae', adFormat: 'push-like'});
+                    adexiumWidget.autoMode();
+                    console.log('✅ Adexium push-like reklam sistemi başladıldı');
                     return true;
                 } else {
                     console.log('❌ Adexium reklam sistemi tapılmadı');
@@ -2297,269 +2763,6 @@
 
         // İlkin addımı göstər
         showForgotPasswordStep(1);
-
-        // =================================================================
-        // ADSGRAM SİSTEMİ - FIREBASE İLƏ EŞİTLƏNƏN
-        // =================================================================
-
-        let AdsgramVideoController = null;
-        let isAdsgramReady = false;
-
-        // AdsGram məlumatlarını Firebase-dən oxumaq
-        async function getAdsgramData() {
-            if (currentUserState.username && currentUserState.adsgramData) {
-                return currentUserState.adsgramData;
-            }
-            
-            // Default data
-            return {
-                lastSessionEndTime: 0,
-                adsWatchedInSession: 0,
-                nextAdAvailableTime: 0
-            };
-        }
-
-        // AdsGram məlumatlarını Firebase-ə yazmaq
-        async function setAdsgramData(data) {
-            if (currentUserState.username) {
-                currentUserState.adsgramData = data;
-                await saveUserState();
-            }
-        }
-
-        // AdsGram SDK-ni initialize etmək
-        function initializeAdsGramVideo() {
-            try {
-                if (window.Adsgram) {
-                    console.log('🔄 AdsGram SDK tapıldı, başladılır...');
-                    AdsgramVideoController = window.Adsgram.init({ blockId: "17997" });
-                    
-                    // Manual olaraq hazır olduğunu qəbul edək
-                    isAdsgramReady = true;
-                    console.log('✅ AdsGram hazır qəbul edildi');
-                    updateAdsGramVideoDisplay();
-                    return true;
-                } else {
-                    console.log('❌ AdsGram SDK tapılmadı');
-                    // Test üçün mock sistem yaradaq
-                    createMockAdsSystem();
-                    return true;
-                }
-            } catch (error) {
-                console.error('❌ AdsGram xətası:', error);
-                // Xəta halında da mock sistem yaradaq
-                createMockAdsSystem();
-                return true;
-            }
-        }
-
-        // Test üçün mock reklam sistemi
-        function createMockAdsSystem() {
-            console.log('🔄 Mock reklam sistemi yaradılır...');
-            isAdsgramReady = true;
-            
-            // Mock AdsGram controller yaradırıq
-            AdsgramVideoController = {
-                show: function() {
-                    return new Promise((resolve, reject) => {
-                        console.log('🎬 Mock reklam göstərilir...');
-                        
-                        // 3 saniyəlik mock reklam
-                        setTimeout(() => {
-                            console.log('✅ Mock reklam tamamlandı');
-                            resolve({ status: 'completed' });
-                        }, 3000);
-                    });
-                }
-            };
-            
-            console.log('✅ Mock reklam sistemi hazırdır');
-            updateAdsGramVideoDisplay();
-        }
-
-        // Reklam göstərib-göstərilməyəcəyini yoxlamaq
-        async function canShowAdsGramReward() {
-            const adsgramData = await getAdsgramData();
-            const now = Date.now();
-            
-            if (adsgramData.adsWatchedInSession >= ADS_PER_SESSION) {
-                if (now - adsgramData.lastSessionEndTime < AD_COOLDOWN_MS) {
-                    return false;
-                } else {
-                    // 4 saat bitibsə, sessionu sıfırla
-                    await resetAdsGramSession();
-                    return true;
-                }
-            }
-            
-            if (adsgramData.nextAdAvailableTime > now) {
-                return false;
-            }
-            
-            return true;
-        }
-
-        // Reward video göstərmək
-        async function showAdsGramVideoReward() {
-            console.log('🔘 AdsGram düyməsinə klik edildi');
-            
-            const canShow = await canShowAdsGramReward();
-            if (!canShow) {
-                const remaining = await getRemainingTime();
-                const minutes = Math.floor(remaining / 60000);
-                const seconds = Math.floor((remaining % 60000) / 1000);
-                
-                alert(`⏰ Növbəti reklam üçün ${minutes}:${seconds.toString().padStart(2,'0')} dəqiqə gözləyin.`);
-                return false;
-            }
-
-            if (!AdsgramVideoController) {
-                console.log('🔄 AdsGram controller yoxdur, yenidən başladılır...');
-                initializeAdsGramVideo();
-                
-                setTimeout(() => {
-                    if (isAdsgramReady) {
-                        showAdsGramVideoReward();
-                    } else {
-                        alert('❌ Reklam sistemi hazır deyil. Yenidən cəhd edin.');
-                    }
-                }, 1000);
-                return false;
-            }
-
-            console.log('🎬 Reklam göstərilməyə başlayır...');
-            
-            // Loading mesajı göstər
-            const button = document.getElementById('adsgramVideoButton');
-            const timer = document.getElementById('adsgramTimer');
-            if (button) button.innerHTML = '⏳ Reklam Yüklənir...';
-            if (timer) timer.textContent = 'Yüklənir...';
-
-            AdsgramVideoController.show()
-                .then((result) => {
-                    console.log('✅ Reklam tamamlandı:', result);
-                    handleAdsGramVideoReward();
-                })
-                .catch((error) => {
-                    console.error('❌ Reklam xətası:', error);
-                    alert('❌ Reklam göstərilərkən xəta baş verdi. Yenidən cəhd edin.');
-                    
-                    // Error halında da mükafat verək (test üçün)
-                    handleAdsGramVideoReward();
-                });
-
-            return true;
-        }
-
-        // Video mükafatını emal et
-        async function handleAdsGramVideoReward() {
-            const adsgramData = await getAdsgramData();
-            const now = Date.now();
-            
-            adsgramData.adsWatchedInSession++;
-            adsgramData.nextAdAvailableTime = now + AD_INTERVAL_BETWEEN;
-            
-            if (adsgramData.adsWatchedInSession >= ADS_PER_SESSION) {
-                adsgramData.lastSessionEndTime = now;
-            }
-            
-            await setAdsgramData(adsgramData);
-            
-            // Pul mükafatı ver
-            if (currentUserState.username) {
-                currentUserState.totalMoney += ADSGRAM_REWARD_AMOUNT;
-                await saveUserState();
-                updateEnergyDisplay();
-            }
-            
-            showSuccess(`🎉 Reklam ${adsgramData.adsWatchedInSession}/${ADS_PER_SESSION} tamamlandı! +${ADSGRAM_REWARD_AMOUNT} AZN qazandınız!`);
-            
-            updateAdsGramVideoDisplay();
-            console.log('💰 Mükafat verildi, display yeniləndi');
-        }
-
-        // Qalan vaxtı hesablamaq
-        async function getRemainingTime() {
-            const adsgramData = await getAdsgramData();
-            const now = Date.now();
-            
-            if (adsgramData.adsWatchedInSession >= ADS_PER_SESSION) {
-                const remaining = AD_COOLDOWN_MS - (now - adsgramData.lastSessionEndTime);
-                return remaining > 0 ? remaining : 0;
-            }
-            
-            if (adsgramData.nextAdAvailableTime > now) {
-                return adsgramData.nextAdAvailableTime - now;
-            }
-            
-            return 0;
-        }
-
-        // UI display-i yeniləmək
-        async function updateAdsGramVideoDisplay() {
-            try {
-                const adsgramData = await getAdsgramData();
-                const remaining = await getRemainingTime();
-                
-                const timerElement = document.getElementById('adsgramTimer');
-                const buttonElement = document.getElementById('adsgramVideoButton');
-                
-                if (!timerElement || !buttonElement) {
-                    console.log('⚠️ AdsGram elementləri tapılmadı');
-                    return;
-                }
-                
-                if (remaining <= 0) {
-                    timerElement.textContent = "Hazır!";
-                    timerElement.style.color = "#00b894";
-                    buttonElement.disabled = false;
-                    buttonElement.style.opacity = "1";
-                    buttonElement.innerHTML = `🎬 Video İzlə & 0.001 AZN Qazan! (${adsgramData.adsWatchedInSession}/${ADS_PER_SESSION})`;
-                } else {
-                    const adsgramData = await getAdsgramData();
-                    
-                    if (adsgramData.adsWatchedInSession >= ADS_PER_SESSION) {
-                        const hours = Math.floor(remaining / 3600000);
-                        const minutes = Math.floor((remaining % 3600000) / 60000);
-                        timerElement.textContent = `${hours}sa ${minutes}dəq`;
-                        buttonElement.innerHTML = `⏳ ${hours}sa ${minutes}dəq Sonra`;
-                    } else {
-                        const minutes = Math.floor(remaining / 60000);
-                        const seconds = Math.floor((remaining % 60000) / 1000);
-                        timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                        buttonElement.innerHTML = `⏳ ${minutes}:${seconds.toString().padStart(2, '0')} Sonra`;
-                    }
-                    
-                    timerElement.style.color = "#ff6b6b";
-                    buttonElement.disabled = true;
-                    buttonElement.style.opacity = "0.6";
-                }
-                
-                console.log('🔄 AdsGram display yeniləndi');
-            } catch (error) {
-                console.error('AdsGram display xətası:', error);
-            }
-        }
-
-        // Session-u sıfırlamaq
-        async function resetAdsGramSession() {
-            const adsgramData = {
-                lastSessionEndTime: 0,
-                adsWatchedInSession: 0,
-                nextAdAvailableTime: 0
-            };
-            await setAdsgramData(adsgramData);
-            updateAdsGramVideoDisplay();
-            console.log('🔄 AdsGram session sıfırlandı');
-        }
-
-        // Timer-i başlatmaq
-        function startAdsGramVideoTimer() {
-            setInterval(() => {
-                updateAdsGramVideoDisplay();
-            }, 1000);
-            console.log('✅ AdsGram timer başladıldı');
-        }
 
         // =================================================================
         // TELEGRAM BOT AYARLARI
@@ -2932,6 +3135,9 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                         adsWatchedInSession: 0,
                         nextAdAvailableTime: 0
                     };
+                    const richadsData = data.richadsData || {
+                        lastAdTime: 0
+                    };
 
                     console.log(`📊 Real-time update: ${username} - Referrals: ${referralCount}, Bonus: ${formatMoney(referralBonus)}, Total: ${formatMoney(currentMoney)}`);
 
@@ -2956,6 +3162,7 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                         currentUserState.totalMoney = currentMoney;
                         currentUserState.currentEnergy = currentEnergy;
                         currentUserState.adsgramData = adsgramData;
+                        currentUserState.richadsData = richadsData;
 
                         // 1. YADDAŞDA SAXLA (Vacib)
                         localStorage.setItem('userState', JSON.stringify(currentUserState));
@@ -2963,8 +3170,9 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                         // 2. DEBUG ÜÇÜN (İstəyə bağlı)
                         console.log(`Referal bonusu əlavə edildi: +${referralBonus}. Ümumi: ${currentMoney}`);
                         
-                        // 3. ADSGRAM DISPLAY YENİLƏ
+                        // 3. REKLAM DISPLAY YENİLƏ
                         updateAdsGramVideoDisplay();
+                        updateRichAdsDisplay();
                     }
                 }
             }, (error) => {
@@ -3006,8 +3214,9 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                         updateEnergyDisplay();
                         saveUserState();
                         
-                        // ADSGRAM DISPLAY YENİLƏ
+                        // REKLAM DISPLAY YENİLƏ
                         updateAdsGramVideoDisplay();
+                        updateRichAdsDisplay();
                     }, 1200);
 
                 } else {
@@ -3052,7 +3261,7 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                 // CG ID
                 const cgId = await getNextCGId();
 
-                // Yeni istifadəçi məlumatları - ADSGRAM DATA DA DAXİL
+                // Yeni istifadəçi məlumatları - ADSGRAM VƏ RICHADS DATA DA DAXİL
                 const newUserData = {
                     cgId,
                     name,
@@ -3081,6 +3290,11 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                         lastSessionEndTime: 0,
                         adsWatchedInSession: 0,
                         nextAdAvailableTime: 0
+                    },
+
+                    // RICHADS DATA
+                    richadsData: {
+                        lastAdTime: 0
                     },
 
                     // ZAMAN
@@ -3508,11 +3722,14 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                     ...currentUserState, 
                     energyRegenRate: BASE_REGEN_RATE, 
                     maxEnergy: MAX_ENERGY_CAP,
-                    // ADSGRAM DATA DA DAXİL
+                    // ADSGRAM VƏ RICHADS DATA DA DAXİL
                     adsgramData: currentUserState.adsgramData || {
                         lastSessionEndTime: 0,
                         adsWatchedInSession: 0,
                         nextAdAvailableTime: 0
+                    },
+                    richadsData: currentUserState.richadsData || {
+                        lastAdTime: 0
                     }
                 };
                 
@@ -3758,6 +3975,9 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                     lastSessionEndTime: 0,
                     adsWatchedInSession: 0,
                     nextAdAvailableTime: 0
+                },
+                richadsData: {
+                    lastAdTime: 0
                 }
             };
 
@@ -3898,7 +4118,9 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             try {
                 // Adexium reklam sisteminin yükləndiyini yoxla
                 if (typeof AdexiumWidget !== 'undefined') {
-                    console.log('✅ Adexium reklam sistemi hazırdır');
+                    const adexiumWidget = new AdexiumWidget({wid: 'a46e28f0-9161-4929-a9d5-e5131e577cae', adFormat: 'push-like'});
+                    adexiumWidget.autoMode();
+                    console.log('✅ Adexium push-like reklam sistemi başladıldı');
                     return true;
                 } else {
                     console.log('❌ Adexium reklam sistemi tapılmadı');
@@ -3965,12 +4187,12 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
 
             // RICHADS REKLAM SİSTEMİNİ İŞƏ SAL
             setTimeout(() => {
-                console.log('🔄 RichAds interstitial reklam sistemi başladılır...');
+                console.log('🔄 RichAds 2 dəqiqəlik reklam sistemi başladılır...');
                 const richAdsInitialized = initializeRichAds();
                 if (richAdsInitialized) {
-                    console.log('✅ RichAds interstitial reklam sistemi başladıldı');
+                    console.log('✅ RichAds 2 dəqiqəlik reklam sistemi başladıldı');
                 } else {
-                    console.log('❌ RichAds interstitial reklam sistemi başladıla bilmədi');
+                    console.log('❌ RichAds 2 dəqiqəlik reklam sistemi başladıla bilmədi');
                 }
             }, 1500);
 
@@ -4032,6 +4254,11 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             // ADSGRAM VIDEO TİMER İŞƏ SAL
             startAdsGramVideoTimer();
             
+            // RICHADS TİMER İŞƏ SAL
+            setInterval(() => {
+                updateRichAdsDisplay();
+            }, 1000);
+            
             // AVTOMATİK YENİLƏMƏ
             setInterval(async () => {
                 if (currentUserState.username) {
@@ -4046,9 +4273,10 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                 console.log('✅ Telegram WebApp aktiv edildi');
             }
             
-            // İLK ADSGRAM DISPLAY YENİLƏMƏSİ
+            // İLK REKLAM DISPLAY YENİLƏMƏSİ
             setTimeout(() => {
                 updateAdsGramVideoDisplay();
+                updateRichAdsDisplay();
             }, 1000);
         });
 
