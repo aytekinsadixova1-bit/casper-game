@@ -14,9 +14,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     
-    <!-- Telegram JS -->
-    <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
-
     <!-- RichAds SDK -->
     <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js"></script>
     
@@ -52,7 +49,7 @@
             position: relative;
         }
 
-        /* YENİ: Dinamik arxa plan effektləri */
+        /* Dinamik arxa plan effektləri */
         body::before {
             content: '';
             position: fixed;
@@ -297,7 +294,7 @@
             display: block !important;
         }
 
-        /* YENİ: Kiçik ruh animasiyaları */
+        /* Kiçik ruh animasiyaları */
         .ghost-particle {
             position: absolute;
             font-size: 20px;
@@ -494,7 +491,7 @@
             margin-top: 2px; 
         }
 
-        /* YENİ: Pul popup əvəzinə ruh partikülləri */
+        /* Pul popup əvəzinə ruh partikülləri */
         .ghost-popup { 
             position: absolute; 
             font-size: 24px;
@@ -1161,7 +1158,7 @@
             font-weight: bold;
         }
 
-        /* YENİ: Ruh partikülləri üçün rəng variantları */
+        /* Ruh partikülləri üçün rəng variantları */
         .ghost-red { color: #ff0066; }
         .ghost-blue { color: #0099ff; }
         .ghost-green { color: #00ff99; }
@@ -1169,7 +1166,7 @@
         .ghost-yellow { color: #ffff00; }
         .ghost-cyan { color: #00ffff; }
         
-        /* YENİ: Rewarded Interstitial reklam düyməsi */
+        /* Rewarded Interstitial reklam düyməsi */
         .rewarded-interstitial-btn {
             background: linear-gradient(45deg, #9C27B0, #673AB7);
             color: white;
@@ -1339,7 +1336,7 @@
                             </div>
                         </div>
 
-                        <!-- YENİ ADSGRAM 10 REKLAM + 2 DƏQ + 4 SAAT SİSTEMİ -->
+                        <!-- ADSGRAM 10 REKLAM + 2 DƏQ + 4 SAAT SİSTEMİ -->
                         <div class="bonus-info" style="margin: 12px 0; text-align: center;">
                             <button onclick="showAdsGramVideoReward()" class="adsgram-video-btn" id="adsgramVideoButton">
                                 🎬 Video İzlə & 0.001 AZN Qazan! (0/10)
@@ -1350,7 +1347,7 @@
                             </p>
                         </div>
 
-                        <!-- YENİ: REWARDED INTERSTITIAL REKLAM SİSTEMİ -->
+                        <!-- REWARDED INTERSTITIAL REKLAM SİSTEMİ -->
                         <div class="bonus-info" style="margin: 12px 0; text-align: center;">
                             <button onclick="showRewardedInterstitialAd()" class="rewarded-interstitial-btn" id="rewardedInterstitialButton">
                                 🎁 Hər 50 klikdən sonra reklam izlə & 0.000003 AZN qazan!
@@ -1719,6 +1716,50 @@
 
     <script>
         // =================================================================
+        // TELEGRAM WEBAPP FIX - CloudStorage xətasının qarşısını almaq
+        // =================================================================
+        
+        // Telegram WebApp CloudStorage xətasını həll etmək
+        function initializeTelegramWebApp() {
+            if (window.Telegram && Telegram.WebApp) {
+                try {
+                    // CloudStorage-un mövcud olub-olmadığını yoxla
+                    if (typeof Telegram.WebApp.CloudStorage === 'undefined') {
+                        console.log('ℹ️ CloudStorage dəstəklənmir, lakin WebApp normal işləyəcək');
+                        // CloudStorage olmadan da işləmək üçün alternativ yarat
+                        Telegram.WebApp.CloudStorage = {
+                            setItem: function(key, value) {
+                                console.log('📝 CloudStorage simulyasiya: setItem', key, value);
+                                return Promise.resolve();
+                            },
+                            getItem: function(key) {
+                                console.log('📝 CloudStorage simulyasiya: getItem', key);
+                                return Promise.resolve(null);
+                            },
+                            getItems: function(keys) {
+                                console.log('📝 CloudStorage simulyasiya: getItems', keys);
+                                return Promise.resolve({});
+                            }
+                        };
+                    }
+                    
+                    // WebApp-i işə sal
+                    Telegram.WebApp.expand();
+                    Telegram.WebApp.ready();
+                    
+                    console.log('✅ Telegram WebApp uğurla işə salındı');
+                    return true;
+                } catch (error) {
+                    console.warn('⚠️ Telegram WebApp işə salınarkən xəta:', error);
+                    return false;
+                }
+            } else {
+                console.log('ℹ️ Telegram WebApp mühiti tapılmadı, normal brauzerdə işləyir');
+                return false;
+            }
+        }
+
+        // =================================================================
         // FIREBASE KONFİQURASİYASI
         // =================================================================
         const firebaseConfig = {
@@ -1743,11 +1784,6 @@
             console.error('❌ Firebase xətası:', error);
         }
 
-        // =================================================================
-        // GLOBAL DƏYİŞƏNLƏR
-        // =================================================================
-        let referralUnsubscribe = null;
-        
         // =================================================================
         // OYUN DƏYİŞƏNLƏRİ VƏ SABİTLƏR
         // =================================================================
@@ -1775,11 +1811,11 @@
         const AD_COOLDOWN_MS = 4 * 60 * 60 * 1000; // 4 saat
         const AD_INTERVAL_BETWEEN = 2 * 60 * 1000; // 2 dəqiqə
 
-        // YENİ: REWARDED INTERSTITIAL SABİTLƏRİ
+        // REWARDED INTERSTITIAL SABİTLƏRİ
         const REWARDED_INTERSTITIAL_CLICKS = 50; // Hər 50 klikdən bir
         const REWARDED_INTERSTITIAL_REWARD = 0.000003; // 0.000003 AZN mükafat
 
-        // YENİ: RICHADS VƏ ADEXIUM SABİTLƏRİ
+        // RICHADS VƏ ADEXIUM SABİTLƏRİ
         const RICHADS_INTERVAL = 2 * 60 * 1000; // 2 dəqiqə
         const ADEXIUM_INTERVAL = 90 * 1000; // 90 saniyə
 
@@ -1797,13 +1833,13 @@
                 adsWatchedInSession: 0,
                 nextAdAvailableTime: 0
             },
-            // YENİ: REWARDED INTERSTITIAL MƏLUMATLARI
+            // REWARDED INTERSTITIAL MƏLUMATLARI
             rewardedInterstitialData: {
                 clickCount: 0,
                 lastShownTime: 0,
                 nextAvailableTime: 0
             },
-            // YENİ: RICHADS VƏ ADEXIUM MƏLUMATLARI
+            // RICHADS VƏ ADEXIUM MƏLUMATLARI
             richadsData: {
                 lastShownTime: 0,
                 nextAvailableTime: 0
@@ -1848,7 +1884,7 @@
         const subScreens = document.querySelectorAll('.game-sub-screen');
 
         // =================================================================
-        // YENİ: REWARDED INTERSTITIAL REKLAM SİSTEMİ
+        // REWARDED INTERSTITIAL REKLAM SİSTEMİ
         // =================================================================
 
         // Rewarded Interstitial reklam göstərmək
@@ -1871,9 +1907,15 @@
 
             try {
                 // Rewarded Interstitial reklamı göstər
-                await show_10135032();
+                if (typeof show_10135032 !== 'undefined') {
+                    await show_10135032();
+                    console.log('✅ Rewarded Interstitial reklam tamamlandı');
+                } else {
+                    console.log('⚠️ Rewarded Interstitial SDK tapılmadı, test rejimində işləyir');
+                    // Test rejimi - 3 saniyə gözlə
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                }
                 
-                console.log('✅ Rewarded Interstitial reklam tamamlandı');
                 handleRewardedInterstitialReward();
                 
             } catch (error) {
@@ -2016,7 +2058,7 @@
         }
 
         // =================================================================
-        // YENİ: RICHADS VƏ ADEXIUM REKLAM SİSTEMLƏRİ
+        // RICHADS VƏ ADEXIUM REKLAM SİSTEMLƏRİ
         // =================================================================
 
         // RichAds reklam sistemini başlatmaq
@@ -2159,7 +2201,7 @@
             // Pul əlavə et
             currentUserState.totalMoney += MONEY_PER_CLICK;
 
-            // YENİ: Rewarded Interstitial klik sayını artır
+            // Rewarded Interstitial klik sayını artır
             if (currentUserState.rewardedInterstitialData) {
                 currentUserState.rewardedInterstitialData.clickCount++;
                 
@@ -2540,7 +2582,7 @@
             }
             
             if (adsgramData.nextAdAvailableTime > now) {
-                return adsgramData.nextAdAvailableTime - now;
+                return adsgramData.nextAvailableTime - now;
             }
             
             return 0;
@@ -3137,14 +3179,14 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                         nextAdAvailableTime: 0
                     },
 
-                    // YENİ: REWARDED INTERSTITIAL DATA
+                    // REWARDED INTERSTITIAL DATA
                     rewardedInterstitialData: {
                         clickCount: 0,
                         lastShownTime: 0,
                         nextAvailableTime: 0
                     },
 
-                    // YENİ: RICHADS VƏ ADEXIUM DATA
+                    // RICHADS VƏ ADEXIUM DATA
                     richadsData: {
                         lastShownTime: 0,
                         nextAvailableTime: 0
@@ -3989,30 +4031,12 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
         });
 
         // =================================================================
-        // ADEXIUM REKLAM SİSTEMİ
-        // =================================================================
-
-        // Adexium reklam sistemini başlatmaq
-        function initializeAdexiumAds() {
-            try {
-                // Adexium reklam sisteminin yükləndiyini yoxla
-                if (typeof AdexiumWidget !== 'undefined') {
-                    console.log('✅ Adexium reklam sistemi hazırdır');
-                    return true;
-                } else {
-                    console.log('❌ Adexium reklam sistemi tapılmadı');
-                    return false;
-                }
-            } catch (error) {
-                console.error('Adexium xətası:', error);
-                return false;
-            }
-        }
-
-        // =================================================================
         // BAŞLANĞIÇ FUNKSİYASI
         // =================================================================
         window.addEventListener('load', async function() {
+            // TELEGRAM WEBAPP FIX İLƏ BAŞLA
+            initializeTelegramWebApp();
+            
             // Şəkilləri yüklə
             const IMAGE_CONFIG = {
                 splashImage: "https://i.ibb.co/JFndRdvY/casper.jpg",
@@ -4095,7 +4119,7 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                 }
             }, 2500);
             
-            // YENİ: REWARDED INTERSTITIAL SİSTEMİNİ İŞƏ SAL
+            // REWARDED INTERSTITIAL SİSTEMİNİ İŞƏ SAL
             setTimeout(() => {
                 console.log('🔄 Rewarded Interstitial reklam sistemi başladılır...');
                 console.log('✅ Rewarded Interstitial reklam sistemi hazırdır');
@@ -4139,10 +4163,10 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
             // ADSGRAM VIDEO TİMER İŞƏ SAL
             startAdsGramVideoTimer();
             
-            // YENİ: REWARDED INTERSTITIAL TİMER İŞƏ SAL
+            // REWARDED INTERSTITIAL TİMER İŞƏ SAL
             startRewardedInterstitialTimer();
             
-            // YENİ: RICHADS VƏ ADEXIUM TİMERLƏRİNİ İŞƏ SAL
+            // RICHADS VƏ ADEXIUM TİMERLƏRİNİ İŞƏ SAL
             startRichAdsAndAdexiumTimers();
             
             // AVTOMATİK YENİLƏMƏ
@@ -4152,13 +4176,6 @@ Qeydiyyat zamanı dəvət kodumu daxil et! 🚀`;
                 }
             }, 30000);
 
-            // TELEGRAM WEBAPP ƏLAQƏSİ
-            if (window.Telegram && Telegram.WebApp) {
-                Telegram.WebApp.expand();
-                Telegram.WebApp.ready();
-                console.log('✅ Telegram WebApp aktiv edildi');
-            }
-            
             // İLK ADSGRAM DISPLAY YENİLƏMƏSİ
             setTimeout(() => {
                 updateAdsGramVideoDisplay();
